@@ -3,7 +3,7 @@
 # setuptools, pip, and virtualenv should already be present in the (virtual) python2.7
 # python-devel and mysql-devel were needed for installing mysqlclient
 # install the packages below from a terminal: 
-# $ pip install -r requirements_py2.7.txt
+# $ pip install -r requirements.txt
 
 future >= 0.15.2
 Django >= 1.8.6
