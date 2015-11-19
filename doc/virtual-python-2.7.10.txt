@@ -1,0 +1,68 @@
+FL-22-Oct-2014 Created
+FL-22-Oct-2014 Changed
+
+Create a virtualenv Python-2.7.10
+
+On NB-030018 with CentOS-7.1
+	use the _new_ setuptools
+	use pip instead of easy_install
+	use unicode ucs4 instead of ucs2
+
+-1- Create a normal Python-2.7.10 from its source. 
+	Get Python-2.7.10 from https://www.python.org/downloads/release/python-2710/
+		$ tar -zxf Python-2.7.10.tgz
+		$ cd Python-2.7.10
+	Installation directory will be: ~/opt/Python/python-2.7.10
+		$ export PYTHON_LOCAL=~/opt/Python/python-2.7.10
+		$ ./configure --enable-unicode=ucs4 --prefix=$PYTHON_LOCAL
+		$ make
+
+		The following warnings can be ignored: 
+		Python build finished, but the necessary bits to build these modules were not found:
+			bsddb185			# "Berkeley db 1.85": really old version, so forget it.
+			dl					# "SGI-specific modules", so forget it.
+			imageop				# "These don't work for 64-bit platforms", so forget it.
+			sunaudiodev			# "SunOS specific", so forget it.
+		To find the necessary bits, look in setup.py in detect_modules() for the module's name.
+
+		If there are other modules that could not be built, that can be remedied by installing 
+		the needed additional linux packages, and re-make. 
+		
+		$ make altinstall		# alt: do not [try to] replace /usr/bin/python
+
+	Create a script ~/bin/python2710
+	activate this python
+		$ source ~/bin/python2710
+	check: 
+		$ python -V
+
+
+-2- Add setuptools (pip requires setuptools)
+		$ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
+		 -> setuptools-18.4 in $PYTHON_LOCAL/lib/python2.7/site-packages
+
+-3- Add pip
+	Python 2.7.9 and later (on the python2 series), and Python 3.4 and later include pip by default, 
+	otherwise: 
+		$ easy_install --verbose --prefix=$PYTHON_LOCAL pip
+		-> pip-7.1.2 in $PYTHON_LOCAL/lib/python2.7/site-packages
+
+-4- Add virtualenv
+	The default build directory for pip is /tmp/pip-build/
+	If that is 'taken' by another user, you can specify a different location with 
+			--build <build_dir>
+		$ pip install --verbose --install-option="--prefix=$PYTHON_LOCAL" virtualenv
+		$ pip install --verbose --install-option="--prefix=$PYTHON_LOCAL" --build ~/tmp/pip-build virtualenv
+		-> virtualenv-13.1.2 in $PYTHON_LOCAL/lib/python2.7/site-packages
+
+-5- Create a virtualenv python for hsnmailenbeheer somewhere, say in HSNMAILENBEHEER_PARENT
+		$ cd $HSNMAILENBEHEER_PARENT
+	use the created python
+		$ source ~/bin/python2710
+	create a virtualenv python; its top-level directory will be python2710
+		$ virtualenv python2710
+	use it
+		$ source python2710/bin/activate
+	notice that your prompt is now prefixed with '(python2710)'
+
+[eof]
