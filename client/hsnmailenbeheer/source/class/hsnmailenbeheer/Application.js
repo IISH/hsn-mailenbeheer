@@ -71,10 +71,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
   //port :  443,  // https
   //port : 8000,  // http
   //port : 8443,  // https-alt
-    
-    http_loc : "/hsnmailenbeheer",
-    
-    login_loc : "/hsnmailenbeheer/login",
+
+    http_loc : "/hsnwsgi",
+
+    login_loc : http_loc + "/login",
   //login_loc : "/qx",
     
     http_method : "GET",
@@ -187,8 +187,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
     {    
       console.debug( "getHsnData()" );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsndata/";
-      
+      //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsndata/";
+        var url = this.http_loc + "/gethsndata/";
+
       var method = this.http_method;
       
     //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
@@ -290,8 +291,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "getHsnOpData, opnum: " + opnum );
       
     //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/qx";
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsnopdata";
-      
+      //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsnopdata";
+      var url = this.http_loc + "/gethsnopdata";
+
       var method = this.http_method;
       
       var params = ""
@@ -459,8 +461,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "saveHsnOpData() path: " + path );
       console.debug( data );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + path;
-      
+      //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + path;
+      var url = this.http_loc + path;
+
       var method = this.http_method;
       
     //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
