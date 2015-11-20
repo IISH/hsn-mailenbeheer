@@ -44,7 +44,7 @@ fi
 # Create a workspace
 work=$instance-$version
 if [ -d $work ] ; then
-	rm -rf $work
+    rm -rf $work
 fi
 rsync -av --progress --exclude='build.sh' --exclude='.git' . $work
 echo $revision > $work/revision.txt
@@ -66,18 +66,29 @@ if [ $rc -eq 0 ] ; then
     # ToDo: parse the test report
     mkdir -p "target/test-reports"
 else
-	echo -e "There are test failures."
-	exit $rc
+    echo -e "There are test failures."
+    exit $rc
 fi
 
 
 # Build the java libraries
-$work/client/hsnmailenbeheer/generate.py source
-$work/client/hsnmailenbeheer/generate.py build
-
+for action in source build
+do
+    $work/client/hsnmailenbeheer/generate.py $action
+    rc=$?
+    if [ $rc -ne 0 ] ; then
+        echo -e "Unable to build javascript libraries ${work}/client/hsnmailenbeheer/generate.py ${action}"
+        exit 1
+    fi
+done
 
 # Create the artifact
 mkdir -p target
-tar -pczf target/$instance-$version.tar.gz $work
+build=target/$instance-$version.tar.gz
+tar -pczf $build $work
+if [ ! -f $build ] ; then
+    echo -e "Unable to create the artifact."
+    exit $rc
+fi
 
 exit 0
