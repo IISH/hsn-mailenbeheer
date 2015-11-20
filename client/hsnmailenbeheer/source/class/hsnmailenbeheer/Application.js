@@ -72,7 +72,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
   //port : 8000,  // http
   //port : 8443,  // https-alt
 
-    http_loc : "hsnmailenbeheer",
+    http_loc : '/hsnwsgi',
     
     login_loc : http_loc + '/login',
   //login_loc : "/qx",
