@@ -52,7 +52,7 @@ echo $revision > $work/revision.txt
 
 # Setup and activate a virtual environment
 $p/bin/virtualenv $work/virtualenv
-source $work/virtualenv/bin/activate
+. $work/virtualenv/bin/activate
 
 
 # Retrieve the dependencies
@@ -62,7 +62,7 @@ pip install -r $work/requirements.txt
 # Test
 python $work/server/manage.py test $work/server
 rc=$?
-if [[ $rc == 0 ]] ; then
+if [ $rc -eq 0 ] ; then
     # ToDo: parse the test report
     mkdir -p "target/test-reports"
 else
@@ -79,3 +79,5 @@ $work/client/hsnmailenbeheer/generate.py build
 # Create the artifact
 mkdir -p target
 tar -pczf target/$instance-$version.tar.gz $work
+
+exit 0
