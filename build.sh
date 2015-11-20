@@ -56,7 +56,7 @@ $p/bin/virtualenv $work/virtualenv
 
 
 # Retrieve the dependencies
-pip install -r $work/requirements.txt
+pip install -r $work/requirements.txt --cache-dir=/tmp
 
 
 # Test
