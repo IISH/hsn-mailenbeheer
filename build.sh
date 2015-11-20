@@ -59,6 +59,10 @@ $p/bin/virtualenv $work/virtualenv
 pip install -r $work/requirements.txt --cache-dir=/tmp
 
 
+# Collect the static files
+python $work/server/manage.py --noinput collectstatic
+
+
 # Test
 python $work/server/manage.py test $work/server
 rc=$?
