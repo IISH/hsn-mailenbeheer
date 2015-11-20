@@ -35,7 +35,7 @@ echo "revision=${revision}"
 
 
 
-# Remove any precious builds
+# Remove any previous builds
 if [ -d target ] ; then
     rm -rf target
 fi
@@ -59,6 +59,18 @@ $p/bin/virtualenv $work/virtualenv
 pip install -r $work/requirements.txt --cache-dir=/tmp
 
 
+# Build the javascript libraries
+for action in source build
+do
+    $work/client/hsnmailenbeheer/generate.py $action
+    rc=$?
+    if [ $rc -ne 0 ] ; then
+        echo -e "Unable to build javascript libraries ${work}/client/hsnmailenbeheer/generate.py ${action}"
+        exit 1
+    fi
+done
+
+
 # Collect the static files
 python $work/server/manage.py --noinput collectstatic
 
@@ -75,17 +87,6 @@ else
 fi
 
 
-# Build the java libraries
-for action in source build
-do
-    $work/client/hsnmailenbeheer/generate.py $action
-    rc=$?
-    if [ $rc -ne 0 ] ; then
-        echo -e "Unable to build javascript libraries ${work}/client/hsnmailenbeheer/generate.py ${action}"
-        exit 1
-    fi
-done
-
 # Create the artifact
 mkdir -p target
 build=target/$instance-$version.tar.gz
@@ -94,5 +95,6 @@ if [ ! -f $build ] ; then
     echo -e "Unable to create the artifact."
     exit $rc
 fi
+
 
 exit 0

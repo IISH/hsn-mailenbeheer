@@ -130,7 +130,7 @@ LOGIN_URL = "/accounts/login/"
 HSN_START_DATE = 1811
 
 # local settings: db, ...
-config = os.environ['HSN_MAILENBEHEER_CONFIG']
+config = os.environ.get('HSN_MAILENBEHEER_CONFIG')
 if config:
     try:
         from config import *
