@@ -74,7 +74,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
 
     http_loc : '/hsnwsgi',
     
-    login_loc : http_loc + '/login',
+    login_loc : this.http_loc + '/login',
   //login_loc : "/qx",
     
     http_method : "GET",
