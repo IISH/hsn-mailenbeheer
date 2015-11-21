@@ -48,9 +48,9 @@ if [ -d target ] ; then
 fi
 
 
-# Create a workspacespace
+# Create a workspace
 if [ -d $workspace ] ; then
-    rm -rf $workspace
+    rm -rf $workspace/*
 fi
 rsync -av --progress --exclude='build.sh' --exclude='.git' . $workspace
 echo $revision > $workspace/revision.txt
