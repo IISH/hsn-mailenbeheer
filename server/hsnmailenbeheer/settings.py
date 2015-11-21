@@ -141,8 +141,9 @@ LOGIN_URL = "/accounts/login/"
 HSN_START_DATE = 1811
 
 # local settings: db, ...
-hsn_mailenbeheer_home = os.environ.get('HSN_MAILENBEHEER_SETTINGS')
+hsn_mailenbeheer_home = os.environ.get('HSN_MAILENBEHEER_HOME')
 if hsn_mailenbeheer_home:
+    custom = hsn_mailenbeheer_home + '/settings.py'
     try:
         from custom import *
     except ImportError:
