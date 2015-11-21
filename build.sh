@@ -4,7 +4,7 @@
 #
 # Build script for the project to produce a packaged distribution.
 #
-# Example: ./build.sh hsn-mailenbeheer 1.0.0 /home/mailenbeheer/1.0.0 /usr/share/python/2.7.10
+# Example: ./build.sh hsn-mailenbeheer 1.0.0 /home/hsn-mailenbeheer /usr/share/python/2.7.10
 #
 # Requirements: virtualenv and pip must be installed with the targeted python distribution.
 
@@ -22,9 +22,10 @@ fi
 
 workspace=$3
 if [ -z "$workspace" ] ; then
-    workspace="/home/${instance}/${version}"
-    echo "Setting default workspacespace to ${workspace}"
+    workspace="/home/${instance}"
+    echo "Setting default workspace to ${workspace}"
 fi
+builddir="${workspace}/django"
 
 p=$4
 if [ -z "$p" ] ; then
@@ -36,7 +37,8 @@ fi
 revision=$(git rev-parse HEAD)
 echo "instance=${instance}"
 echo "version=${version}"
-echo "workspacespace=${workspace}"
+echo "workspace=${workspace}"
+echo "builddir=${builddir}"
 echo "python distribution=${p}"
 echo "revision=${revision}"
 
@@ -49,41 +51,41 @@ fi
 
 
 # Create a workspace
-if [ -d $workspace ] ; then
-    rm -rf $workspace/*
+if [ -d $builddir ] ; then
+    rm -rf $builddir
 fi
-rsync -av --progress --exclude='build.sh' --exclude='.git' . $workspace
-echo $revision > $workspace/revision.txt
+rsync -av --progress --exclude='build.sh' --exclude='.git' . $builddir
+echo $revision > $builddir/revision.txt
 
 
 # Setup and activate a virtual environment
-$p/bin/virtualenv $workspace/virtualenv
-. $workspace/virtualenv/bin/activate
+$p/bin/virtualenv $builddir/virtualenv
+. $builddir/virtualenv/bin/activate
 
 
 # Retrieve the dependencies
-pip install -r $workspace/requirements.txt --cache-dir=/tmp
+pip install -r $builddir/requirements.txt --cache-dir=$workspace
 
 
 # Build the javascript libraries
 for action in source build
 do
     echo "generate ${action}"
-    $workspace/client/hsnmailenbeheer/generate.py $action
+    $builddir/client/hsnmailenbeheer/generate.py $action
     rc=$?
     if [ $rc -ne 0 ] ; then
-        echo -e "Unable to install javascript libraries ${workspace}/client/hsnmailenbeheer/generate.py ${action}"
+        echo -e "Unable to install javascript libraries ${builddir}/client/hsnmailenbeheer/generate.py ${action}"
         exit 1
     fi
 done
 
 
 # Collect the static files
-python $workspace/server/manage.py collectstatic --noinput
+python $builddir/server/manage.py collectstatic --noinput
 
 
 # Test
-python $workspace/server/manage.py test $workspace/server
+python $builddir/server/manage.py test $builddir/server
 rc=$?
 if [ $rc -eq 0 ] ; then
     # ToDo: parse the test report
@@ -96,16 +98,16 @@ fi
 
 # Create the artifact
 mkdir -p target
-build=target/$instance-$version.tar.gz
-tar -pczf $build $workspace
+package=target/$instance-$version.tar.gz
+tar -pczf $package -C $workspace $instance-$version
 
 
 # clean up
 deactivate
-rm -rf $workspace/*
+rm -rf $builddir
 
 
-if [ -f $build ] ; then
+if [ -f $package ] ; then
     echo "I think we are done for today."
     exit 0
 else
