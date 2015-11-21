@@ -8,6 +8,9 @@
 #
 # Requirements: virtualenv and pip must be installed with the targeted python distribution.
 
+APPLICATION_NAME="django"
+
+
 instance=$1
 if [ -z "$instance" ] ; then
     instance="hsn-mailenbeheer"
@@ -25,7 +28,7 @@ if [ -z "$workspace" ] ; then
     workspace="/home/${instance}"
     echo "Setting default workspace to ${workspace}"
 fi
-builddir="${workspace}/django"
+builddir="${workspace}/${APPLICATION_NAME}"
 
 p=$4
 if [ -z "$p" ] ; then
@@ -99,7 +102,7 @@ fi
 # Create the artifact
 mkdir -p target
 package=target/$instance-$version.tar.gz
-tar -pczf $package -C $workspace $instance-$version
+tar -pczf $package -C $workspace $APPLICATION_NAME
 
 
 # clean up
