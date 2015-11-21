@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		admin.py
-Version:	0.2
+Version:	1.0.0
 Goal:		Admin classes for the mail tables
 
 26-May-2015	Created

@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		settings.py
-Version:	0.3
+Version:	1.0.0
 Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
@@ -30,6 +30,15 @@ print("Django version: %s" % DJANGO_MAJ_MIN, file=sys.stderr)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT   = os.path.abspath( os.path.dirname( __file__ ) )
+PROJECT_PARENT = os.path.dirname( PROJECT_ROOT )
+PROJECT_GRANNY = os.path.dirname( PROJECT_PARENT )
+STATIC_ROOT = os.path.abspath( os.path.join( PROJECT_GRANNY, "static" ) )
+print( "STATIC_ROOT:", STATIC_ROOT )
+print( "PROJECT_ROOT:", PROJECT_ROOT )
+print( "PROJECT_PARENT:", PROJECT_PARENT )
+print( "PROJECT_GRANNY:", PROJECT_GRANNY )
+
 
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -134,7 +143,7 @@ HSN_START_DATE = 1811
 # local settings: db, ...
 hsn_mailenbeheer_home = os.environ.get('HSN_MAILENBEHEER_HOME')
 if hsn_mailenbeheer_home:
-    custom = hsn_mailenbeheer_home + '/*_settings.py'
+    custom = hsn_mailenbeheer_home + '/settings.py'
     try:
         from custom import *
     except ImportError:

@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		print.py
-Version:	0.2
+Version:	1.0.0
 Goal:		Send letters to printer
 Notice:		A PostScript letter is created, saved, and sent trough CUPS to the default printer
 

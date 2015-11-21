@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		urls.py
-Version:	0.2
+Version:	1.0.0
 Goal:		URL dispatcher
 
 26-May-2015	Created

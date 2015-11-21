@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     0.9
+ * Version:     1.0.0
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *

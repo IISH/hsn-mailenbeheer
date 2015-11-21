@@ -62,17 +62,18 @@ pip install -r $work/requirements.txt --cache-dir=/tmp
 # Build the javascript libraries
 for action in source build
 do
+    echo "generate ${action}"
     $work/client/hsnmailenbeheer/generate.py $action
     rc=$?
     if [ $rc -ne 0 ] ; then
-        echo -e "Unable to build javascript libraries ${work}/client/hsnmailenbeheer/generate.py ${action}"
+        echo -e "Unable to install javascript libraries ${work}/client/hsnmailenbeheer/generate.py ${action}"
         exit 1
     fi
 done
 
 
 # Collect the static files
-python $work/server/manage.py --noinput collectstatic
+python $work/server/manage.py collectstatic --noinput
 
 
 # Test
@@ -91,10 +92,18 @@ fi
 mkdir -p target
 build=target/$instance-$version.tar.gz
 tar -pczf $build $work
-if [ ! -f $build ] ; then
+
+
+# clean up
+rm -rf $work
+
+
+if [ -f $build ] ; then
+    echo "I think we are done for today."
+    exit 0
+else
     echo -e "Unable to create the artifact."
-    exit $rc
+    exit 1
 fi
 
-
-exit 0
+exit 1
