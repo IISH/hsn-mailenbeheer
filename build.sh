@@ -102,7 +102,7 @@ tar -pczf $build $workspace
 
 # clean up
 deactivate
-rm -rf $workspace
+rm -rf $workspace/*
 
 
 if [ -f $build ] ; then
