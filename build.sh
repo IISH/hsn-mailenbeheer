@@ -109,8 +109,9 @@ tar -pczf $package -C $workspace $APPLICATION_NAME
 deactivate
 rm -rf $builddir
 
-
-if [ -f $package ] ; then
+tar tf $package
+rc=$?
+if [ $rc -eq 0 ] ; then
     echo "I think we are done for today."
     exit 0
 else
