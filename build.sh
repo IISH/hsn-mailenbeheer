@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ./build.sh [instance] [version] [python distribution]
+# ./build.sh [instance] [version] [workspace] [python distribution]
 #
 # Build script for the project to produce a packaged distribution.
 #
@@ -20,7 +20,13 @@ if [ -z "$version" ] ; then
     echo "Setting default version to ${version} "
 fi
 
-p=$3
+workspace=$3
+if [ -z "$workspace" ] ; then
+    workspace="/home/${instance}"
+    echo "Setting default workspacespace to ${workspace}"
+fi
+
+p=$4
 if [ -z "$p" ] ; then
     p=$(which python)
     echo "Setting default python to system ${p}"
@@ -30,6 +36,7 @@ fi
 revision=$(git rev-parse HEAD)
 echo "instance=${instance}"
 echo "version=${version}"
+echo "workspacespace=${workspace}"
 echo "python distribution=${p}"
 echo "revision=${revision}"
 
@@ -41,43 +48,42 @@ if [ -d target ] ; then
 fi
 
 
-# Create a workspace
-work=$instance-$version
-if [ -d $work ] ; then
-    rm -rf $work
+# Create a workspacespace
+if [ -d $workspace ] ; then
+    rm -rf $workspace
 fi
-rsync -av --progress --exclude='build.sh' --exclude='.git' . $work
-echo $revision > $work/revision.txt
+rsync -av --progress --exclude='build.sh' --exclude='.git' . $workspace
+echo $revision > $workspace/revision.txt
 
 
 # Setup and activate a virtual environment
-$p/bin/virtualenv $work/virtualenv
-. $work/virtualenv/bin/activate
+$p/bin/virtualenv $workspace/virtualenv
+. $workspace/virtualenv/bin/activate
 
 
 # Retrieve the dependencies
-pip install -r $work/requirements.txt --cache-dir=/tmp
+pip install -r $workspace/requirements.txt --cache-dir=/tmp
 
 
 # Build the javascript libraries
 for action in source build
 do
     echo "generate ${action}"
-    $work/client/hsnmailenbeheer/generate.py $action
+    $workspace/client/hsnmailenbeheer/generate.py $action
     rc=$?
     if [ $rc -ne 0 ] ; then
-        echo -e "Unable to install javascript libraries ${work}/client/hsnmailenbeheer/generate.py ${action}"
+        echo -e "Unable to install javascript libraries ${workspace}/client/hsnmailenbeheer/generate.py ${action}"
         exit 1
     fi
 done
 
 
 # Collect the static files
-python $work/server/manage.py collectstatic --noinput
+python $workspace/server/manage.py collectstatic --noinput
 
 
 # Test
-python $work/server/manage.py test $work/server
+python $workspace/server/manage.py test $workspace/server
 rc=$?
 if [ $rc -eq 0 ] ; then
     # ToDo: parse the test report
@@ -91,11 +97,12 @@ fi
 # Create the artifact
 mkdir -p target
 build=target/$instance-$version.tar.gz
-tar -pczf $build $work
+tar -pczf $build $workspace
 
 
 # clean up
-rm -rf $work
+deactivate
+rm -rf $workspace
 
 
 if [ -f $build ] ; then
