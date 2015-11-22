@@ -141,13 +141,10 @@ LOGIN_URL = "/accounts/login/"
 HSN_START_DATE = 1811
 
 # local settings: db, ...
-hsn_mailenbeheer_home = os.environ.get('HSN_MAILENBEHEER_HOME')
-if hsn_mailenbeheer_home:
-    custom = hsn_mailenbeheer_home + '/settings.py'
-    try:
-        from custom import *
-    except ImportError:
-        print("Unable to find or parse the config file from {}".format(custom), file=sys.stderr)
-        pass
+try:
+    from hsnmailenbeheer.settings_local import *
+except ImportError:
+    print( "No file settings_local", file = sys.stderr )
+    pass
 
 # [eof]
