@@ -58,7 +58,6 @@ if [ -d $builddir ] ; then
     rm -rf $builddir
 fi
 rsync -av --progress --exclude='build.sh' --exclude='.git' . $builddir
-echo $revision > $builddir/revision.txt
 
 
 # Setup and activate a virtual environment
@@ -85,6 +84,7 @@ done
 
 # Collect the static files
 python $builddir/server/manage.py collectstatic --noinput
+echo $revision > $builddir/static/revision.txt
 
 
 # Test
