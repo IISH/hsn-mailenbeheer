@@ -65,7 +65,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
     protocol : null,
     port :   null,  // http
 
-    http_loc : '/wsgi',
+    http_loc : '/hsnmailenbeheer_wsgi',
     
     login_loc : 'login',
   //login_loc : "/qx",
