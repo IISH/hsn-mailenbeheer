@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		views.py
-Version:	0.3
+Version:	1.0.0
 Goal:		View for hsn_manage
 
 Functions:

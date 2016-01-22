@@ -107,7 +107,7 @@ hsnmailenbeheer installation
 	hsnmailenbeheer/client/hsnmailenbeheer/build/index.html
 		the entry point for Apache to retrieve the GUI
 	
-	HSN-mai/server/hsnmailenbeheer/wsgi.py
+	hsnmailenbeheer/server/hsnmailenbeheer/wsgi.py
 	is the entry point for Apache to execute the Python code; 
 	and it activates the python version to be used. 
 	In order to be able do this, apache needs the mod_wsgi extension. 

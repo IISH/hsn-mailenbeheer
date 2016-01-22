@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     0.9
+ * Version:     1.0.0
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -61,20 +61,13 @@ qx.Class.define( "hsnmailenbeheer.Application",
     
     timestamp_client : "17-Nov-2015 11:54",
     
-    host : "localhost",
-  //host : "127.0.0.1",
-    
-    protocol : "http",
-  //protocol : "https",
-    
-    port :   80,  // http
-  //port :  443,  // https
-  //port : 8000,  // http
-  //port : 8443,  // https-alt
+    host : null,
+    protocol : null,
+    port :   null,  // http
 
-    http_loc : "/hsnwsgi",
-
-    login_loc : http_loc + "/login",
+    http_loc : '/hsnmailenbeheer_wsgi',
+    
+    login_loc : 'login',
   //login_loc : "/qx",
     
     http_method : "GET",
@@ -178,7 +171,22 @@ qx.Class.define( "hsnmailenbeheer.Application",
       */
 
     }, // main
-    
+
+
+      /**
+       * url
+       *
+       * Construct a url
+        * @param path
+       *
+       */
+        url : function( path ) {
+          var protocol = ( this.protocol ) ? this.protocol + '://' : '';
+          var host = ( this.host ) ? this.host : '';
+          var port = ( this.port && this.host ) ? ':' + this.port : '';
+          var _path = ( path ) ? '/' + path : '';
+          return protocol + host + port + this.http_loc + _path;
+      },
     
     /**
      * getHsnData
@@ -186,9 +194,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
     getHsnData : function( timestamp_client )
     {    
       console.debug( "getHsnData()" );
-      
-      //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsndata/";
-        var url = this.http_loc + "/gethsndata/";
+
+      var url =  this.url('gethsndata/');
 
       var method = this.http_method;
       
@@ -290,9 +297,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       if( opnum == null ) { opnum = ""; }
       console.debug( "getHsnOpData, opnum: " + opnum );
       
-    //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/qx";
-      //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsnopdata";
-      var url = this.http_loc + "/gethsnopdata";
+        var url = this.url('gethsnopdata');
 
       var method = this.http_method;
       
@@ -461,8 +466,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "saveHsnOpData() path: " + path );
       console.debug( data );
       
-      //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + path;
-      var url = this.http_loc + path;
+        var url = this.url(path) ;
 
       var method = this.http_method;
       
@@ -5518,7 +5522,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         this.password = password;       // default password
       }
 
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.login_loc;
+        var url = this.url(this.login_loc);
 
     //var responseType = "text/html";
 
