@@ -75,7 +75,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
     http_loc : "/hsnmailenbeheer_wsgi",
     
     login_loc : "/hsnmailenbeheer_wsgi/login",
-  //login_loc : "/qx",
     
     http_method : "GET",
   //http_method : "POST",
@@ -178,7 +177,22 @@ qx.Class.define( "hsnmailenbeheer.Application",
       */
 
     }, // main
-    
+
+
+      /**
+       * url
+       *
+       * Construct a url
+        * @param path
+       *
+       */
+        url : function( path ) {
+          var protocol = ( this.protocol ) ? this.protocol + '://' : '';
+          var host = ( this.host ) ? this.host : '';
+          var port = ( this.port && this.host ) ? ':' + this.port : '';
+          var _path = ( path ) ? '/' + path : '';
+          return protocol + host + port + this.http_loc + _path;
+      },
     
     /**
      * getHsnData
@@ -186,9 +200,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
     getHsnData : function( timestamp_client )
     {    
       console.debug( "getHsnData()" );
-      
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsndata/";
-      
+
+      var url =  this.url('gethsndata/');
+
       var method = this.http_method;
       
     //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
@@ -289,9 +303,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
       if( opnum == null ) { opnum = ""; }
       console.debug( "getHsnOpData, opnum: " + opnum );
       
-    //var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/qx";
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + "/gethsnopdata";
-      
+        var url = this.url('gethsnopdata');
+
       var method = this.http_method;
       
       var params = ""
@@ -459,8 +472,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "saveHsnOpData() path: " + path );
       console.debug( data );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_loc + path;
-      
+        var url = this.url(path) ;
+
       var method = this.http_method;
       
     //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
@@ -5515,7 +5528,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         this.password = password;       // default password
       }
 
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.login_loc;
+        var url = this.url(this.login_loc);
 
     //var responseType = "text/html";
 

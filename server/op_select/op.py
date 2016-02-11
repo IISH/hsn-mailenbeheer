@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		op.py
-Version:	0.1
+Version:	1.0.0
 Goal:		'OP' te Onderzoeken Persoon (person to be investigated) functions
 
 Functions:

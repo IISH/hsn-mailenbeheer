@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		print.py
-Version:	0.1
+Version:	1.0.0
 Goal:		Show printers
 Notice:		Derived from cupstree; original cupstree code from: 
 			/usr/share/doc/python-cups-doc-1.9.63/examples/cupstree.py
