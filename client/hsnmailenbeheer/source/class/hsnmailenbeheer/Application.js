@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     0.9
+ * Version:     1.0.0
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -35,7 +35,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-17-Nov-2015: Changed
+ * FL-11-Feb-2016: Changed
  */
 
 /**
@@ -59,7 +59,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "17-Nov-2015 11:54",
+    timestamp_client : "11-Feb-2016 15:14",
     
     host : "localhost",
   //host : "127.0.0.1",
@@ -72,9 +72,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
   //port : 8000,  // http
   //port : 8443,  // https-alt
     
-    http_loc : "/hsnmailenbeheer",
+    http_loc : "/hsnmailenbeheer_wsgi",
     
-    login_loc : "/hsnmailenbeheer/login",
+    login_loc : "/hsnmailenbeheer_wsgi/login",
   //login_loc : "/qx",
     
     http_method : "GET",
@@ -160,7 +160,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       // actual application code...
       qx.locale.Manager.getInstance().setLocale( "nl" );
       console.debug( "Qooxdoo version: " + qx.core.Environment.get( 'qx.version' ) );
-      console.debug( "host:", + this.host + ", port: " + this.port );
+      console.debug( "host: " + this.host + ", port: " + this.port );
       
       this.getHsnData( this.timestamp_client );    // get 'static' data; then create and fill the windows
       
