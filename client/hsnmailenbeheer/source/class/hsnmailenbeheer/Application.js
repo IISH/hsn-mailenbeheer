@@ -35,7 +35,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-11-Feb-2016: Changed
+ * FL-22-Feb-2016: Changed
  */
 
 /**
@@ -69,7 +69,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
     
     port :   80,  // http
   //port :  443,  // https
-  //port : 8000,  // http
+  //port : 8000,  // http Django dev server default port
   //port : 8443,  // https-alt
     
     http_loc : "/hsnmailenbeheer_wsgi",
@@ -183,7 +183,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
        * url
        *
        * Construct a url
-        * @param path
+        * @param path {string} 
        *
        */
         url : function( path ) {
