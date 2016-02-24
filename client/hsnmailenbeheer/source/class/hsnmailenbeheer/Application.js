@@ -8,6 +8,7 @@
  *
  * functions:
  * main                 : function()
+ * url                  : function( path )
  * getHsnData           : function()
  * getHsnOpData         : function( ev )
  * saveHsnOpData        : function( path, data )
@@ -35,7 +36,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-22-Feb-2016: Changed
+ * FL-24-Feb-2016: Changed
  */
 
 /**
@@ -155,54 +156,59 @@ qx.Class.define( "hsnmailenbeheer.Application",
         qx.log.appender.Native;   // support native logging capabilities, e.g. Firebug for Firefox
         qx.log.appender.Console;  // support additional cross-browser console. Press F7 to toggle visibility
       }
-
+      
       // actual application code...
       qx.locale.Manager.getInstance().setLocale( "nl" );
       console.debug( "Qooxdoo version: " + qx.core.Environment.get( 'qx.version' ) );
       console.debug( "host: " + this.host + ", port: " + this.port );
       
-      this.getHsnData( this.timestamp_client );    // get 'static' data; then create and fill the windows
-      
+    //this.createLogin( this.timestamp_client );
+      this.createLogin();
+    //this.getHsnData( this.timestamp_client );    // get 'static' data; then create and fill the windows
       
       // New Dialog
       /*
       this.__uiWindow = new hsnmailenbeheer.UserDialog();
       this.__uiWindow.moveTo(320, 30);
       this.__uiWindow.open();
-
+      
       // Adding the listener for pressing "Ok"
       this.__uiWindow.addListener( "changeUserData", function ( ev ) {
         this.debug( ev.getData() );
       });
       */
-
+      
     }, // main
 
 
-      /**
-       * url
-       *
-       * Construct a url
-        * @param path {string} 
-       *
-       */
-        url : function( path ) {
-          var protocol = ( this.protocol ) ? this.protocol + '://' : '';
-          var host = ( this.host ) ? this.host : '';
-          var port = ( this.port && this.host ) ? ':' + this.port : '';
-          var _path = ( path ) ? '/' + path : '';
-          return protocol + host + port + this.http_loc + _path;
-      },
-    
+
+    /**
+      * url
+      *
+      * Construct a url
+      * @param path {string} 
+      */
+      url : function( path ) 
+      {
+        var protocol = ( this.protocol ) ? this.protocol + '://' : '';
+        var host = ( this.host ) ? this.host : '';
+        var port = ( this.port && this.host ) ? ':' + this.port : '';
+        var _path = ( path ) ? '/' + path : '';
+        return protocol + host + port + this.http_loc + _path;
+    },
+
+
+
     /**
      * getHsnData
      */
-    getHsnData : function( timestamp_client )
+  //getHsnData : function( timestamp_client )
+    getHsnData : function()
     {    
       console.debug( "getHsnData()" );
-
+      
       var url =  this.url('gethsndata/');
-
+      
       var method = this.http_method;
       
     //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
@@ -248,8 +254,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
             this.location_array.push( loc_arr );
           }
           
-          console.debug( "timestamp client: " + timestamp_client );
-          console.debug( "timestamp server: " + this.HSN.timestamp_server );
+        //console.debug( "timestamp client: " + timestamp_client );
+        //console.debug( "timestamp server: " + this.HSN.timestamp_server );
           
           // now create the windows, and fill some of their data structures
           this.createWindows();
@@ -597,8 +603,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         this
       );
       
-      this.window0.open();  // start screen
-    //this.createLogin();
+    this.window0.open();  // start screen
       
     }, // createWindows
     
@@ -5245,6 +5250,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
     showDialog : function( text )
     {
       console.debug( "showDialog()" );
+      console.debug( text );
+      
     //if( ! this.__dlg )
     //{
         var dlg = this.__dlg = new qx.ui.window.Window().set({
@@ -5395,17 +5402,25 @@ qx.Class.define( "hsnmailenbeheer.Application",
 
     _AuthenticateResponse : function( ev )
     {
+      console.debug( "_AuthenticateResponse()" );
+      console.debug( "_AuthenticateResponse() this.timestamp_client: " + this.timestamp_client );
+      
       this.io_login = this.IO_SUCCESS;
       var request = ev.getTarget();
-
+      
       // Response parsed according to the server's response content type, e.g. JSON
       var json_data = request.getResponse();
       console.debug( json_data );
       
       var content_type = request.getResponseContentType();
+      console.debug( "content_type: " + content_type );
       if( content_type !== "application/json" )
-      { this.createAlert( "unexpected response:<br>" + request.getResponseText() ); }   // unparsed
-
+      { 
+        var msg = "unexpected response:<br>" + request.getResponseText();
+        this.showDialog( msg );
+      //this.createAlert( msg ); // unparsed
+      }   
+      
       /*
       if( this.debugIE )    // debug: still have problems with IE
       {
@@ -5414,25 +5429,27 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var response_raw = request.getResponseText();       // unparsed
           var head = response_raw.substr( 0, 400 );
-          this.createAlert( "raw response:<br>" + head );
-
+          this.showDialog( "raw response:<br>" + head );
+        //this.createAlert( "raw response:<br>" + head );
+          
           var head = response.substr( 0, 400 );
-          this.createAlert( "parsed response:<br>" + head );
+          this.showDialog( "parsed response:<br>" + head );
+        //this.createAlert( "parsed response:<br>" + head );
         }
       }
       */
-
+      
       /*
       if( this.debugIE )
       {
         var nativeXhr = request.getTransport().getRequest();
-
-        this.createAlert( "nativeXhr:<br>" + nativeXhr );
-        this.createAlert( "nativeXhr.response:<br>" + nativeXhr.response );
-        this.createAlert( "nativeXhr.status:<br>" + nativeXhr.status );
-        this.createAlert( "nativeXhr.statusText:<br>" + nativeXhr.statusText );
-        this.createAlert( "nativeXhr.responseText:<br>" + nativeXhr.responseText );
-
+        
+        this.showDialog( "nativeXhr:<br>" + nativeXhr );
+        this.showDialog( "nativeXhr.response:<br>" + nativeXhr.response );
+        this.showDialog( "nativeXhr.status:<br>" + nativeXhr.status );
+        this.showDialog( "nativeXhr.statusText:<br>" + nativeXhr.statusText );
+        this.showDialog( "nativeXhr.responseText:<br>" + nativeXhr.responseText );
+        
       //console.debug( nativeXhr );
       //console.debug( nativeXhr.response );
       //console.debug( nativeXhr.status );
@@ -5445,42 +5462,19 @@ qx.Class.define( "hsnmailenbeheer.Application",
       this.info( "resp_status: " + resp_status );
       this.python_version   = json_data.python_version;
       this.django_version   = json_data.django_version;
-      this.server_timestamp = json_data.timestamp;
-    //console.debug( "server_timestamp: " + this.server_timestamp );
-
+      this.timestamp_server = json_data.timestamp;
+      console.debug( "timestamp_server: " + this.timestamp_server );
+      
       if( resp_status === "ok" )
       {
-        if( this.username !== "guest" )      // enable buddy mode
+        if( this.username !== "guest" )
         {
-          this.rbtnBuddy.setEnabled( true );
-          this.buddyList = json_data.buddies;
-          if( this.username === "Piek" || 
-              this.username === "Attila" || 
-              this.username === "Fons" || 
-              this.username === "Isa" || 
-              this.username === "Hennie" )
-          { this.btnSourceWords.setEnabled( true ); }
-          else
-          { this.btnSourceWords.setEnabled( false ); }
-          this.menuSource.add( this.btnSourceWords );
+          this.showDialog( this.tr( "Welcome" ) + " " + this.username );
         }
         else
         {
-          this.btnTagsave.setEnabled( false );     // no tagsaving for guest account
-          this.btnUnTagsave.setEnabled( false );   // no untagging for guest account
-          this.buddyList = [];                     // no buddies for guest
-          this.createAlert( this.tr( "Welcome guest" ) );
+          this.showDialog( this.tr( "Welcome guest" ) );
         }
-
-        this.nounList   = json_data.nouns;
-        this.verbList   = json_data.verbs;
-        this.adjectList = json_data.adjects;
-        this.totalList  = json_data.totals;
-
-        if( this.nounList   == undefined ) { this.nounList   = {}; }
-        if( this.verbList   == undefined ) { this.verbList   = {}; }
-        if( this.adjectList == undefined ) { this.adjectList = {}; }
-        if( this.totalList  == undefined ) { this.totalList  = {}; }
       }
       else
       {
@@ -5491,15 +5485,20 @@ qx.Class.define( "hsnmailenbeheer.Application",
         msg += "<br>Message: " + server_msg;
       //msg += "<br><br>You can proceed as guest, but your tagging actions will not be saved.";
       //msg += "<br><br>You can retry to login by reloading the page.";
-        this.createAlert( msg );
+        this.showDialog( msg );
+      //this.createAlert( msg );
         this.createLogin();
       }
-
-      if( this.client_timestamp !== this.server_timestamp )
-      { this.createAlert( "client/server timestamp mismatch<br>version " + this.client_timestamp + " client<br>version " + this.server_timestamp + " server<br><br> This can be an innocent oversight, or it could imply a potential problem. Start with flushing your browser cache, and restarting the browser." ); }
-
-      this.createConfig();      // using _buddyList
-      this.createListWindow();
+      
+      if( this.timestamp_client !== this.timestamp_server )
+      { 
+        var msg = "client/server timestamp mismatch<br>version " + this.timestamp_client + " client<br>version " + this.timestamp_server + " server<br><br> This can be an innocent oversight, or it could imply a potential problem. Start with flushing your browser cache, and restarting the browser.";
+        this.showDialog( msg );
+      //this.createAlert( msg );
+      }
+      
+    //this.createConfig();      // using _buddyList
+    //this.createListWindow();
     }, // _AuthenticateResponse
 
 
@@ -5511,27 +5510,28 @@ qx.Class.define( "hsnmailenbeheer.Application",
 
     
     
-    _doAuthenticate : function()
+    _doAuthenticate : function( ev )
     {
-    //this.consolelog( "_doAuthenticate()" );
+      console.debug( "_doAuthenticate()" );
+      console.debug( "_doAuthenticate() this.timestamp_client: " + this.timestamp_client );
+      
+      
     //this.__effect.start();
-     //var username = this.fieldUsername.getValue();
-     //var password = this.fieldPassword.getValue();
-      var username = "guest";
-      var password = "guest";
-
+      this.username = this.fieldUsername.getValue();
+      this.password = this.fieldPassword.getValue();
+      
+      console.debug( "username :", this.username );
+      console.debug( "password :", this.password );
+      
       //this.__container.hide();
-
-      if( ! ( username === null && password === null ) )
-      {
-        this.username = username;       // default username
-        this.password = password;       // default password
-      }
-
-        var url = this.url(this.login_loc);
-
+      
+      if( this.username === null || this.password === null )
+      { return; }
+      
+      var url = this.url( this.login_loc );
+      
     //var responseType = "text/html";
-
+      
       var method = this.http_method;
       var params = "";
       
@@ -5539,7 +5539,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       { params += "?"; }
       else if( method === "POST" )  // use POST for login.
       { url += '/'; }               // required: POST + Django: APPEND_SLASH
-
+      
       if( this.debugIE )
       { params += "qxenv:qx.debug.io:true"; }
       
@@ -5553,25 +5553,24 @@ qx.Class.define( "hsnmailenbeheer.Application",
         params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
         params += "&pwd=" + encodeURIComponent( this.password );
       }
-
+      
       if( method === "GET" )
       { url += params; }
       console.debug( url );
       
       var request = new qx.io.request.Xhr( url );
       request.setMethod( method );
-
+      
       if( method === "POST" )           // set parameters in data
       { request.setRequestData( params ); }
-
-
+      
       request.addListener
       (
         "success",
-        function( ev ) { this.AuthenticateResponse( ev ); },
+        function( ev ) { this._AuthenticateResponse( ev ); },
         this
       );
-
+      
       request.addListener
       (
         "fail",
@@ -5579,16 +5578,18 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           this.io_login = this.IO_FAIL;
           var request = ev.getTarget();
-
+          
           var msg = "Authentication info:<br>failed, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
-          this.createAlert( msg );
-
+          this.showDialog( msg );
+        //this.createAlert( msg );
+          
           var response = request.getResponse();
-          this.createAlert( response );
+          this.showDialog( response );
+        //this.createAlert( response );
         },
         this
       );
-
+      
       request.addListener
       (
         "load",
@@ -5599,7 +5600,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         },
         this
       );
-
+      
       request.addListener
       (
         "readystatechange",
@@ -5611,21 +5612,23 @@ qx.Class.define( "hsnmailenbeheer.Application",
         },
         this
       );
-
+      
       request.addListener
       (
         "timeout",
         function( ev ) 
         {
           this.io_login = this.IO_TIMEOUT;
-          this.createAlert( "Authentication info:<br>timeout<br><br>The server is too busy, please take a break, try again later, and reload this web app" );
+          var msg = "Authentication info:<br>timeout<br><br>The server is too busy, please take a break, try again later, and reload this web app";
+          this.showDialog( msg );
+        //this.createAlert( msg );
         },
         this
       );
-
+      
       request.send();             // Send the request
     }, // _doAuthenticate
-
+    
     /*
     __prepareEffect : function()
     {
@@ -5634,22 +5637,23 @@ qx.Class.define( "hsnmailenbeheer.Application",
     */
 
 
+
     createLogin : function()
     {
-    //this.consolelog( "createLogin()" );
-    //this.base(arguments);
-
+      console.debug( "createLogin()" );
+      console.debug( "createLogin() this.timestamp_client: " + this.timestamp_client );
+      
       // Container layout
       var layout = new qx.ui.layout.Grid( 9, 5 );
       layout.setColumnAlign( 0, "right", "top" );
       layout.setColumnAlign( 2, "right", "top" );
-
+      
       // Container widget
       this.__container = new qx.ui.groupbox.GroupBox().set({
         contentPadding: [ 16, 16, 16, 16 ]
       });
       this.__container.setLayout( layout );
-
+      
       this.__container.addListener( "resize", function( ev )
       {
         var bounds = this.__container.getBounds();
@@ -5658,9 +5662,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
           marginLeft : Math.round( -bounds.width  / 2 )
         });
       }, this);
-
-      this.getRoot().add(this.__container, { left : "50%", top : "41%" });
-
+      
+      this.getRoot().add( this.__container, { left : "50%", top : "41%" } );
+      
       // Labels
       var labels = [ this.tr("Username"), this.tr("Password") ];
       for( var i = 0; i < labels.length; i++ )
@@ -5670,23 +5674,23 @@ qx.Class.define( "hsnmailenbeheer.Application",
           paddingTop   : 3
         }), {row : i, column : 0});
       }
-
+      
       // Text fields
       var fieldUsr = new qx.ui.form.TextField();
       var fieldPwd = new qx.ui.form.PasswordField();
       this.fieldUsername = fieldUsr;
       this.fieldPassword = fieldPwd;
-
+      
       this.__container.add( fieldUsr.set({
         allowShrinkX : false,
         paddingTop   : 3
       }), { row : 0, column : 1 });
-
+      
       this.__container.add(fieldPwd.set({
         allowShrinkX : false,
         paddingTop   : 3
       }), { row : 1, column : 1 });
-
+      
       // PasswordField has no "execute" event
       fieldPwd.addListener
       (
@@ -5694,15 +5698,15 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev )
         {
           if( ev.getKeyIdentifier() === "Enter" )
-          { this.doAuthenticate(); }
+          { this._doAuthenticate( ev ); }
         }, 
         this
       );
-
+      
       // Button
       var btnLogin = this.__btnOk =  new qx.ui.form.Button( this.tr( "Login" ) );
       btnLogin.setAllowStretchX( false );
-
+      
       this.__container.add(
         btnLogin,
         {
@@ -5710,83 +5714,22 @@ qx.Class.define( "hsnmailenbeheer.Application",
           column : 1
         }
       );
-
+      
       // Check input on click
-      btnLogin.addListener( "execute", this._doAuthenticate, this );
-
+      btnLogin.addListener
+      ( 
+        "execute", 
+        function( ev ) { this._doAuthenticate( ev ); },
+        this 
+      );
+      
       this.__container.addListener( "appear", function()
       {
-        this.__prepareEffect();     // shake widget when login is wrong
+      //this.__prepareEffect();     // shake widget when login is wrong
         fieldUsr.focus();           // so that user can start typing his/her name right away
       }, this);
-    }, // createLogin
+    } // createLogin
     
-    
-    
-    /**
-     * createAlert
-     */
-    /*
-    createAlert : function( msg )
-    {
-      (
-      //new dialog.Alert({
-      //new dutchsemcor.Alert({
-        new hsnmailenbeheer.Alert({
-          message : msg
-        })
-      ).show();
-    } // createAlert
-    */
-    
-    
-    statics: 
-    {
-      DATA: 
-      [
-        ["1","libgtop-2.0/glibtop_server"],
-        ["2","libgtop-2.0/glibtop"],
-        ["3","libgtop-2.0/libgtopconfig"],
-        ["4","libgtop-2.0/glibtop_machine"],
-        ["5","libgtop-2.0/glibtop/mem"],
-        ["6","libgtop-2.0/glibtop/command"],
-        ["7","libgtop-2.0/glibtop/sem_limits"],
-        ["8","libgtop-2.0/glibtop/version"],
-        ["9","libgtop-2.0/glibtop/procmem"],
-        ["10","libgtop-2.0/glibtop/prockernel"],
-        ["11","libgtop-2.0/glibtop/procaffinity"],
-        ["12","libgtop-2.0/glibtop/fsusage"],
-        ["13","libgtop-2.0/glibtop/netlist"],
-        ["14","libgtop-2.0/glibtop/procsignal"],
-        ["15","libgtop-2.0/glibtop/gnuserv"],
-        ["16","libgtop-2.0/glibtop/proclist"],
-        ["17","libgtop-2.0/glibtop/netload"],
-        ["18","libgtop-2.0/glibtop/procuid"],
-        ["19","libgtop-2.0/glibtop/sysinfo"],
-        ["20","libgtop-2.0/glibtop/swap"],
-        ["21","libgtop-2.0/glibtop/procmap"],
-        ["22","libgtop-2.0/glibtop/proctime"],
-        ["23","libgtop-2.0/glibtop/sysdeps"],
-        ["24","libgtop-2.0/glibtop/parameter"],
-        ["25","libgtop-2.0/glibtop/loadavg"],
-        ["26","libgtop-2.0/glibtop/procstate"],
-        ["27","libgtop-2.0/glibtop/cpu"],
-        ["28","libgtop-2.0/glibtop/mountlist"],
-        ["29","libgtop-2.0/glibtop/procargs"],
-        ["30","libgtop-2.0/glibtop/shm_limits"],
-        ["31","libgtop-2.0/glibtop/global"],
-        ["32","libgtop-2.0/glibtop/procsegment"],
-        ["33","libgtop-2.0/glibtop/msg_limits"],
-        ["34","libgtop-2.0/glibtop/procopenfiles"],
-        ["35","libgtop-2.0/glibtop/union"],
-        ["36","libgtop-2.0/glibtop/open"],
-        ["37","libgtop-2.0/glibtop/uptime"],
-        ["38","libgtop-2.0/glibtop/signal"],
-        ["39","libgtop-2.0/glibtop/procwd"],
-        ["40","libgtop-2.0/glibtop/ppp"],
-        ["41","libgtop-2.0/glibtop/close"]
-      ]
-    }
   } // members
 });
 

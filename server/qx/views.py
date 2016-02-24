@@ -22,7 +22,7 @@ putopmutation( request )
 printmailbev( request )
 
 22-Jun-2015	Created
-17-Nov-2015	Changed
+24-Feb-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -105,7 +105,16 @@ def login( request ):
 #	return render_to_response( template, dictionary, context )
 #	return render( template, dictionary, context )
 #	return render( dictionary, context )
-	return HttpResponse( "Hello, world. You're at qx login." )
+#	return HttpResponse( "Hello, world. You're at qx login." )
+
+	dictionary = \
+	{
+		"status"    : "ok",
+		"timestamp" : settings.TIMESTAMP_SERVER,
+		"msg"       : "Hello, world. You're at qx login."
+	}
+
+	return JsonResponse( dictionary )
 
 
 

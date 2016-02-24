@@ -4,7 +4,7 @@
 #
 # Build script for the project to produce a packaged distribution.
 #
-# Example: ./build.sh hsn-mailenbeheer 1.0.0 /home/hsn-mailenbeheer /usr/share/python/2.7.10
+# Example: ./build.sh hsn-mailenbeheer 1.0.0 /home/hsn-mailenbeheer /usr/share/python/2.7.11
 #
 # Requirements: virtualenv and pip must be installed with the targeted python distribution.
 

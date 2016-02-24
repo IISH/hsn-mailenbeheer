@@ -8,12 +8,12 @@ Version:	1.0.0
 Goal:		
 
 09-Jun-2015	Created
-03-Nov-2015	Changed
+24-Feb-2016	Changed
 """
 
 from django.conf.urls import patterns
 
-from .views import ( gethsndata, gethsnopdata, puthsnmanage, puthsnmanagemissing, 
+from .views import ( login, gethsndata, gethsnopdata, puthsnmanage, puthsnmanagemissing, 
 	putmailbev, putmailhuw, putmailbevreceived, putopmutation, printmailbev )
 
 
@@ -28,8 +28,8 @@ urlpatterns = patterns( '',
 	( r'putopmutation/',       putopmutation ),
 	( r'printmailbev/',        printmailbev ),
 	
-	( r'', gethsndata ),		# default action
-#	( r'', login ),				# default action
+#	( r'', gethsndata ),		# default action
+	( r'', login ),			  	# default action
 )
 
 # [eof]
