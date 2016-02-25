@@ -8,7 +8,8 @@ Version:	1.0.0
 Goal:		URL dispatcher
 
 26-May-2015	Created
-17-Nov-2015	Changed
+25-Feb-2016	Login
+25-Feb-2016	Changed
 """
 
 from django.conf.urls import include, url
@@ -18,7 +19,7 @@ from django.contrib.auth import views as auth_views
 from hsnmailenbeheer import settings
 
 urlpatterns = [
-#	url( r'^accounts/',        include( 'registration.backends.simple.urls' ) ),
+	url( r'^accounts/',        include( 'registration.backends.simple.urls' ) ),
 #	url( r'^accounts/login/$', auth_views.login ),
 	url( r'',                  include( 'qx.urls' ) ),
 ]

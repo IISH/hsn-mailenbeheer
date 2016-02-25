@@ -7,24 +7,30 @@
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
  * functions:
- * main                 : function()
- * url                  : function( path )
- * getHsnData           : function()
- * getHsnOpData         : function( ev )
- * saveHsnOpData        : function( path, data )
- * createWindows        : function()
- * createWindow0        : function()
- * createWindow1        : function()
- * createWindow1Dialog  : function()
- * createWindow1Missing : function()
- * createWindow2        : function()
- * createWindow3        : function()
- * createWindow4        : function()
- * createWindow5        : function()
- * createWindow6        : function()
- * getUservalueCombobox : function( combobox, value, key )
- * showDialog           : function( text )
- * closeWindow          : function( window, text )
+ * main                  : function()
+ * url                   : function( path )
+ * getHsnData            : function()
+ * getHsnOpData          : function( ev )
+ * saveHsnOpData         : function( path, data )
+ * createWindows         : function()
+ * createWindow0         : function()
+ * createWindow1         : function()
+ * createWindow1Dialog   : function()
+ * createWindow1Missing  : function()
+ * createWindow2         : function()
+ * createWindow3         : function()
+ * createWindow4         : function()
+ * createWindow5         : function()
+ * createWindow6         : function()
+ * isNumeric             : function( n )
+ * isValidDate           : function( dateString )
+ * location2nr           : function( location_value )
+ * getUservalueCombobox  : function( combobox, value, key )
+ * closeWindow           : function( window, text )
+ * showDialog            : function( text )
+ * _AuthenticateResponse : function( ev )
+ * _doAuthenticate       : function( ev )
+ * createLogin           : function()
  * 
  * possible table selection modes: 
  *  model.NO_SELECTION;                        // 1 
@@ -36,7 +42,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-24-Feb-2016: Changed
+ * FL-25-Feb-2016: Changed
  */
 
 /**
@@ -82,8 +88,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
     
     debugIE : false,
     
-    username : "guest",
-    password : "guest",
+    _username : null,
+    _password : null,
   
     MAIN_WIDTH  : 800,
     MAIN_HEIGHT : 500,
@@ -162,9 +168,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "Qooxdoo version: " + qx.core.Environment.get( 'qx.version' ) );
       console.debug( "host: " + this.host + ", port: " + this.port );
       
-    //this.createLogin( this.timestamp_client );
       this.createLogin();
-    //this.getHsnData( this.timestamp_client );    // get 'static' data; then create and fill the windows
+    //this.getHsnData();    // get 'static' data; then create and fill the windows
       
       // New Dialog
       /*
@@ -202,7 +207,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
     /**
      * getHsnData
      */
-  //getHsnData : function( timestamp_client )
     getHsnData : function()
     {    
       console.debug( "getHsnData()" );
@@ -211,8 +215,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       var method = this.http_method;
       
-    //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-    //params += "&pwd=" + encodeURIComponent( this.password );
+    //params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+    //params += "&pwd=" + encodeURIComponent( this._password );
       
       console.debug( "url: " + url );
       
@@ -319,8 +323,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
       else if( method === "POST" )  // use POST for login.
       { url += '/'; }               // required: POST + Django: APPEND_SLASH
       
-    //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-    //params += "&pwd=" + encodeURIComponent( this.password );
+    //params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+    //params += "&pwd=" + encodeURIComponent( this._password );
       params += "op_num=" + opnum;
       
       if( method === "GET" )
@@ -482,8 +486,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
 
       var method = this.http_method;
       
-    //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-    //params += "&pwd=" + encodeURIComponent( this.password );
+    //params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+    //params += "&pwd=" + encodeURIComponent( this._password );
       
       console.debug( "url: " + url );
       
@@ -622,7 +626,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       var ct_width = wd_width - 32;  // 22 = estimated margin
       
-      var window = new qx.ui.window.Window( "HSN - Mail" );
+      var window = new qx.ui.window.Window( "HSN - Mail en Beheer" );
       window.set({
         width         : wd_width,
         height        : wd_height,
@@ -4825,7 +4829,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
               textfieldBirthDay  .setValue( op_info.rp_b_day  .toString() ); 
               textfieldBirthMonth.setValue( op_info.rp_b_month.toString() );
               textfieldBirthYear .setValue( op_info.rp_b_year .toString() );
-          
               
               comboboxBirthplace.setValue( op_info.rp_b_place );
               textfieldGender   .setValue( op_info.rp_b_sex );
@@ -5204,9 +5207,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       // Check the range of the day
       return day > 0 && day <= monthLength[ month - 1 ];
-    },
+    }, // isValidDate
     
-  
+    
+    
     location2nr : function( location_value )
     {
       // with the _underscore library we would do: 
@@ -5224,7 +5228,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         }
       }
       return location_nr;
-    },
+    }, // location2nr
     
     
     
@@ -5245,67 +5249,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
       return data;
     }, // getUservalueCombobox
     
-    
-    
-    showDialog : function( text )
-    {
-      console.debug( "showDialog()" );
-      console.debug( text );
-      
-    //if( ! this.__dlg )
-    //{
-        var dlg = this.__dlg = new qx.ui.window.Window().set({
-          modal          : true,
-          showMinimize   : false,
-          showMaximize   : false,
-          width          : 400,
-          contentPadding : [ 10, 10, 10, 10 ]
-        });
-        dlg.moveTo( 315, 100 );
-        
-        dlg.addListener( "appear", dlg.center );
-        
-        var layout = new qx.ui.layout.Grid( 15, 15 );
-        layout.setRowFlex( 0, 1 );
-        layout.setColumnFlex( 1, 1 );
-        dlg.setLayout( layout );
-        
-        dlg.add
-        (
-          new qx.ui.basic.Image( "icon/32/status/dialog-information.png" ),
-          { row : 0, column : 0 }
-        );
-        
-        dlg.add
-        ( 
-          new qx.ui.basic.Label().set({
-            rich       : true,
-            allowGrowY : true
-          }), 
-          { row: 0, column: 1 }
-        );
-        
-        var button = new qx.ui.form.Button( "OK" ).set({
-          alignX     : "center",
-          allowGrowX : false,
-          padding: [ 2, 10 ]
-        });
-        
-        button.addListener
-        (
-          "execute", 
-          function( ev ) { dlg.close(); }, 
-          this
-        );
-        
-        dlg.add( button, { row : 1, column : 0, colSpan : 2 } );
-    //}
-      
-      this.__dlg.getChildren()[ 1 ].setValue( text );
-      this.__dlg.open();
-      this.__dlg.getChildren()[ 2 ].focus();
-    },
-  
     
     
     /**
@@ -5397,117 +5340,184 @@ qx.Class.define( "hsnmailenbeheer.Application",
     //this.__windowClose.getChildren()[ 2 ].focus();
     }, // closeWindow
     
-
-  //===< Unused code below here >=======================================
-
-    _AuthenticateResponse : function( ev )
+    
+    
+    showDialog : function( text, title )
     {
-      console.debug( "_AuthenticateResponse()" );
-      console.debug( "_AuthenticateResponse() this.timestamp_client: " + this.timestamp_client );
+      console.debug( "showDialog()" );
+      console.debug( text );
       
-      this.io_login = this.IO_SUCCESS;
-      var request = ev.getTarget();
-      
-      // Response parsed according to the server's response content type, e.g. JSON
-      var json_data = request.getResponse();
-      console.debug( json_data );
-      
-      var content_type = request.getResponseContentType();
-      console.debug( "content_type: " + content_type );
-      if( content_type !== "application/json" )
-      { 
-        var msg = "unexpected response:<br>" + request.getResponseText();
-        this.showDialog( msg );
-      //this.createAlert( msg ); // unparsed
-      }   
-      
-      /*
-      if( this.debugIE )    // debug: still have problems with IE
-      {
-        var browsername = qx.core.Environment.get( "browser.name" );
-        if( browsername === "ie" )                            // IExplorer
-        {
-          var response_raw = request.getResponseText();       // unparsed
-          var head = response_raw.substr( 0, 400 );
-          this.showDialog( "raw response:<br>" + head );
-        //this.createAlert( "raw response:<br>" + head );
-          
-          var head = response.substr( 0, 400 );
-          this.showDialog( "parsed response:<br>" + head );
-        //this.createAlert( "parsed response:<br>" + head );
-        }
-      }
-      */
-      
-      /*
-      if( this.debugIE )
-      {
-        var nativeXhr = request.getTransport().getRequest();
+    //if( ! this.__dialog )
+    //{
+        var dialog = this.__dialog = new qx.ui.window.Window( title ).set({
+          modal          : true,
+          showMinimize   : false,
+          showMaximize   : false,
+          width          : 400,
+          contentPadding : [ 10, 10, 10, 10 ]
+        });
+        dialog.moveTo( 315, 100 );
         
-        this.showDialog( "nativeXhr:<br>" + nativeXhr );
-        this.showDialog( "nativeXhr.response:<br>" + nativeXhr.response );
-        this.showDialog( "nativeXhr.status:<br>" + nativeXhr.status );
-        this.showDialog( "nativeXhr.statusText:<br>" + nativeXhr.statusText );
-        this.showDialog( "nativeXhr.responseText:<br>" + nativeXhr.responseText );
+        dialog.addListener( "appear", dialog.center );
         
-      //console.debug( nativeXhr );
-      //console.debug( nativeXhr.response );
-      //console.debug( nativeXhr.status );
-      //console.debug( nativeXhr.statusText );
-      //console.debug( nativeXhr.responseText );
-      }
-      */
-
-      var resp_status = json_data.status;
-      this.info( "resp_status: " + resp_status );
-      this.python_version   = json_data.python_version;
-      this.django_version   = json_data.django_version;
-      this.timestamp_server = json_data.timestamp;
-      console.debug( "timestamp_server: " + this.timestamp_server );
+        var layout = new qx.ui.layout.Grid( 15, 15 );
+        layout.setRowFlex( 0, 1 );
+        layout.setColumnFlex( 1, 1 );
+        dialog.setLayout( layout );
+        
+        dialog.add
+        (
+          new qx.ui.basic.Image( "icon/32/status/dialog-information.png" ),
+          { row : 0, column : 0 }
+        );
+        
+        dialog.add
+        ( 
+          new qx.ui.basic.Label().set({
+            rich       : true,
+            allowGrowY : true
+          }), 
+          { row: 0, column: 1 }
+        );
+        
+        var button = new qx.ui.form.Button( "OK" ).set({
+          alignX     : "center",
+          allowGrowX : false,
+          padding: [ 2, 10 ]
+        });
+        
+        button.addListener
+        (
+          "execute", 
+          function( ev ) { dialog.close(); }, 
+          this
+        );
+        
+        dialog.add( button, { row : 1, column : 0, colSpan : 2 } );
+    //}
       
-      if( resp_status === "ok" )
-      {
-        if( this.username !== "guest" )
-        {
-          this.showDialog( this.tr( "Welcome" ) + " " + this.username );
-        }
-        else
-        {
-          this.showDialog( this.tr( "Welcome guest" ) );
-        }
-      }
-      else
-      {
-        // no more guest auto-login
-        var server_msg = json_data.msg;
-        var msg = "Authentication...";
-        msg += "<br><br>Server response: " + resp_status;
-        msg += "<br>Message: " + server_msg;
-      //msg += "<br><br>You can proceed as guest, but your tagging actions will not be saved.";
-      //msg += "<br><br>You can retry to login by reloading the page.";
-        this.showDialog( msg );
-      //this.createAlert( msg );
-        this.createLogin();
-      }
-      
-      if( this.timestamp_client !== this.timestamp_server )
-      { 
-        var msg = "client/server timestamp mismatch<br>version " + this.timestamp_client + " client<br>version " + this.timestamp_server + " server<br><br> This can be an innocent oversight, or it could imply a potential problem. Start with flushing your browser cache, and restarting the browser.";
-        this.showDialog( msg );
-      //this.createAlert( msg );
-      }
-      
-    //this.createConfig();      // using _buddyList
-    //this.createListWindow();
-    }, // _AuthenticateResponse
-
-
-
+      this.__dialog.getChildren()[ 1 ].setValue( text );
+      this.__dialog.open();
+      this.__dialog.getChildren()[ 2 ].focus();
+    }, // showDialog
+    
+    
+    
     // login related
-    __effect    : null,     // login
-    __container : null,     // login
-    __btnOk     : null,     // login
-
+    __windowLogin : null,
+    __buttonLogin : null,
+    
+    createLogin : function()
+    {
+      console.debug( "createLogin()" );
+      console.debug( "createLogin() this.timestamp_client: " + this.timestamp_client );
+      
+      // login windowLogin layout
+      var layout = new qx.ui.layout.Grid( 9, 5 );
+      layout.setColumnAlign( 0, "right", "top" );
+      layout.setColumnAlign( 2, "right", "top" );
+      
+      var window = this.__windowLogin = new qx.ui.window.Window( "HSN - Mail en Beheer" ).
+      set({
+        modal          : true,
+        width          : 255,
+        contentPadding : [ 20, 20, 20, 20 ],
+        showMinimize   : false,
+        showMaximize   : false,
+        allowGrowX     : false,
+        allowGrowY     : false,
+        allowShrinkX   : false,
+        allowShrinkY   : false,
+        allowStretchX  : false,
+        allowStretchY  : false
+      });
+      
+      window.center();
+      window.setLayout( layout );
+      this.getRoot().add( window );
+      window.open();
+            
+      window.addListener( "appear", function()
+      {
+        window.center();
+        fieldUsername.setValue( "" );
+        fieldPassword.setValue( "" );
+        fieldUsername.focus();           // so that user can start typing his/her name right away
+      }, this);
+      
+      // Labels
+    //var labels = [ this.tr("Username") + ":", this.tr("Password") + ":" ];
+      var labels = [ "Gebruikersnaam:", "Wachtwoord:" ];
+      for( var i = 0; i < labels.length; i++ )
+      {
+        window.add( new qx.ui.basic.Label( labels[ i ] ).set({
+          allowShrinkX : false,
+          paddingTop   : 3
+        }), { row : i, column : 0 });
+      }
+      
+      // Text fields
+      var fieldUsername = this._fieldUsername = new qx.ui.form.TextField()    .set({ width : 150 });
+      var fieldPassword = this._fieldPassword = new qx.ui.form.PasswordField().set({ width : 150 });
+      
+      window.add( fieldUsername.set({
+        allowShrinkX : false,
+        paddingTop   : 3
+      }), { row : 0, column : 1 });
+      
+      window.add( fieldPassword.set({
+        allowShrinkX : false,
+        paddingTop   : 3
+      }), { row : 1, column : 1 });
+      
+      // PasswordField has no "execute" event
+      fieldPassword.addListener
+      (
+        "keypress", 
+        function( ev )
+        {
+          if( ev.getKeyIdentifier() === "Enter" )
+          { this._doAuthenticate( ev ); }
+        }, 
+        this
+      );
+      
+      var layoutButtons = new qx.ui.layout.HBox( 5 ).set({ AlignX : "center" });
+      var containerButtons = new qx.ui.container.Composite( layoutButtons );
+      window.add( containerButtons, { row : 3, column : 1 } );
+      
+      // Cancel button
+      var buttonCancel = this.__buttonCancel =  new qx.ui.form.Button( "Annuleren" );
+      buttonCancel.setAllowStretchX( false );
+      
+      buttonCancel.addListener
+      ( 
+        "execute", 
+        function( ev ) { window.close(); },
+        this 
+      );
+      
+      // Login button
+      var buttonLogin = this.__buttonLogin =  new qx.ui.form.Button( "Aanmelden" );
+      buttonLogin.setAllowStretchX( false );
+      
+      buttonLogin.addListener
+      ( 
+        "execute", 
+        function( ev ) 
+        { 
+          window.close();
+          this._doAuthenticate( ev ); 
+        },
+        this 
+      );
+      
+      containerButtons.add( buttonCancel );
+      containerButtons.add( new qx.ui.core.Spacer( 10 ) );
+      containerButtons.add( buttonLogin );
+      
+    }, // createLogin
+    
     
     
     _doAuthenticate : function( ev )
@@ -5515,18 +5525,17 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "_doAuthenticate()" );
       console.debug( "_doAuthenticate() this.timestamp_client: " + this.timestamp_client );
       
+      this._username = this._fieldUsername.getValue();
+      this._password = this._fieldPassword.getValue();
       
-    //this.__effect.start();
-      this.username = this.fieldUsername.getValue();
-      this.password = this.fieldPassword.getValue();
+      console.debug( "username :", this._username );
+      console.debug( "password :", this._password );
       
-      console.debug( "username :", this.username );
-      console.debug( "password :", this.password );
-      
-      //this.__container.hide();
-      
-      if( this.username === null || this.password === null )
-      { return; }
+      if( this._username === null || this._password === null )
+      { 
+        this.__windowLogin.show();
+        return;
+      }
       
       var url = this.url( this.login_loc );
       
@@ -5545,13 +5554,13 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       if( method === "GET" )
       {
-        params += "&usr=" + encodeURIComponent( this.username );
-        params += "&pwd=" + encodeURIComponent( this.password );
+        params += "&usr=" + encodeURIComponent( this._username );
+        params += "&pwd=" + encodeURIComponent( this._password );
       }
       else
       {
-        params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-        params += "&pwd=" + encodeURIComponent( this.password );
+        params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+        params += "&pwd=" + encodeURIComponent( this._password );
       }
       
       if( method === "GET" )
@@ -5576,159 +5585,92 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "fail",
         function( ev )
         {
-          this.io_login = this.IO_FAIL;
           var request = ev.getTarget();
           
           var msg = "Authentication info:<br>failed, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
           this.showDialog( msg );
-        //this.createAlert( msg );
           
           var response = request.getResponse();
           this.showDialog( response );
-        //this.createAlert( response );
         },
         this
       );
       
       request.addListener
-      (
-        "load",
-        function( ev )
-        {
-          this.io_login = this.IO_LOAD;
-          this.info( "load" );
-        },
-        this
-      );
-      
-      request.addListener
-      (
-        "readystatechange",
-        function( ev )
-        {
-          this.io_login = this.IO_STATECHANGE;
-          var phase = request.getPhase();
-          this.info( "phase: " + phase );
-        },
-        this
-      );
-      
-      request.addListener
-      (
-        "timeout",
+      ( 
+        "statusError", 
         function( ev ) 
         {
-          this.io_login = this.IO_TIMEOUT;
-          var msg = "Authentication info:<br>timeout<br><br>The server is too busy, please take a break, try again later, and reload this web app";
+          var request = ev.getTarget();
+          
+          var msg = "Authentication info:<br>statusError, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
           this.showDialog( msg );
-        //this.createAlert( msg );
-        },
-        this
-      );
-      
-      request.send();             // Send the request
-    }, // _doAuthenticate
-    
-    /*
-    __prepareEffect : function()
-    {
-      this.__effect = new qx.fx.effect.combination.Shake( this.__container.getContainerElement().getDomElement() );
-    }, // __prepareEffect
-    */
-
-
-
-    createLogin : function()
-    {
-      console.debug( "createLogin()" );
-      console.debug( "createLogin() this.timestamp_client: " + this.timestamp_client );
-      
-      // Container layout
-      var layout = new qx.ui.layout.Grid( 9, 5 );
-      layout.setColumnAlign( 0, "right", "top" );
-      layout.setColumnAlign( 2, "right", "top" );
-      
-      // Container widget
-      this.__container = new qx.ui.groupbox.GroupBox().set({
-        contentPadding: [ 16, 16, 16, 16 ]
-      });
-      this.__container.setLayout( layout );
-      
-      this.__container.addListener( "resize", function( ev )
-      {
-        var bounds = this.__container.getBounds();
-        this.__container.set({
-          marginTop  : Math.round( -bounds.height / 2 ),
-          marginLeft : Math.round( -bounds.width  / 2 )
-        });
-      }, this);
-      
-      this.getRoot().add( this.__container, { left : "50%", top : "41%" } );
-      
-      // Labels
-      var labels = [ this.tr("Username"), this.tr("Password") ];
-      for( var i = 0; i < labels.length; i++ )
-      {
-        this.__container.add( new qx.ui.basic.Label( labels[i] ).set({
-          allowShrinkX : false,
-          paddingTop   : 3
-        }), {row : i, column : 0});
-      }
-      
-      // Text fields
-      var fieldUsr = new qx.ui.form.TextField();
-      var fieldPwd = new qx.ui.form.PasswordField();
-      this.fieldUsername = fieldUsr;
-      this.fieldPassword = fieldPwd;
-      
-      this.__container.add( fieldUsr.set({
-        allowShrinkX : false,
-        paddingTop   : 3
-      }), { row : 0, column : 1 });
-      
-      this.__container.add(fieldPwd.set({
-        allowShrinkX : false,
-        paddingTop   : 3
-      }), { row : 1, column : 1 });
-      
-      // PasswordField has no "execute" event
-      fieldPwd.addListener
-      (
-        "keypress", 
-        function( ev )
-        {
-          if( ev.getKeyIdentifier() === "Enter" )
-          { this._doAuthenticate( ev ); }
+          
+          var response = request.getResponse();
+          this.showDialog( response );
         }, 
-        this
-      );
-      
-      // Button
-      var btnLogin = this.__btnOk =  new qx.ui.form.Button( this.tr( "Login" ) );
-      btnLogin.setAllowStretchX( false );
-      
-      this.__container.add(
-        btnLogin,
-        {
-          row    : 3,
-          column : 1
-        }
-      );
-      
-      // Check input on click
-      btnLogin.addListener
-      ( 
-        "execute", 
-        function( ev ) { this._doAuthenticate( ev ); },
         this 
       );
       
-      this.__container.addListener( "appear", function()
+      request.send();             // Send the request
+      
+    }, // _doAuthenticate
+    
+    
+    
+    _AuthenticateResponse : function( ev )
+    {
+      console.debug( "_AuthenticateResponse()" );
+      console.debug( "_AuthenticateResponse() this.timestamp_client: " + this.timestamp_client );
+      
+      this.io_login = this.IO_SUCCESS;
+      var request = ev.getTarget();
+      
+      // Response parsed according to the server's response content type, e.g. JSON
+      var json_data = request.getResponse();
+      console.debug( json_data );
+      
+      var content_type = request.getResponseContentType();
+      console.debug( "content_type: " + content_type );
+      if( content_type !== "application/json" )
+      { 
+        var msg = "unexpected response:<br>" + request.getResponseText();
+        this.showDialog( msg );
+      //this.createAlert( msg ); // unparsed
+      }   
+      
+      var resp_status = json_data.status;
+      this.info( "resp_status: " + resp_status );
+      this.python_version   = json_data.python_version;
+      this.django_version   = json_data.django_version;
+      this.timestamp_server = json_data.timestamp;
+      console.debug( "timestamp_server: " + this.timestamp_server );
+      
+      if( resp_status === "ok" )
       {
-      //this.__prepareEffect();     // shake widget when login is wrong
-        fieldUsr.focus();           // so that user can start typing his/her name right away
-      }, this);
-    } // createLogin
+      //this.showDialog( this.tr( "Welcome" ) + " " + this._username );
+        this.getHsnData();    // get 'static' data; then create and fill the windows
+      }
+      else
+      {
+        var server_msg = json_data.msg;
+        var msg = "Authentication";
+        msg += "<br><br>Server response: " + resp_status;
+        msg += "<br>Message: " + server_msg;
+      //msg += "<br><br>You can retry to login by reloading the page.";
+        var title = "HSN - Mail en Beheer";
+        this.showDialog( msg, title );
+        
+        this.__windowLogin.show();
+      }
+      
+      if( this.timestamp_client !== this.timestamp_server )
+      { 
+        var msg = "client/server timestamp mismatch<br>version " + this.timestamp_client + " client<br>version " + this.timestamp_server + " server<br><br> This can be an innocent oversight, or it could imply a potential problem. Start with flushing your browser cache, and restarting the browser.";
+        this.showDialog( msg );
+      }
+      
+    } // _AuthenticateResponse
     
   } // members
 });

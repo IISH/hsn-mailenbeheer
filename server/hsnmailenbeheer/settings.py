@@ -8,13 +8,14 @@ Version:	1.0.0
 Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
-11-Feb-2016	Changed
+25-Feb-2016	Django-1.8 changes
+25-Feb-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next,
-                      oct, open, pow, range, round, str, super, zip)
+	oct, open, pow, range, round, str, super, zip)
 
 import os
 import sys
@@ -55,49 +56,48 @@ ALLOWED_HOSTS = []  # overwritten in settings_local
 
 # Application definition
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
 
-    # 'debug_toolbar',
-    'mail',
-    'qx',
+	# 'debug_toolbar',
+	'mail',
+	'qx',
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  # not in Django-1.4.20
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',  # not in Django-1.4.20
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  # not in Django-1.4.20
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.middleware.security.SecurityMiddleware',  # not in Django-1.4.20
 )
 
 ROOT_URLCONF = 'hsnmailenbeheer.urls'
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',  # needed by django_tables2
-)
-
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['qx'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+	{
+		'BACKEND': 'django.template.backends.django.DjangoTemplates',
+		'DIRS': [ 'qx' ],
+		'APP_DIRS': True,
+		'OPTIONS': {
+			'context_processors': [
+				'django.contrib.auth.context_processors.auth',
+				'django.template.context_processors.debug',
+				'django.template.context_processors.i18n',
+				'django.template.context_processors.media',
+				'django.template.context_processors.static',
+				'django.template.context_processors.tz',
+				'django.contrib.messages.context_processors.messages',
+			],
+		},
+	},
 ]
 
 WSGI_APPLICATION = 'hsnmailenbeheer.wsgi.application'
@@ -135,16 +135,17 @@ STATIC_URL = '/static/'
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-#LOGIN_URL = "login"
+# Dgango-registration; register url = /accounts/register/
 LOGIN_URL = "/accounts/login/"
+ACCOUNT_ACTIVATION_DAYS = 7
 
 HSN_START_DATE = 1811
 
 # local settings: db, ...
 try:
-    from hsnmailenbeheer.settings_local import *
+	from hsnmailenbeheer.settings_local import *
 except ImportError:
-    print( "No file settings_local", file = sys.stderr )
-    pass
+	print( "No file settings_local", file = sys.stderr )
+	pass
 
 # [eof]

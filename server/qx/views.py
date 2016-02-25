@@ -107,11 +107,17 @@ def login( request ):
 #	return render( dictionary, context )
 #	return HttpResponse( "Hello, world. You're at qx login." )
 
+#	status = "ok"
+#	msg = "Hello, world. You're at qx login"
+	
+	status = "fail"
+	msg = "Authentication failure"
+	
 	dictionary = \
 	{
-		"status"    : "ok",
-		"timestamp" : settings.TIMESTAMP_SERVER,
-		"msg"       : "Hello, world. You're at qx login."
+		"status"    : status,
+		"msg"       : msg,
+		"timestamp" : settings.TIMESTAMP_SERVER
 	}
 
 	return JsonResponse( dictionary )
