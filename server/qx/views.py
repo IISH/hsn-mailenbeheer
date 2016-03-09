@@ -3,14 +3,13 @@
 """
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
-Name:		views.py
+Name:		qx/views.py
 Version:	1.0.0
 Goal:		View for op_select
 
 Functions:
 json_response( func )
 def none2empty( var ):
-login( request )
 gethsndata( request )
 gethsnopdata( request )
 puthsnmanage( request )
@@ -22,7 +21,7 @@ putopmutation( request )
 printmailbev( request )
 
 22-Jun-2015	Created
-24-Feb-2016	Changed
+09-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -41,9 +40,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 from hsnmailenbeheer import settings
+from qx.ldap_authenticate import ldap_authenticate
+from reference.views import get_locations
 from hsn_manage.views import ( get_marriages, get_deaths, get_partners, get_missing, get_hsnmanage, 
 	put_hsnmanage, put_hsnmanagemissing )
-from mail.views import ( get_locations, get_municipalities, get_sources, get_text_strings, 
+from mail.views import ( get_municipalities, get_sources, get_text_strings, 
 	get_mails, get_mails_print, 
 	put_mailbev, put_mailhuw, put_mailbevreceived, put_opmutation )
 from mail.print import print_mailbev
@@ -78,49 +79,6 @@ def none2empty( var ):
 	if var == None: 
 		var = ""
 	return var
-
-
-
-@csrf_exempt
-def login( request ):
-	print( "qx/views/login()" )
-	
-#	scheme_authority, sub_site = get_server_info( request )
-
-	template = "index.html"
-	dictionary = \
-	{
-	#	'SUB_SITE'      : sub_site,
-	#	'STATIC_PREFIX' : scheme_authority,
-		'STATIC_PREFIX' : '',
-	#	'STATIC_URL'    : settings.STATIC_URL,
-	#	'STATIC_URL'    : '127.0.0.1',
-		'STATIC_URL'    : '/',
-	}
-
-	# context contains csrf_token (and STATIC_URL for django >= 1.3)
-#	context = context_instance = RequestContext( request )
-	context = RequestContext( request )
-
-#	return render_to_response( template, dictionary, context )
-#	return render( template, dictionary, context )
-#	return render( dictionary, context )
-#	return HttpResponse( "Hello, world. You're at qx login." )
-
-#	status = "ok"
-#	msg = "Hello, world. You're at qx login"
-	
-	status = "fail"
-	msg = "Authentication failure"
-	
-	dictionary = \
-	{
-		"status"    : status,
-		"msg"       : msg,
-		"timestamp" : settings.TIMESTAMP_SERVER
-	}
-
-	return JsonResponse( dictionary )
 
 
 

@@ -3,12 +3,11 @@
 """
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
-Name:		views.py
+Name:		mail/views.py
 Version:	1.0.0
-Goal:		View for op_select
+Goal:		Views for mail
 
 Functions:
-def get_locations():
 def get_municipalities():
 def get_sources():
 def get_text_strings():
@@ -20,7 +19,8 @@ def put_mailbevreceived( mailbevreceived_req ):
 def put_opmutation( opmutation_req ):
 
 26-May-2015	Created
-26-Oct-2015	Changed
+08-Mar-2016	Split-off hsn_central & hsn_reference db's
+09-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -33,50 +33,8 @@ from sys import stderr, exc_info
 
 from django.conf import settings
 
-#from mail.models import Gemeente, HsnIdmut, Huwknd, Locarchf, Mail, Plaats
-from mail.models import ( ArchiefGemeente, HsnIdmut, Huwknd, Mail, Plaats, 
+from mail.models import ( ArchiefGemeente, HsnIdmut, Mail, 
 	TekstFaseA, TekstFaseB, TekstFaseCD, TekstGevonden, TekstReden, TekstVoortgang )
-
-
-def get_locations():
-	"""
-	List of (nr + location) for combobox. 
-	Notice: locations from table 'Plaats'. 
-	
-	Some gemnaam occur more than once, but identical gemnaam have identical gemnr. 
-	So we need only single occurrences in the list for all unique name/nr pairs. 
-	"""
-#	print( "get_locations()" )
-
-	choices_location = []
-	nr_list = []
-	
-	try:
-		locations = Plaats.objects.all().order_by( "gemnaam" )
-
-		for location in locations:
-			name = location.gemnaam
-			nr   = location.gemnr
-		#	print( nr, name )
-			
-			if name is None:
-				continue
-			
-			try:
-				nr_list.index( nr )
-				# already in list
-			except:
-				nr_list.append( nr )
-				map = { "nr" : nr, "name" : name }
-				choices_location.append( map )
-
-	except:
-		type, value, tb = exc_info()
-		msg = "get_locations() failed: %s" % value
-		print( "%s\n" % msg )
-
-	return choices_location
-
 
 
 def get_municipalities():

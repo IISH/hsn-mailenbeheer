@@ -9,20 +9,20 @@ Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
 25-Feb-2016	Django-1.8 changes
-25-Feb-2016	Changed
+02-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
-from __future__ import (absolute_import, division, print_function, unicode_literals)
-from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next,
-	oct, open, pow, range, round, str, super, zip)
+from __future__ import ( absolute_import, division, print_function, unicode_literals )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next,
+	oct, open, pow, range, round, str, super, zip )
 
 import os
 import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "11-Feb-2016 15:14"
+TIMESTAMP_SERVER = "09-Mar-2016 16:49"
 
 django_version_str = get_version()
 django_version_lst = django_version_str.split('.')
@@ -48,14 +48,13 @@ SECRET_KEY = 'not_secret'  # must be overwritten in settings_local
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # can be overwritten in settings_local
-
 ADMIN_ENABLED = DEBUG
 
 ALLOWED_HOSTS = []  # overwritten in settings_local
 
 
 # Application definition
-INSTALLED_APPS = (
+INSTALLED_APPS = [
 	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
@@ -63,12 +62,16 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 
-	# 'debug_toolbar',
-	'mail',
+#	'debug_toolbar',
+	'loginout',
+	'mail',				# tables from hsn_mail
+	'central',			# tables from hsn_central
+	'reference',		# tables from hsn_reference
 	'qx',
-)
+]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
+	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,8 +79,7 @@ MIDDLEWARE_CLASSES = (
 	'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  # not in Django-1.4.20
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'django.middleware.security.SecurityMiddleware',  # not in Django-1.4.20
-)
+]
 
 ROOT_URLCONF = 'hsnmailenbeheer.urls'
 
@@ -89,12 +91,12 @@ TEMPLATES = [
 		'OPTIONS': {
 			'context_processors': [
 				'django.contrib.auth.context_processors.auth',
+				'django.contrib.messages.context_processors.messages',
 				'django.template.context_processors.debug',
 				'django.template.context_processors.i18n',
 				'django.template.context_processors.media',
 				'django.template.context_processors.static',
 				'django.template.context_processors.tz',
-				'django.contrib.messages.context_processors.messages',
 			],
 		},
 	},

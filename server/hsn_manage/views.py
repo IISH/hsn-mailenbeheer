@@ -26,7 +26,8 @@ def put_hsnmanage( fields )
 def put_hsnmanagemissing( missing_req )
 
 02-Jun-2015	Created
-26-Oct-2015	Changed
+08-Mar-2016	Split-off hsn_central & hsn_reference db's
+09-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -41,8 +42,9 @@ import numbers
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from mail.models import ( HsnBeheer, HsnKwyt, Huwknd, Mail, Ovlknd, Pkknd, Plaats, 
-	TekstVoortgang, TekstFaseA, TekstFaseB, TekstFaseCD )
+from mail.models import ( HsnBeheer, HsnKwyt, Mail, TekstVoortgang, TekstFaseA, TekstFaseB, TekstFaseCD )
+from reference.views import ( get_location_by_gemnr, get_location_by_gemnaam )
+from central.views import ( get_huwknd, get_ovlknd, get_pkknd )
 
 from hsnmailenbeheer.settings import PROJECT_ROOT
 path.append( os.path.join( PROJECT_ROOT, "op_select" ) )
@@ -126,67 +128,60 @@ def get_marriages_huwknd( op_numstr ):
 	marriages = []
 
 	# get marriage info info from Huwknd
-	try:
-		huwknd_qs = Huwknd.objects.filter( idnr = op_numstr )
+	huwknd_qs = get_huwknd( op_numstr )
 
-		if huwknd_qs is not None:
-			for huwknd in huwknd_qs:
-				mar_date  = "%02d/%02d/%04d" % ( int(huwknd.hdag), int(huwknd.hmaand), int(huwknd.hjaar) )
-				
-				# construct partner info
-				gebsex = huwknd.gebsex
-				if gebsex == 'm':					# OP is man
-					partnersex = 'v'
-					familyname = huwknd.anmhv		# familyname wife
-					firstname1 = huwknd.vrn1hv		# firstname1 wife
-					firstname2 = huwknd.vrn2hv		# firstname2 wife
-					firstname3 = huwknd.vrn3hv		# firstname3 wife
-				elif gebsex == 'v':					# OP is woman
-					partnersex = 'm'
-					familyname = huwknd.anmhm		# familyname husband
-					firstname1 = huwknd.vrn1hm		# firstname1 husband
-					firstname2 = huwknd.vrn2hm		# firstname2 husband
-					firstname3 = huwknd.vrn3hm		# firstname3 husband
-				
-				if familyname is None: familyname = ""
-				if firstname1 is None: firstname1 = ""
-				if firstname2 is None: firstname2 = ""
-				if firstname3 is None: firstname3 = ""
-				
-				fullname = familyname
-				fullname += ", "
-				fullname += firstname1
-				if firstname2 != "":
-					fullname += " "
-					fullname += firstname2
-				if firstname3 != "":
-					fullname += " "
-					fullname += firstname3
-				
-				partner = ""
-				if gebsex == 'm' or gebsex == 'v':
-					partner = {
-						"sex"        : partnersex,
-						"familyname" : familyname,
-						"firstname1" : firstname1,
-						"firstname2" : firstname2,
-						"firstname3" : firstname3,
-						"fullname"   : fullname
-					}
-					print( "partner:", partner )
-				
-				mar = { "date" : mar_date, "place" : huwknd.hplts, "comment" : "ingevoerd", "partner" : partner }
-				print( "marriage:", mar )
-				
-				marriages.append( mar )
-		else:
-			print( "Huwknd entry %s does not exist", op_numstr )
-
-	except:
-		print( "hsn_manage/views/get_marriages_huwknd( %s )" % op_numstr)
-		type, value, tb = exc_info()
-		msg = "Huwknd.objects.filter failed: %s" % value
-		print( "%s\n" % msg )
+	if huwknd_qs is not None:
+		for huwknd in huwknd_qs:
+			mar_date  = "%02d/%02d/%04d" % ( int(huwknd.hdag), int(huwknd.hmaand), int(huwknd.hjaar) )
+			
+			# construct partner info
+			gebsex = huwknd.gebsex
+			if gebsex == 'm':					# OP is man
+				partnersex = 'v'
+				familyname = huwknd.anmhv		# familyname wife
+				firstname1 = huwknd.vrn1hv		# firstname1 wife
+				firstname2 = huwknd.vrn2hv		# firstname2 wife
+				firstname3 = huwknd.vrn3hv		# firstname3 wife
+			elif gebsex == 'v':					# OP is woman
+				partnersex = 'm'
+				familyname = huwknd.anmhm		# familyname husband
+				firstname1 = huwknd.vrn1hm		# firstname1 husband
+				firstname2 = huwknd.vrn2hm		# firstname2 husband
+				firstname3 = huwknd.vrn3hm		# firstname3 husband
+			
+			if familyname is None: familyname = ""
+			if firstname1 is None: firstname1 = ""
+			if firstname2 is None: firstname2 = ""
+			if firstname3 is None: firstname3 = ""
+			
+			fullname = familyname
+			fullname += ", "
+			fullname += firstname1
+			if firstname2 != "":
+				fullname += " "
+				fullname += firstname2
+			if firstname3 != "":
+				fullname += " "
+				fullname += firstname3
+			
+			partner = ""
+			if gebsex == 'm' or gebsex == 'v':
+				partner = {
+					"sex"        : partnersex,
+					"familyname" : familyname,
+					"firstname1" : firstname1,
+					"firstname2" : firstname2,
+					"firstname3" : firstname3,
+					"fullname"   : fullname
+				}
+				print( "partner:", partner )
+			
+			mar = { "date" : mar_date, "place" : huwknd.hplts, "comment" : "ingevoerd", "partner" : partner }
+			print( "marriage:", mar )
+			
+			marriages.append( mar )
+	else:
+		print( "Huwknd entry %s does not exist", op_numstr )
 
 	return marriages
 
@@ -255,37 +250,30 @@ def get_death_ovlknd( op_numstr ):
 	death_location_nr = ""
 
 	# get death info info from Ovlknd
-	try:
-		entry = Ovlknd.objects.filter( idnr = op_numstr ).order_by( "id" ).first()
-
-		if entry is None:
-			print( "Ovlknd entry %s does not exist" % op_numstr )
-		else:
-			from qx.views import none2empty
-			death_location    = none2empty( entry.oacgemnm )
-			death_location_nr = none2empty( entry.oacgemnr )
-			
-			death = { 
-				"table_name"        : "Ovlknd", 
-				"edit"              : False, 
-				"death_day"         : entry.ovldag, 
-				"death_month"       : entry.ovlmnd, 
-				"death_year"        : entry.ovljr, 
-				"death_location"    : death_location,
-				"death_location_nr" : death_location_nr
-			}
-			print( death )
-
-	except:
-		print( "hsn_manage/views/get_death_ovlknd( %s )" % op_numstr)
-		type, value, tb = exc_info()
-		msg = "Ovlknd.objects.filter failed: %s" % value
-		print( "%s\n" % msg )
-		return death
+	entry = get_ovlknd( op_numstr )
+	
+	if entry is None:
+		print( "Ovlknd entry %s does not exist" % op_numstr )
+	else:
+		from qx.views import none2empty
+		death_location    = none2empty( entry.oacgemnm )
+		death_location_nr = none2empty( entry.oacgemnr )
+		
+		death = { 
+			"table_name"        : "Ovlknd", 
+			"edit"              : False, 
+			"death_day"         : entry.ovldag, 
+			"death_month"       : entry.ovlmnd, 
+			"death_year"        : entry.ovljr, 
+			"death_location"    : death_location,
+			"death_location_nr" : death_location_nr
+		}
+		print( death )
+	
 	
 	# sometimes the death location is empty, but it might be retrieved via the nr
 	if death is not None and death_location == "" and death_location_nr != "":
-		plaats_qs = Plaats.objects.filter( gemnr = death_location_nr ).first()
+		plaats_qs = get_location_by_gemnr( death_location_nr )
 		
 		if plaats_qs is not None:
 			death_location = plaats_qs.gemnaam
@@ -303,28 +291,21 @@ def get_death_pkknd( op_numstr ):
 	death = None
 
 	# get death info info from Pkknd
-	try:
-		entry = Pkknd.objects.filter( idnr = op_numstr ).order_by( "id" ).first()
+	entry = get_pkknd( op_numstr )
 
-		if entry is not None:
-			death = { 
-				"table_name"     : "Pkknd", 
-				"edit"           : False, 
-				"death_day"      : entry.odgperp, 
-				"death_month"    : entry.omdperp, 
-				"death_year"     : entry.ojrperp, 
-				"death_location" : entry.oplperp
-			}
-			print( death )
-		else:
-			print( "Pkknd entry %s does not exist" % op_numstr )
+	if entry is not None:
+		death = { 
+			"table_name"     : "Pkknd", 
+			"edit"           : False, 
+			"death_day"      : entry.odgperp, 
+			"death_month"    : entry.omdperp, 
+			"death_year"     : entry.ojrperp, 
+			"death_location" : entry.oplperp
+		}
+		print( death )
+	else:
+		print( "Pkknd entry %s does not exist" % op_numstr )
 
-	except:
-		print( "hsn_manage/views/get_death_ovlknd( %s )" % op_numstr)
-		type, value, tb = exc_info()
-		msg = "Pkknd.objects.filter failed: %s" % value
-		print( "%s\n" % msg )
-	
 	return death
 
 
@@ -401,62 +382,55 @@ def get_partners_huwknd( op_number ):
 	npartners = 0
 	partners = []
 		
-	try:
-		huwknd_qs = Huwknd.objects.filter( idnr = op_number ).order_by( "id" )
-		
-		if huwknd_qs is None:
-			print( "Huwknd does not contain partners for OP %d", op_number )
-		else:
-			nhuwknds = huwknd_qs.count()
-			print( "Huwknd has %d entries for OP %s" % ( nhuwknds, op_number ) )
-			for huwknd in huwknd_qs:
-				mar_date  = "%02d/%02d/%04d" % ( int(huwknd.hdag), int(huwknd.hmaand), int(huwknd.hjaar) )
-				gebsex = huwknd.gebsex
-				
-				if gebsex == 'm':					# OP is man
-					partnersex = 'v'
-					familyname = huwknd.anmhv		# familyname wife
-					firstname1 = huwknd.vrn1hv		# firstname1 wife
-					firstname2 = huwknd.vrn2hv		# firstname2 wife
-					firstname3 = huwknd.vrn3hv		# firstname3 wife
-				elif gebsex == 'v':					# OP is woman
-					partnersex = 'm'
-					familyname = huwknd.anmhm		# familyname husband
-					firstname1 = huwknd.vrn1hm		# firstname1 husband
-					firstname2 = huwknd.vrn2hm		# firstname2 husband
-					firstname3 = huwknd.vrn3hm		# firstname3 husband
-				
-				if familyname is None: familyname = ""
-				if firstname1 is None: firstname1 = ""
-				if firstname2 is None: firstname2 = ""
-				if firstname3 is None: firstname3 = ""
-				
-				fullname = familyname
-				fullname += ", "
-				fullname += firstname1
-				if firstname2 != "":
-					fullname += " "
-					fullname += firstname2
-				if firstname3 != "":
-					fullname += " "	
-					fullname += firstname3
-					
-				if gebsex == 'm' or gebsex == 'v':
-					partner = {
-						"mar_date" : mar_date,
-						"sex"      : partnersex,
-						"fullname" : fullname
-					}
-					npartners += 1
-					print( "partner:", partner )
-					partners.append( partner )
-			print( "Huwknd has %d partner entries for OP %s" % ( npartners, op_number ) )
+	huwknd_qs = get_huwknd( op_number )
+	
+	if huwknd_qs is None:
+		print( "Huwknd does not contain partners for OP %d", op_number )
+	else:
+		nhuwknds = huwknd_qs.count()
+		print( "Huwknd has %d entries for OP %s" % ( nhuwknds, op_number ) )
+		for huwknd in huwknd_qs:
+			mar_date  = "%02d/%02d/%04d" % ( int(huwknd.hdag), int(huwknd.hmaand), int(huwknd.hjaar) )
+			gebsex = huwknd.gebsex
 			
-	except:
-		print( "get_partners()" )
-		type, value, tb = exc_info()
-		msg = "Huwknd.objects.filter failed: %s" % value
-		print( "%s\n" % msg )
+			if gebsex == 'm':					# OP is man
+				partnersex = 'v'
+				familyname = huwknd.anmhv		# familyname wife
+				firstname1 = huwknd.vrn1hv		# firstname1 wife
+				firstname2 = huwknd.vrn2hv		# firstname2 wife
+				firstname3 = huwknd.vrn3hv		# firstname3 wife
+			elif gebsex == 'v':					# OP is woman
+				partnersex = 'm'
+				familyname = huwknd.anmhm		# familyname husband
+				firstname1 = huwknd.vrn1hm		# firstname1 husband
+				firstname2 = huwknd.vrn2hm		# firstname2 husband
+				firstname3 = huwknd.vrn3hm		# firstname3 husband
+			
+			if familyname is None: familyname = ""
+			if firstname1 is None: firstname1 = ""
+			if firstname2 is None: firstname2 = ""
+			if firstname3 is None: firstname3 = ""
+			
+			fullname = familyname
+			fullname += ", "
+			fullname += firstname1
+			if firstname2 != "":
+				fullname += " "
+				fullname += firstname2
+			if firstname3 != "":
+				fullname += " "	
+				fullname += firstname3
+				
+			if gebsex == 'm' or gebsex == 'v':
+				partner = {
+					"mar_date" : mar_date,
+					"sex"      : partnersex,
+					"fullname" : fullname
+				}
+				npartners += 1
+				print( "partner:", partner )
+				partners.append( partner )
+		print( "Huwknd has %d partner entries for OP %s" % ( npartners, op_number ) )
 	
 	return partners
 
@@ -639,22 +613,15 @@ def get_hsnmanage( op_numstr ):
 	
 	# also need the number of the location
 	hsnopmanage[ "ovlplaats_gemnr" ] = ""
-	try:
-		location = hsnmanage.ovlplaats
-		plaats_qs = Plaats.objects.get( gemnaam = location )
-		
-		if plaats_qs is not None:
-			location_num = plaats_qs.gemnr
-			hsnopmanage[ "ovlplaats_gemnr" ] = location_num
-		else:
-			print( "Plaats entry %s does not exist", location )
 
-	except:
-		print( "hsn_manage/views/get_hsnmanage( %s )" % op_numstr )
-		type, value, tb = exc_info()
-		msg = "Plaats.objects.get failed: %s" % value
-		print( "%s\n" % msg )
+	location = hsnmanage.ovlplaats
+	plaats_qs = get_location_by_gemnaam( location )
 	
+	if plaats_qs is not None:
+		location_num = plaats_qs.gemnr
+		hsnopmanage[ "ovlplaats_gemnr" ] = location_num
+	else:
+		print( "Plaats entry %s does not exist", location )
 	
 	# also need the voortgang string
 	invoerstatus = hsnmanage.invoerstatus

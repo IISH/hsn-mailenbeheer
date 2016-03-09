@@ -10,7 +10,6 @@ Notice:		A PostScript letter is created, saved, and sent trough CUPS to the defa
 
 Functions:
 def print_mailbev():
-def get_opsex( idnr ):
 def get_mailtype( idnr ):
 def get_archive( gemnr ):
 def get_pathname_psfile( id ):
@@ -20,7 +19,8 @@ def print_ps_letter( id, pathname_print_out ):
 def update_status( id ):
 
 17-Jun-2015	Created
-27-Oct-2015	Changed
+08-Mar-2016	Split-off hsn_central & hsn_reference db's
+09-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -37,7 +37,8 @@ import codecs
 import cups
 
 from hsnmailenbeheer import settings
-from mail.models import ArchiefGemeente, HsnBeheer, Hsnrp, Mail
+from mail.models import ArchiefGemeente, HsnBeheer, Mail
+from reference.views import get_opsex
 from op_select.op import get_op_info
 	
 from .cupstree import get_printers
@@ -147,23 +148,6 @@ def print_mailbev():
 		print( "%s\n" % msg )
 	
 	return ret_status, msg, ids
-
-
-
-def get_opsex( idnr ):
-	opsex = None
-	# get birth info from Hsnrp
-	try:
-		birth_info = Hsnrp.objects.filter( idnr = idnr ).last()		# idnr is not pk
-		if birth_info is not None:
-			opsex = birth_info.rp_b_sex
-	except:
-		print( "print/get_opsex()" )
-		type, value, tb = exc_info()
-		msg = "Hsnrp.objects.get failed: %s" % value
-		print( "%s\n" % msg )
-
-	return opsex
 
 
 

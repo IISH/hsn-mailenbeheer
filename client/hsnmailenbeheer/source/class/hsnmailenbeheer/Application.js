@@ -28,9 +28,10 @@
  * getUservalueCombobox  : function( combobox, value, key )
  * closeWindow           : function( window, text )
  * showDialog            : function( text )
- * _AuthenticateResponse : function( ev )
- * _doAuthenticate       : function( ev )
  * createLogin           : function()
+ * _doAuthenticate       : function( ev )
+ * _AuthenticateResponse : function( ev )
+ * createLogout          : function( ev )
  * 
  * possible table selection modes: 
  *  model.NO_SELECTION;                        // 1 
@@ -42,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-25-Feb-2016: Changed
+ * FL-07-Mar-2016: Changed
  */
 
 /**
@@ -66,7 +67,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "11-Feb-2016 15:14",
+    timestamp_client : "09-Mar-2016 16:49",
+
+    test_usr : "",
+    test_pwd : "",
     
     host : "localhost",
   //host : "127.0.0.1",
@@ -79,9 +83,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
   //port : 8000,  // http Django dev server default port
   //port : 8443,  // https-alt
     
-    http_loc : "/hsnmailenbeheer_wsgi",
-    
-    login_loc : "/hsnmailenbeheer_wsgi/login",
+    http_loc   : "/hsnmailenbeheer_wsgi",
+    login_loc  : "/hsnmailenbeheer_wsgi/login",
+    logout_loc : "/hsnmailenbeheer_wsgi/logout",
     
     http_method : "GET",
   //http_method : "POST",
@@ -877,6 +881,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       {
         console.debug( "button7 Stoppen met dit programma" );
         this.window0.close();
+        this.createLogout( ev );
       }, this );              
       
       return window;
@@ -5412,12 +5417,12 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "createLogin()" );
       console.debug( "createLogin() this.timestamp_client: " + this.timestamp_client );
       
-      // login windowLogin layout
+      // login windowLogin
       var layout = new qx.ui.layout.Grid( 9, 5 );
       layout.setColumnAlign( 0, "right", "top" );
       layout.setColumnAlign( 2, "right", "top" );
       
-      var window = this.__windowLogin = new qx.ui.window.Window( "HSN - Mail en Beheer" ).
+      var window = this.__windowLogin = new qx.ui.window.Window( "HSN - Mail en Beheer -- Login" ).
       set({
         modal          : true,
         width          : 255,
@@ -5436,12 +5441,13 @@ qx.Class.define( "hsnmailenbeheer.Application",
       window.setLayout( layout );
       this.getRoot().add( window );
       window.open();
-            
+      
       window.addListener( "appear", function()
       {
         window.center();
-        fieldUsername.setValue( "" );
-        fieldPassword.setValue( "" );
+        fieldUsername.setValue( this.test_usr );
+        fieldPassword.setValue( this.test_pwd );
+        
         fieldUsername.focus();           // so that user can start typing his/her name right away
       }, this);
       
@@ -5476,8 +5482,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "keypress", 
         function( ev )
         {
-          if( ev.getKeyIdentifier() === "Enter" )
-          { this._doAuthenticate( ev ); }
+          if( ev.getKeyIdentifier() === "Enter" ) { 
+            window.close();
+            this._doAuthenticate( ev ); 
+          }
         }, 
         this
       );
@@ -5538,8 +5546,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
       }
       
       var url = this.url( this.login_loc );
-      
-    //var responseType = "text/html";
       
       var method = this.http_method;
       var params = "";
@@ -5670,8 +5676,134 @@ qx.Class.define( "hsnmailenbeheer.Application",
         this.showDialog( msg );
       }
       
-    } // _AuthenticateResponse
+    }, // _AuthenticateResponse
     
+    
+    
+    createLogout : function( ev )
+    {
+      console.debug( "createLogout()" );
+    //var msg = "Afmelden van <b>" + this._username + "</b> ...";
+    //this.showDialog( msg );
+    //this.__windowLogout.show();
+      
+      // logout windowLogout
+      var layout = new qx.ui.layout.Grid( 1, 1 );
+      layout.setColumnAlign( 0, "center", "center" );
+      
+      var window = this.__windowLogout = new qx.ui.window.Window( "HSN - Mail en Beheer -- Logout" ).
+      set({
+        modal          : true,
+        width          : 255,
+        contentPadding : [ 20, 20, 20, 20 ],
+        showMinimize   : false,
+        showMaximize   : false,
+        allowGrowX     : false,
+        allowGrowY     : false,
+        allowShrinkX   : false,
+        allowShrinkY   : false,
+        allowStretchX  : false,
+        allowStretchY  : false
+      });
+      
+      window.center();
+      window.setLayout( layout );
+      this.getRoot().add( window );
+      window.open();
+      
+      var msg = "Afmelden van <b>" + this._username + "</b> ...";
+      var label = new qx.ui.basic.Label( msg ).set({
+          allowShrinkX : false,
+          paddingTop   : 3,
+          rich         : true
+        });
+      window.add( label, { row : 0, column : 0 });
+      
+      var url = this.url( this.logout_loc );
+      
+      var method = this.http_method;
+      var params = "";
+      
+      if( method === "GET" )        // only for testing, 
+      { params += "?"; }
+      else if( method === "POST" )  // use POST for login.
+      { url += '/'; }               // required: POST + Django: APPEND_SLASH
+      
+      if( this.debugIE )
+      { params += "qxenv:qx.debug.io:true"; }
+      
+      if( method === "GET" )
+      {
+        params += "&usr=" + encodeURIComponent( this._username );
+      //params += "&pwd=" + encodeURIComponent( this._password );
+      }
+      else
+      {
+        params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+      //params += "&pwd=" + encodeURIComponent( this._password );
+      }
+      
+      if( method === "GET" )
+      { url += params; }
+      console.debug( url );
+      
+      var request = new qx.io.request.Xhr( url );
+      request.setMethod( method );
+      
+      if( method === "POST" )           // set parameters in data
+      { request.setRequestData( params ); }
+      
+      request.addListener
+      (
+        "success",
+        function( ev ) {
+          console.debug( "Logout: success" );
+          this.__windowLogout.close();
+          this.__windowLogin.open();
+        },
+        this
+      );
+      
+      request.addListener
+      (
+        "fail",
+        function( ev )
+        {
+          console.debug( "Logout: fail" );
+          this.__windowLogout.close();
+          
+          var request = ev.getTarget();
+          var msg = "Logout info:<br>failed, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
+          this.showDialog( msg );
+          
+          var response = request.getResponse();
+          this.showDialog( response );
+        },
+        this
+      );
+      
+      request.addListener
+      ( 
+        "statusError", 
+        function( ev ) 
+        {
+          console.debug( "Logout: fail" );
+          this.__windowLogout.close();
+          
+          var request = ev.getTarget();
+          var msg = "Logout info:<br>statusError, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
+          this.showDialog( msg );
+          
+          var response = request.getResponse();
+          this.showDialog( response );
+        }, 
+        this 
+      );
+      
+      request.send();             // Send the request
+      
+    } // createLogout
+      
   } // members
 });
 

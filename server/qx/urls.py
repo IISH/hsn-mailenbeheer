@@ -8,28 +8,27 @@ Version:	1.0.0
 Goal:		
 
 09-Jun-2015	Created
-24-Feb-2016	Changed
+02-Mar-2016	Changed
 """
 
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-from .views import ( login, gethsndata, gethsnopdata, puthsnmanage, puthsnmanagemissing, 
+from .views import ( gethsndata, gethsnopdata, puthsnmanage, puthsnmanagemissing, 
 	putmailbev, putmailhuw, putmailbevreceived, putopmutation, printmailbev )
 
 
-urlpatterns = patterns( '',
-	( r'gethsndata/',          gethsndata ),
-	( r'gethsnopdata',         gethsnopdata ),		# no trailing /
-	( r'puthsnmanage/',        puthsnmanage ),
-	( r'puthsnmanagemissing/', puthsnmanagemissing ),
-	( r'putmailbev/',          putmailbev ),
-	( r'putmailhuw/',          putmailhuw ),
-	( r'putmailbevreceived/',  putmailbevreceived  ),
-	( r'putopmutation/',       putopmutation ),
-	( r'printmailbev/',        printmailbev ),
+urlpatterns = [
+	url( r'gethsndata/',          gethsndata ),
+	url( r'gethsnopdata',         gethsnopdata ),		# no trailing /
+	url( r'puthsnmanage/',        puthsnmanage ),
+	url( r'puthsnmanagemissing/', puthsnmanagemissing ),
+	url( r'putmailbev/',          putmailbev ),
+	url( r'putmailhuw/',          putmailhuw ),
+	url( r'putmailbevreceived/',  putmailbevreceived  ),
+	url( r'putopmutation/',       putopmutation ),
+	url( r'printmailbev/',        printmailbev ),
 	
-#	( r'', gethsndata ),		# default action
-	( r'', login ),			  	# default action
-)
+#	url( r'', gethsndata ),		# default action
+]
 
 # [eof]
