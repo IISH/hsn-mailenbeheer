@@ -39,9 +39,13 @@ debug = settings.DEBUG
 
 #LDAP_PORT = 389		# = default
 
-LDAP_SEARCH_USERNAME = settings.LDAP_SEARCH_USERNAME
-LDAP_SEARCH_PASSWORD = settings.LDAP_SEARCH_PASSWORD
-
+try:
+	LDAP_SEARCH_USERNAME = settings.LDAP_SEARCH_USERNAME
+	LDAP_SEARCH_PASSWORD = settings.LDAP_SEARCH_PASSWORD
+except:
+	LDAP_SEARCH_USERNAME = ""
+	LDAP_SEARCH_PASSWORD = ""
+	
 LDAP_URI = settings.LDAP_URI
 DC_HOST  = settings.DC_HOST
 
@@ -169,31 +173,34 @@ def ldap_authenticate( username, password ):
 		ldap_client.set_option( ldap.OPT_REFERRALS, 0 )
 		ldap_client.set_option( ldap.OPT_PROTOCOL_VERSION, 3 )
 		
-		user_dict = find_user( ldap_client, username )
-		#print( "user_dict: ", user_dict )
+		if not ( LDAP_SEARCH_USERNAME == "" or LDAP_SEARCH_PASSWORD == "" ):
+			user_dict = find_user( ldap_client, username )
+			#print( "user_dict: ", user_dict )
 		
-		if user_dict is not None:
+			if user_dict is not None:
+				is_authenticated = authenticate_remote( ldap_client, username, password )
+			
+				"""
+				# "local" authenticate no longer used
+				ldap_uid = user_dict.get( "uid" )[ 0 ]
+				tagged_digest_salt = user_dict.get( "userPassword" )[ 0 ]
+				
+				if debug: 
+					print( "ldap uid: %s" % ldap_uid )
+					print( "ldap_pwd: %s" % tagged_digest_salt )
+				
+				is_authenticated = check_password( tagged_digest_salt, password )
+				"""
+		else:
+			# directly authenticate without initial search user
 			is_authenticated = authenticate_remote( ldap_client, username, password )
 			
-			"""
-			# "local" authenticate no longer used
-			ldap_uid = user_dict.get( "uid" )[ 0 ]
-			tagged_digest_salt = user_dict.get( "userPassword" )[ 0 ]
-			
-			if debug: 
-				print( "ldap uid: %s" % ldap_uid )
-				print( "ldap_pwd: %s" % tagged_digest_salt )
-			
-			is_authenticated = check_password( tagged_digest_salt, password )
-			"""
-			
+		if debug:
 			if is_authenticated:
-				if debug: print( "User: %s authenticated OK" % username )
+				print( "User: %s authenticated OK" % username )
 			else:
-				if debug: print( "User: %s NOT authenticated" % username )
-		else:
-			if debug: print( "User: %s NOT found" % username)
-		
+				print( "User: %s NOT authenticated" % username )
+				
 	except ldap.LDAPError, ex:
 		print( "\nLDAP Error")
 		show_dict( ex.message )
