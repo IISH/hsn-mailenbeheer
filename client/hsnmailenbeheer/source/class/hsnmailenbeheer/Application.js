@@ -43,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-07-Mar-2016: Changed
+ * FL-16-Mar-2016: Changed
  */
 
 /**
@@ -67,7 +67,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "09-Mar-2016 16:49",
+    timestamp_client : "16-Mar-2016 13:21",
 
     test_usr : "",
     test_pwd : "",
@@ -5422,13 +5422,14 @@ qx.Class.define( "hsnmailenbeheer.Application",
       layout.setColumnAlign( 0, "right", "top" );
       layout.setColumnAlign( 2, "right", "top" );
       
-      var window = this.__windowLogin = new qx.ui.window.Window( "HSN - Mail en Beheer -- Login" ).
+      var window = this.__windowLogin = new qx.ui.window.Window( "HSN - Mail en Beheer -- LDAP/Jira Login" ).
       set({
         modal          : true,
         width          : 255,
         contentPadding : [ 20, 20, 20, 20 ],
         showMinimize   : false,
         showMaximize   : false,
+        showClose      : false,
         allowGrowX     : false,
         allowGrowY     : false,
         allowShrinkX   : false,
@@ -5442,14 +5443,18 @@ qx.Class.define( "hsnmailenbeheer.Application",
       this.getRoot().add( window );
       window.open();
       
-      window.addListener( "appear", function()
-      {
-        window.center();
-        fieldUsername.setValue( this.test_usr );
-        fieldPassword.setValue( this.test_pwd );
-        
-        fieldUsername.focus();           // so that user can start typing his/her name right away
-      }, this);
+      window.addListener
+      ( 
+        "appear", function()
+        {
+          window.center();
+          fieldUsername.setValue( this.test_usr );
+          fieldPassword.setValue( this.test_pwd );
+          
+          fieldUsername.focus();           // so that user can start typing his/her name right away
+        }, 
+        this
+      );
       
       // Labels
     //var labels = [ this.tr("Username") + ":", this.tr("Password") + ":" ];

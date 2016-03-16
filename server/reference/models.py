@@ -8,7 +8,7 @@ Version:	1.0.0
 Goal:		Model classes for the hsn_reference tables
 
 08-Mar-2016	Created
-08-Mar-2016	Changed
+14-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -61,7 +61,7 @@ class Plaats( models.Model ):
 
 	class Meta:
 		managed = False
-		db_table = 'PLAATS'
+		db_table = 'ref_plaats'
 		unique_together = (('gemnr', 'volgnr'),)
 
 # [eof]

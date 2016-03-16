@@ -21,7 +21,7 @@ putopmutation( request )
 printmailbev( request )
 
 22-Jun-2015	Created
-09-Mar-2016	Changed
+15-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -44,9 +44,9 @@ from qx.ldap_authenticate import ldap_authenticate
 from reference.views import get_locations
 from hsn_manage.views import ( get_marriages, get_deaths, get_partners, get_missing, get_hsnmanage, 
 	put_hsnmanage, put_hsnmanagemissing )
-from mail.views import ( get_municipalities, get_sources, get_text_strings, 
-	get_mails, get_mails_print, 
+from mail.views import ( get_sources, get_text_strings, get_mails, get_mails_print, 
 	put_mailbev, put_mailhuw, put_mailbevreceived, put_opmutation )
+#from mail.views import get_municipalities	# obsolete
 from mail.print import print_mailbev
 from op_select.op import get_op_info
 from mail.cupstree import get_printers
@@ -87,8 +87,8 @@ def none2empty( var ):
 def gethsndata( request ):
 	print( "qx/views/gethsndata()" )
 
-	# Notice: in the client we only use locations (Plaats), 
-	# never municipalities (Gemeente), even if the GUI says Gemeente. 
+	# Notice: in the client we only use locations (plaats), 
+	# never municipalities (gemeente), even if the GUI says gemeente
 	# Municipality can be used in the Mail letters
 	
 	printers       = get_printers()

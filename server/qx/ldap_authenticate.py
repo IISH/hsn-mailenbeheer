@@ -23,7 +23,7 @@ LDAP Methods with names ending in _s are the synchronous form and wait for and
 return with the server's result, or with None if no data is expected.
 
 01-Mar-2016	Created
-07-Mar-2016	Changed
+16-Mar-2016	Changed
 """
 
 import sys
@@ -34,9 +34,10 @@ from hsnmailenbeheer import settings
 #from openldap_passwd import check_password		# no longer used
 
 
-debug = True
+#debug = True
+debug = settings.DEBUG
 
-#LDAP_PORT = 389		# default
+#LDAP_PORT = 389		# = default
 
 LDAP_SEARCH_USERNAME = settings.LDAP_SEARCH_USERNAME
 LDAP_SEARCH_PASSWORD = settings.LDAP_SEARCH_PASSWORD
@@ -93,15 +94,22 @@ def get_usr_dict( ldap_resp ):
 
 
 def find_user( ldap_client, username ):
-	search_filter = "cn=%s" % username
-	if debug: print( "search_filter: %s" % search_filter )
+	print( "\nfind_user()" )
 	
 	user_dict = None
 	
 	# bind admin to the server
+	print( "ldap_client.simple_bind_s()" )
+	print( "DN_SEARCH: %s" % DN_SEARCH )
+	print( "LDAP_SEARCH_PASSWORD: %s" %  LDAP_SEARCH_PASSWORD )
 	ldap_client.simple_bind_s( DN_SEARCH, LDAP_SEARCH_PASSWORD )
 
 	# search user
+	search_filter = "cn=%s" % username
+	print( "ldap_client.search_s()" )
+	print( "DN_BASE: %s" % DN_BASE )
+	print( "ldap.SCOPE_SUBTREE: %s" % ldap.SCOPE_SUBTREE )
+	print( "search_filter: %s" % search_filter )
 	ldap_resp = ldap_client.search_s( DN_BASE, ldap.SCOPE_SUBTREE, search_filter )
 	user_dict = get_usr_dict( ldap_resp )
 	
@@ -117,14 +125,22 @@ def find_user( ldap_client, username ):
 
 
 def authenticate_remote( ldap_client, username, password ):
-	dn_user = "cn=%s,ou=users,%s" % ( username, DC_HOST )
-	if debug: print( "dn_user: %s" % dn_user )
+	print( "\nauthenticate_remote()" )
 	
+	dn_user = "cn=%s,ou=users,%s" % ( username, DC_HOST )
+	
+	print( "ldap_client.simple_bind_s()" )
+	print( "dn_user: %s" % dn_user )
+	print( "password: %s" % password )
+
 	is_authenticated = True
 	try:
 		# bind user to the server
 		ldap_client.simple_bind_s( dn_user, password )
 	except ldap.INVALID_CREDENTIALS:
+		print( "ldap.INVALID_CREDENTIALS" )
+		print( "dn_user: %s" % dn_user )
+		print( "password: %s" % password )
 		is_authenticated = False
 	
 	return is_authenticated
@@ -133,6 +149,7 @@ def authenticate_remote( ldap_client, username, password ):
 
 def ldap_authenticate( username, password ):
 	if debug:
+		print( "ldap_authenticate()" )
 		print( "LDAP_SEARCH_USERNAME: %s" % LDAP_SEARCH_USERNAME )
 		print( "LDAP_SEARCH_PASSWORD: %s" % LDAP_SEARCH_PASSWORD )
 		print( "LDAP_USER_USERNAME:  %s" % username )
@@ -159,6 +176,7 @@ def ldap_authenticate( username, password ):
 			is_authenticated = authenticate_remote( ldap_client, username, password )
 			
 			"""
+			# "local" authenticate no longer used
 			ldap_uid = user_dict.get( "uid" )[ 0 ]
 			tagged_digest_salt = user_dict.get( "userPassword" )[ 0 ]
 			

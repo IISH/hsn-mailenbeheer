@@ -8,7 +8,7 @@ Version:	1.0.0
 Goal:		Views for mail
 
 Functions:
-def get_municipalities():
+#def get_municipalities():	# obsolete
 def get_sources():
 def get_text_strings():
 def get_mails( op_number ):
@@ -20,7 +20,7 @@ def put_opmutation( opmutation_req ):
 
 26-May-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-09-Mar-2016	Changed
+15-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -37,11 +37,11 @@ from mail.models import ( ArchiefGemeente, HsnIdmut, Mail,
 	TekstFaseA, TekstFaseB, TekstFaseCD, TekstGevonden, TekstReden, TekstVoortgang )
 
 
+"""
+# obsolete: table Gemeente does not exist anymore
 def get_municipalities():
-	"""
-	List of (nr + town) for combobox
-	Notice: municipalities from table 'Gemeente', not from table 'Plaats'.
-	"""
+	# List of (nr + town) for combobox
+	# Notice: municipalities from table 'Gemeente', not from table 'Plaats'.
 #	print( "get_municipalities()" )
 
 	choices_municipality = []
@@ -67,7 +67,7 @@ def get_municipalities():
 		print( "%s\n" % msg )
 
 	return choices_municipality 
-
+"""
 
 
 def get_sources():
@@ -78,7 +78,7 @@ def get_sources():
 	choices_source = []
 
 	try:
-		sources = ArchiefGemeente.objects.all().order_by( "gemnaam" )
+		sources = ArchiefGemeente.objects.using( "mail" ).all().order_by( "gemnaam" )
 
 		s = 0
 		for source in sources:
@@ -113,7 +113,7 @@ def get_text_strings():
 	
 	strings = []
 	try:
-		objects = TekstFaseA.objects.all().order_by( "fase_a" )
+		objects = TekstFaseA.objects.using( "mail" ).all().order_by( "fase_a" )
 		
 		o = 0
 		for object in objects:
@@ -135,7 +135,7 @@ def get_text_strings():
 	
 	strings = []
 	try:
-		objects = TekstFaseB.objects.all().order_by( "fase_b" )
+		objects = TekstFaseB.objects.using( "mail" ).all().order_by( "fase_b" )
 		
 		o = 0
 		for object in objects:
@@ -157,7 +157,7 @@ def get_text_strings():
 	
 	strings = []
 	try:
-		objects = TekstFaseCD.objects.all().order_by( "fase_c_d" )
+		objects = TekstFaseCD.objects.using( "mail" ).all().order_by( "fase_c_d" )
 		
 		o = 0
 		for object in objects:
@@ -179,7 +179,7 @@ def get_text_strings():
 	
 	strings = []
 	try:
-		objects = TekstGevonden.objects.all().order_by( "id" )
+		objects = TekstGevonden.objects.using( "mail" ).all().order_by( "id" )
 		
 		o = 0
 		for object in objects:
@@ -201,7 +201,7 @@ def get_text_strings():
 	
 	strings = []
 	try:
-		objects = TekstReden.objects.all().order_by( "reden" )
+		objects = TekstReden.objects.using( "mail" ).all().order_by( "reden" )
 		
 		o = 0
 		for object in objects:
@@ -223,7 +223,7 @@ def get_text_strings():
 	
 	strings = []
 	try:
-		objects = TekstVoortgang.objects.all().order_by( "id" )
+		objects = TekstVoortgang.objects.using( "mail" ).all().order_by( "id" )
 		
 		o = 0
 		for object in objects:
@@ -259,7 +259,7 @@ def get_mails( op_number ):
 	mails_oth = []
 	
 	try:
-		mail_qs = Mail.objects.filter( idnr = op_number ).order_by( "id" )
+		mail_qs = Mail.objects.using( "mail" ).filter( idnr = op_number ).order_by( "id" )
 		
 		if mail_qs is None:
 			print( "Mail does not contain entries for OP %d", op_number )
@@ -330,7 +330,7 @@ def get_mails_print():
 	print_huw = []
 
 	try:
-		mail_qs = Mail.objects.filter( status = 0, type = "BEV" ).order_by( "id" )
+		mail_qs = Mail.objects.using( "mail" ).filter( status = 0, type = "BEV" ).order_by( "id" )
 		
 		if mail_qs is None:
 			print( "Mail does not contain entries with status = 0" )
@@ -439,13 +439,13 @@ def put_mailbev( mailbev_req ):
 			try:
 				status = "OK"
 				ncreated += 1
-				mail = Mail.objects.create( **mailbev_dict )
+				mail = Mail.objects.using( "mail" ).create( **mailbev_dict )
 				print( "created id: %s for idnr: %s" % ( mail.id, idnr ) )
 			except:
 				status = "ERROR"
 				print( "mail/views/put_mailbev() idnr = %s" % idnr )
 				type, value, tb = exc_info()
-				msg = "Mail.objects.create() failed: %s" % value
+				msg = "Mail.objects.create failed: %s" % value
 				print( "%s\n" % msg )
 				print( mailbev_dict )
 		
@@ -454,15 +454,15 @@ def put_mailbev( mailbev_req ):
 			try:
 				status = "OK"
 				nupdated += 1
-				mail = Mail.objects.get( id = id )
-				mail = Mail.objects.filter( id = id ).update( **mailbev_dict )
+				mail = Mail.objects.using( "mail" ).get( id = id )
+				mail = Mail.objects.using( "mail" ).filter( id = id ).update( **mailbev_dict )
 				print( "updated id: %s for idnr: %s" % ( id, idnr ) )
 
 			except:
 				status = "ERROR"
 				print( "mail/views/put_mailbev() idnr = %s" % idnr )
 				type, value, tb = exc_info()
-				msg = "Mail.objects.update() failed: %s" % value
+				msg = "Mail.objects.update failed: %s" % value
 				print( "%s\n" % msg )
 				print( mailbev_dict )
 	
@@ -471,14 +471,14 @@ def put_mailbev( mailbev_req ):
 		try:
 			status = "OK"
 			ndeleted += 1
-			mail = Mail.objects.get( id = id )
-			Mail.objects.filter( id = id ).delete()
+			mail = Mail.objects.using( "mail" ).get( id = id )
+			Mail.objects.using( "mail" ).filter( id = id ).delete()
 			print( "deleted id: %s for idnr: %s" % ( id, mail.idnr ) )
 		except:
 			status = "ERROR"
 			print( "mail/views/put_mailbev() idnr = %s" % idnr )
 			type, value, tb = exc_info()
-			msg = "Mail.objects.delete() failed: %s" % value
+			msg = "Mail.objects.delete failed: %s" % value
 			print( "%s\n" % msg )
 			print( mailbev_dict )
 
@@ -567,13 +567,13 @@ def put_mailhuw( mailhuw_req ):
 			try:
 				status = "OK"
 				ncreated += 1
-				mail = Mail.objects.create( **mailhuw_dict )
+				mail = Mail.objects.using( "mail" ).create( **mailhuw_dict )
 				print( "created id: %s for idnr: %s" % ( mail.id, idnr ) )
 			except:
 				status = "ERROR"
 				print( "mail/views/put_mailhuw() idnr = %s" % idnr )
 				type, value, tb = exc_info()
-				msg = "Mail.objects.create() failed: %s" % value
+				msg = "Mail.objects.create failed: %s" % value
 				print( "%s\n" % msg )
 				print( mailhuw_dict )
 		
@@ -582,15 +582,15 @@ def put_mailhuw( mailhuw_req ):
 			try:
 				status = "OK"
 				nupdated += 1
-				mail = Mail.objects.get( id = id )
-				mail = Mail.objects.filter( id = id ).update( **mailhuw_dict )
+				mail = Mail.objects.using( "mail" ).get( id = id )
+				mail = Mail.objects.using( "mail" ).filter( id = id ).update( **mailhuw_dict )
 				print( "updated id: %s for idnr: %s" % ( mail.id, idnr ) )
 
 			except:
 				status = "ERROR"
 				print( "mail/views/put_mailhuw() idnr = %s" % idnr )
 				type, value, tb = exc_info()
-				msg = "Mail.objects.update() failed: %s" % value
+				msg = "Mail.objects.update failed: %s" % value
 				print( "%s\n" % msg )
 				print( mailbev_dict )
 	
@@ -599,14 +599,14 @@ def put_mailhuw( mailhuw_req ):
 		try:
 			status = "OK"
 			ndeleted += 1
-			mail = Mail.objects.get( id = id )
-			Mail.objects.filter( id = id ).delete()
+			mail = Mail.objects.using( "mail" ).get( id = id )
+			Mail.objects.using( "mail" ).filter( id = id ).delete()
 			print( "deleted id: %s for idnr: %s" % ( mail.id, idnr ) )
 		except:
 			status = "ERROR"
 			print( "mail/views/put_mailhuw() idnr = %s" % idnr )
 			type, value, tb = exc_info()
-			msg = "Mail.objects.delete() failed: %s" % value
+			msg = "Mail.objects.delete failed: %s" % value
 			print( "%s\n" % msg )
 			print( mailhuw_dict )
 
@@ -640,13 +640,13 @@ def put_mailbevreceived( mailbevreceived_req ):
 		print( "updating id: %s of idnr: %s" % ( id, idnr ) )
 		try:
 			status = "OK"
-			mail = Mail.objects.filter( id = id ).update( **mailbev_dict )
+			mail = Mail.objects.using( "mail" ).filter( id = id ).update( **mailbev_dict )
 			print( "updated id: %s for idnr: %s" % ( mail.id, idnr ) )
 		except:
 			status = "ERROR"
 			print( "mail/views/put_mailbevreceived() id = %s, idnr = %s" % ( id, idnr ) )
 			type, value, tb = exc_info()
-			msg = "Mail.objects.update() failed: %s" % value
+			msg = "Mail.objects.update failed: %s" % value
 			print( "%s\n" % msg )
 			print( mailbev_dict )
 
@@ -703,7 +703,7 @@ def put_opmutation( opmutation_req ):
 	
 	try:
 		status = "OK"
-		opmutation = HsnIdmut.objects.create( **opmutation_dict )
+		opmutation = HsnIdmut.objects.using( "mail" ).create( **opmutation_dict )
 		print( "created mutation for idnr: %s" % idnr )
 		print( opmutation )
 
@@ -711,7 +711,7 @@ def put_opmutation( opmutation_req ):
 		status = "ERROR"
 		print( "mail/views/put_opmutation() idnr = %s" % idnr )
 		type, value, tb = exc_info()
-		msg = "HsnIdmut.objects.update() failed: %s" % value
+		msg = "HsnIdmut.objects.create failed: %s" % value
 		print( "%s\n" % msg )
 		print( opmutation_dict )
 

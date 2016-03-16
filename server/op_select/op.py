@@ -6,7 +6,7 @@ Project:	HSN Mail
 Name:		op.py
 Version:	1.0.0
 Goal:		'OP' te Onderzoeken Persoon (person to be investigated) functions
-
+HsnIdmut
 Functions:
 def get_op_info( op_number ):
 def get_id_change_manual( op_number ):
@@ -14,7 +14,7 @@ def get_id_change_manual( op_number ):
 
 09-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-09-Mar-2016	Changed
+15-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -150,7 +150,7 @@ def get_id_change_manual( op_number ):
 	op_info_list = []
 		
 	try:
-		hsnidmut_qs = HsnIdmut.objects.filter( idnr = op_number )
+		hsnidmut_qs = HsnIdmut.objects.using( "mail" ).filter( idnr = op_number )
 
 		if hsnidmut_qs is None:
 			print( "HsnIdmut entry %d does not exist", op_number )
@@ -209,7 +209,7 @@ def get_id_change_manual( op_number ):
 	except:
 		print( "op/get_id_change_manual()" )
 		type, value, tb = exc_info()
-		msg = "HsnIdmut.objects.get failed: %s" % value
+		msg = "HsnIdmut.objects.filter failed: %s" % value
 		print( "%s\n" % msg )
 
 	return op_info_list

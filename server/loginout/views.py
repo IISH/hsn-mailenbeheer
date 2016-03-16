@@ -15,7 +15,7 @@ login( request )
 logout( request )
 
 02-Mar-2016	Created
-02-Mar-2016	Changed
+16-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -76,11 +76,14 @@ def login( request ):
 	status = msg = ""
 	if is_ldap_authenticated:
 		print( "User: %s LDAP authenticated OK" % username )
-		status = msg = ""
+		status = "ok"
+		msg    = "LDAP Authentication OK"
 		
+		"""
 		# now check local login
 		is_hsn_authenticated, is_hsn_active = hsn_authenticate( username, password )
 		print( "is_hsn_authenticated: %s, is_hsn_active: %s" % ( is_hsn_authenticated, is_hsn_active ) )
+		
 		if is_hsn_authenticated:
 			if is_hsn_active:
 				status = "ok"
@@ -91,10 +94,11 @@ def login( request ):
 		else:
 			status = "HSN fail"
 			msg = "HSN user <b>%s</b> authentication failure" % username
+		"""
 	else:
 		print( "User: %s NOT LDAP authenticated" % username )
 		status = "LDAP fail"
-		msg = "LDAP Authentication failure"
+		msg    = "LDAP Authentication failure"
 	
 	dictionary = \
 	{

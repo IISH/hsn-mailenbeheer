@@ -3,7 +3,7 @@
 """
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
-Name:		views.py
+Name:		hsn_manage/views.py
 Version:	1.0.0
 Goal:		View for hsn_manage
 
@@ -27,7 +27,7 @@ def put_hsnmanagemissing( missing_req )
 
 02-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-09-Mar-2016	Changed
+15-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -194,7 +194,7 @@ def get_marriages_mail( op_numstr ):
 
 	# get marriage info info from Mail
 	try:
-		mail_qs = Mail.objects.filter( idnr = op_numstr, type = "HUW" ).order_by( "id" )
+		mail_qs = Mail.objects.using( "mail" ).filter( idnr = op_numstr, type = "HUW" ).order_by( "id" )
 
 		if mail_qs is not None:
 			for mail in mail_qs:
@@ -318,7 +318,7 @@ def get_death_hsnmanage( op_numstr ):
 	# get death info info from HsnBeheer
 	try:
 		from qx.views import none2empty
-		entry = HsnBeheer.objects.get( idnr = op_numstr )
+		entry = HsnBeheer.objects.using( "mail" ).get( idnr = op_numstr )
 
 		death_location = none2empty( entry.ovlplaats )
 
@@ -338,7 +338,7 @@ def get_death_hsnmanage( op_numstr ):
 	except:
 		print( "hsn_manage/views/get_death_hsnmanage( %s )" % op_numstr)
 		type, value, tb = exc_info()
-		msg = "HsnBeheer.objects.filter failed: %s" % value
+		msg = "HsnBeheer.objects.get failed: %s" % value
 		print( "%s\n" % msg )
 	
 	return death
@@ -447,7 +447,7 @@ def get_partners_mail( op_number ):
 	
 	# List of partner mentioning of OP in mails
 	try:
-		mail_qs = Mail.objects.filter( idnr = op_number, type = "HUW" ).order_by( "id" )
+		mail_qs = Mail.objects.using( "mail" ).filter( idnr = op_number, type = "HUW" ).order_by( "id" )
 		
 		if mail_qs is None:
 			print( "Mail does not contain partners for OP %d", op_number )
@@ -481,7 +481,7 @@ def get_missing( op_numstr ):
 
 	# get missing data info info from HsnKwyt
 	try:
-		missing_qs = HsnKwyt.objects.filter( idnr = op_numstr ).order_by( "idvolgnr" )
+		missing_qs = HsnKwyt.objects.using( "mail" ).filter( idnr = op_numstr ).order_by( "idvolgnr" )
 
 		if missing_qs is not None:
 			for entry in missing_qs:
@@ -523,7 +523,7 @@ def get_hsnmanage( op_numstr ):
 	phase_c = None
 				
 	try:
-		hsnmanage_qs = HsnBeheer.objects.filter( idnr = op_numstr )
+		hsnmanage_qs = HsnBeheer.objects.using( "mail" ).filter( idnr = op_numstr )
 
 		if hsnmanage_qs is None:
 			print( "HsnBeheer entry %s does not exist", op_numstr )
@@ -573,35 +573,35 @@ def get_hsnmanage( op_numstr ):
 	print( "phase_a:", phase_a, "phase_b:", phase_b, "phase_c:", phase_c )
 	phase_a_str = ""
 	try:
-		tfasea = TekstFaseA.objects.filter( fase_a = hsnmanage.fase_a ).first()
+		tfasea = TekstFaseA.objects.using( "mail" ).filter( fase_a = hsnmanage.fase_a ).first()
 		if tfasea is not None:
 			phase_a_str = str( phase_a ) + " - " + tfasea.fase_a_text
 	except:
 		phase_a = ""
 		type, value, tb = exc_info()
-		msg = "TekstFaseA.objects.filter failed: %s" % value
+		msg = "TekstFaseA.objects failed: %s" % value
 		print( "%s\n" % msg )
 
 	phase_b_str = ""
 	try:
-		tfaseb = TekstFaseB.objects.filter( fase_b = hsnmanage.fase_b ).first()
+		tfaseb = TekstFaseB.objects.using( "mail" ).filter( fase_b = hsnmanage.fase_b ).first()
 		if tfaseb is not None:
 			phase_b_str = str( phase_b ) + " - " + tfaseb.fase_b_text
 	except:
 		phase_b = ""
 		type, value, tb = exc_info()
-		msg = "TekstFaseB.objects.filter failed: %s" % value
+		msg = "TekstFaseB.objects failed: %s" % value
 		print( "%s\n" % msg )
 		
 	phase_c_str = ""
 	try:
-		tfasec = TekstFaseCD.objects.filter( fase_c_d = hsnmanage.fase_c_d ).first()
+		tfasec = TekstFaseCD.objects.using( "mail" ).filter( fase_c_d = hsnmanage.fase_c_d ).first()
 		if tfasec is not None:
 			phase_c_str = str( phase_c ) + " - " + tfasec.fase_c_d_text
 	except:
 		phase_c = ""
 		type, value, tb = exc_info()
-		msg = "TekstFaseCD.objects.filter failed: %s" % value
+		msg = "TekstFaseCD.objects failed: %s" % value
 		print( "%s\n" % msg )
 		
 	print( "phase_a:", phase_a, "phase_b:", phase_b, "phase_c:", phase_c )
@@ -639,12 +639,12 @@ def get_voortgang( invoerstatus ):
 	voortgang = ""
 	
 	try:
-		voortgang_qs = TekstVoortgang.objects.get( invoerstatus = invoerstatus )
+		voortgang_qs = TekstVoortgang.objects.using( "mail" ).get( invoerstatus = invoerstatus )
 		voortgang = voortgang_qs.invoerstatustekst
 	except:
 		print( "hsn_manage/views/get_voortgang( invoerstatus )" )
 		type, value, tb = exc_info()
-		msg = "TekstVoortgang.objects.get failed: %s" % value
+		msg = "TekstVoortgang.objects failed: %s" % value
 		print( "%s\n" % msg )
 
 	return voortgang
@@ -663,7 +663,7 @@ def put_hsnmanage( fields ):
 		print( key, "=", value )
     
 	try:
-		numrows = HsnBeheer.objects.filter( idnr = idnr ).update( **fields )
+		numrows = HsnBeheer.objects.using( "mail" ).filter( idnr = idnr ).update( **fields )
 	except ObjectDoesNotExist:
 		# not found
 		status = "NOT FOUND"
@@ -673,7 +673,7 @@ def put_hsnmanage( fields ):
 		status = "ERROR"
 		print( "hsn_manage/views/put_hsnmanage() OP = %s" % idnr )
 		type, value, tb = exc_info()
-		msg = "HsnBeheer.objects.filter().update() failed: %s" % value
+		msg = "HsnBeheer.objects.update failed: %s" % value
 		print( "%s\n" % msg )
 	else:
 		# no exception
@@ -728,7 +728,7 @@ def put_hsnmanagemissing( missing_req ):
 		
 		try:
 			status = "OK"
-			obj, created = HsnKwyt.objects.update_or_create(
+			obj, created = HsnKwyt.objects.using( "mail" ).update_or_create(
 				idnr = idnr, idvolgnr = idvolgnr, defaults = None, **missing_dict )
 		#	print( "idnr: %s, idvolgnr: %s, created: %s" % ( idnr, idvolgnr, created ) )
 			
@@ -742,7 +742,7 @@ def put_hsnmanagemissing( missing_req ):
 			status = "ERROR"
 			print( "hsn_manage/views/put_hsnmanagemissing() idnr = %s, idvolgnr = %s" % ( idnr, idvolgnr ) )
 			type, value, tb = exc_info()
-			msg = "HsnKwyt.objects.update_or_create() failed: %s" % value
+			msg = "HsnKwyt.objects.update_or_create failed: %s" % value
 			print( "%s\n" % msg )
 			print( missing_dict )
 		
@@ -752,11 +752,11 @@ def put_hsnmanagemissing( missing_req ):
 	try:
 		status = "OK"
 		if nrows == 0:
-			HsnKwyt.objects.filter( idnr = idnr ).delete()
+			HsnKwyt.objects.using( "mail" ).filter( idnr = idnr ).delete()
 		else:
 			print( volgnrs_new )
 			volgnrs_del = []
-			hsnkwyt_qs = HsnKwyt.objects.filter( idnr = idnr )
+			hsnkwyt_qs = HsnKwyt.objects.using( "mail" ).filter( idnr = idnr )
 			if hsnkwyt_qs is not None:
 				for hsnkwyt in hsnkwyt_qs:
 					idvolgnr = hsnkwyt.idvolgnr
@@ -766,12 +766,12 @@ def put_hsnmanagemissing( missing_req ):
 					else:
 						print( "delete idvolgnr: %d of OP: %s" % ( idvolgnr, idnr ) )
 						ndeleted += 1
-						HsnKwyt.objects.filter( idnr = idnr, idvolgnr = idvolgnr ).delete()
+						HsnKwyt.objects.using( "mail" ).filter( idnr = idnr, idvolgnr = idvolgnr ).delete()
 	except:
 		status = "ERROR"
 		print( "hsn_manage/views/put_hsnmanagemissing() idnr = %s, idvolgnr = %s" % ( idnr, idvolgnr ) )
 		type, value, tb = exc_info()
-		msg = "HsnKwyt.objects.delete() failed: %s" % value
+		msg = "HsnKwyt.objects.delete failed: %s" % value
 		print( "%s\n" % msg )
 	
 	msg = "put_hsnmanagemissing() idnr = %s, updated: %d, created: %d, deleted: %d" % \

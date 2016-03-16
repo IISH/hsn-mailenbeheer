@@ -20,7 +20,7 @@ def update_status( id ):
 
 17-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-09-Mar-2016	Changed
+15-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -70,9 +70,9 @@ def print_mailbev():
 		
 		ret_status = "OK"
 		msg = ""
-	#	mail_qs = Mail.objects.filter( status = 0, type = "BEV" ).order_by( "provnr", "archiefnaam", "id" )	# "provnr" not in Mail table
-	#	mail_qs = Mail.objects.filter( status = 0, type = "BEV" ).order_by( "archiefnaam", "id" )	# "archiefnaam" not in Mail table
-		mail_qs = Mail.objects.filter( status = 0, type = "BEV" ).order_by( "gemnr", "id" )
+	#	mail_qs = Mail.objects.using( "mail" ).filter( status = 0, type = "BEV" ).order_by( "provnr", "archiefnaam", "id" )	# "provnr" not in Mail table
+	#	mail_qs = Mail.objects.using( "mail" ).filter( status = 0, type = "BEV" ).order_by( "archiefnaam", "id" )	# "archiefnaam" not in Mail table
+		mail_qs = Mail.objects.using( "mail" ).filter( status = 0, type = "BEV" ).order_by( "gemnr", "id" )
 		
 		if mail_qs is None:
 			msg = "Mail does not contain entries with status = 0"
@@ -155,7 +155,7 @@ def get_mailtype( idnr ):
 	mail_type = None
 	# get mailtype from HsnBeheer
 	try:
-		hsnmanage = HsnBeheer.objects.get( idnr = idnr )
+		hsnmanage = HsnBeheer.objects.using( "mail" ).get( idnr = idnr )
 		if hsnmanage is not None:
 			mail_type = hsnmanage.mail_type
 	except:
@@ -175,7 +175,7 @@ def get_archive( gemnr ):
 	
 	# get archive from ArchiefGemeente
 	try:
-		archive_info = ArchiefGemeente.objects.get( gemnr = gemnr )
+		archive_info = ArchiefGemeente.objects.using( "mail" ).get( gemnr = gemnr )
 		if archive_info is not None:
 			archiefnaam = archive_info.archiefnaam
 			gemeentemet = archive_info.gemeente_met_archief
@@ -759,7 +759,7 @@ def update_status_date( id ):
 	}
 	
 	try:
-		numrows = Mail.objects.filter( id = id ).update( **fields )
+		numrows = Mail.objects.using( "mail" ).filter( id = id ).update( **fields )
 	except ObjectDoesNotExist:
 		# not found
 		ret_status = "NOT FOUND"
