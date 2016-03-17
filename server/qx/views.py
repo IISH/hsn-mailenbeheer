@@ -21,7 +21,9 @@ putopmutation( request )
 printmailbev( request )
 
 22-Jun-2015	Created
-15-Mar-2016	Changed
+17-Mar-2016	@login_required added
+17-Mar-2016	@csrf_exempt removed
+17-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -37,10 +39,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 
 from hsnmailenbeheer import settings
-from qx.ldap_authenticate import ldap_authenticate
 from reference.views import get_locations
 from hsn_manage.views import ( get_marriages, get_deaths, get_partners, get_missing, get_hsnmanage, 
 	put_hsnmanage, put_hsnmanagemissing )
@@ -82,11 +82,24 @@ def none2empty( var ):
 
 
 
-@csrf_exempt
-#@login_required
+@login_required
 def gethsndata( request ):
 	print( "qx/views/gethsndata()" )
 
+	if request.method == "GET":
+		REQUEST = request.GET
+	else:
+		REQUEST = request.POST
+	
+	"""
+	# It seems that the browser automatically sends these cookies, so apparently I do not 
+	# have to copy the csrftoken with qooxdoo in the client into subsequent request objects. 
+	csrftoken = request.COOKIES.get( "csrftoken" )
+	sessionid = request.COOKIES.get( "sessionid" )
+	print( "csrftoken:", csrftoken )
+	print( "sessionid:", sessionid )
+	"""
+	
 	# Notice: in the client we only use locations (plaats), 
 	# never municipalities (gemeente), even if the GUI says gemeente
 	# Municipality can be used in the Mail letters
@@ -113,7 +126,7 @@ def gethsndata( request ):
 
 
 
-@csrf_exempt
+@login_required
 def gethsnopdata( request ):
 	print( "qx/views/gethsnopdata() %s %s" % ( request.scheme, request.method ) )
 	
@@ -218,7 +231,7 @@ def gethsnopdata( request ):
 
 
 
-@csrf_exempt
+@login_required
 def puthsnmanage( request ):
 	print( "qx/views/puthsnmanage()" )
 
@@ -257,7 +270,7 @@ def puthsnmanage( request ):
 
 
 
-@csrf_exempt
+@login_required
 def puthsnmanagemissing( request ):
 	print( "qx/views/puthsnmanagemissing()" )
 
@@ -276,7 +289,7 @@ def puthsnmanagemissing( request ):
 
 
 
-@csrf_exempt
+@login_required
 def putmailbev( request ):
 	print( "qx/views/putmailbev()" )
 
@@ -300,7 +313,7 @@ def putmailbev( request ):
 
 
 
-@csrf_exempt
+@login_required
 def putmailhuw( request ):
 	print( "qx/views/putmailhuw()" )
 
@@ -324,7 +337,7 @@ def putmailhuw( request ):
 
 
 
-@csrf_exempt
+@login_required
 def putmailbevreceived( request ):
 	print( "qx/views/putmailbevreceived()" )
 
@@ -348,7 +361,7 @@ def putmailbevreceived( request ):
 
 
 
-@csrf_exempt
+@login_required
 def putopmutation( request ):
 	print( "qx/views/putopmutation()" )
 
@@ -372,7 +385,7 @@ def putopmutation( request ):
 
 
 
-@csrf_exempt
+@login_required
 def printmailbev( request ):
 	print( "qx/views/printmailbev()" )
 	

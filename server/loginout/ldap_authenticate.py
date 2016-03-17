@@ -3,7 +3,7 @@
 """
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
-Name:		qx/ldap_authenticate.py
+Name:		loginout/ldap_authenticate.py
 Version:	1.0.0
 Goal:		LDAP authentication
 
@@ -23,7 +23,7 @@ LDAP Methods with names ending in _s are the synchronous form and wait for and
 return with the server's result, or with None if no data is expected.
 
 01-Mar-2016	Created
-16-Mar-2016	Changed
+17-Mar-2016	Changed
 """
 
 import sys

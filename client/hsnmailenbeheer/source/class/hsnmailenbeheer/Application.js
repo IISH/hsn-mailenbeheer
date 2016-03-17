@@ -233,9 +233,16 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev ) 
         {
           var request = ev.getTarget();
+          /*
+          var sessionid = request.cookie.get( "sessionid" );
+          var csrftoken = request.cookie.get( "csrftoken" );
+          console.debug( "sessionid: " + sessionid );
+          console.debug( "csrftoken: " + csrftoken );
+      */
           var json_data = request.getResponse();
           var content_type = request.getResponseContentType();
         //console.debug( "getHsnData() content_type: " + content_type );
+          
           if( content_type !== "application/json" )
           { this.createAlert( "getHsnData() unexpected response:<br>" + content_type + "<br>" + request.getResponseText() ); }
           
@@ -279,6 +286,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "getHsnData() fail: " + response );
+          this.showDialog( "fail" + "<br><br>" + response );
         }, 
         this 
       );
@@ -291,6 +299,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "getHsnData() statusError: " + response );
+          this.showDialog( "statusError" + "<br><br>" + response );
         }, 
         this 
       );
@@ -445,6 +454,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "fail: " + response );
+          this.showDialog( "fail" + "<br><br>" + response );
         }, 
         this 
       );
@@ -457,6 +467,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "statusError: " + response );
+          this.showDialog( "statusError" + "<br><br>" + response );
         }, 
         this 
       );

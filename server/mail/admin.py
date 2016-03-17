@@ -10,7 +10,7 @@ Goal:		Admin classes for the hsn_mail tables
 26-May-2015	Created
 09-Sep-2015	Missing HuwkndAdmin added
 12-Oct-2015	Removed superfluous tables
-27-Oct-2015	Changed
+17-Mar-2016	Changed
 """
 
 
@@ -63,6 +63,9 @@ class TekstVoortgangAdmin( admin.ModelAdmin ):
 	list_display = ( 'id', 'invoerstatus', 'invoerstatustekst' )
 
 
+"""
+# We have to adapt the admin classes above for multi-db support, see: 
+# https://docs.djangoproject.com/en/1.9/topics/db/multi-db/
 admin.site.register( ArchiefGemeente, ArchiefGemeenteAdmin )
 admin.site.register( HsnBeheer,       HsnBeheerAdmin )
 admin.site.register( HsnIdmut,        HsnIdmutAdmin )
@@ -75,5 +78,6 @@ admin.site.register( TekstFaseCD,    TekstFaseCDAdmin )
 admin.site.register( TekstGevonden,  TekstGevondenAdmin )
 admin.site.register( TekstReden,     TekstRedenAdmin )
 admin.site.register( TekstVoortgang, TekstVoortgangAdmin )
+"""
 
 # [eof]

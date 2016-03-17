@@ -8,7 +8,7 @@ Version:	1.0.0
 Goal:		Admin classes for the hsn_central tables
 
 08-Mar-2016	Created
-08-Mar-2016	Changed
+17-Mar-2016	Changed
 """
 
 
@@ -26,7 +26,11 @@ class PlaatsAdmin( admin.ModelAdmin ):
 	list_display = ( 'id', 'gemnr', 'provnr', 'regnr', 'regio', 'volgnr', 'gemnaam' )
 
 
+"""
+# We have to adapt the admin classes above for multi-db support, see: 
+# https://docs.djangoproject.com/en/1.9/topics/db/multi-db/
 admin.site.register( Hsnrp,  HsnrpAdmin )
 admin.site.register( Plaats, PlaatsAdmin )
+"""
 
 # [eof]

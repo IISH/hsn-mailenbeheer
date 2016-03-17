@@ -8,14 +8,14 @@ Version:	1.0.0
 Goal:		Views for login & logout
 
 Functions:
-json_response( func )
-def none2empty( var ):
-login( request )
-
-logout( request )
+def hsn_login( request ):
+def hsn_authenticate( request, username, password ):
+def hsn_logout( request ):
 
 02-Mar-2016	Created
-16-Mar-2016	Changed
+17-Mar-2016	@login_required added
+17-Mar-2016	@csrf_exempt removed
+17-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -30,18 +30,16 @@ import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import RequestContext
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 
 from hsnmailenbeheer import settings
-from qx.ldap_authenticate import ldap_authenticate
+from .ldap_authenticate import ldap_authenticate
 
 
-@csrf_exempt
-def login( request ):
-	print( "loginout/views/login()" )
+def hsn_login( request ):
+	print( "loginout/views/hsn_login()" )
 	
 #	scheme_authority, sub_site = get_server_info( request )
 
@@ -71,34 +69,38 @@ def login( request ):
 	print( "username:", username )
 	print( "password:", password )
 	
-	is_ldap_authenticated = ldap_authenticate( username, password )
-	
-	status = msg = ""
-	if is_ldap_authenticated:
-		print( "User: %s LDAP authenticated OK" % username )
-		status = "ok"
-		msg    = "LDAP Authentication OK"
-		
-		"""
-		# now check local login
-		is_hsn_authenticated, is_hsn_active = hsn_authenticate( username, password )
-		print( "is_hsn_authenticated: %s, is_hsn_active: %s" % ( is_hsn_authenticated, is_hsn_active ) )
-		
-		if is_hsn_authenticated:
-			if is_hsn_active:
-				status = "ok"
-				msg = "Hello %s" % username
-			else:
-				status = "HSN fail"
-				msg = "HSN user <b>%s</b> is not active" % username
-		else:
-			status = "HSN fail"
-			msg = "HSN user <b>%s</b> authentication failure" % username
-		"""
-	else:
+	if username is None or password is None:
 		print( "User: %s NOT LDAP authenticated" % username )
 		status = "LDAP fail"
-		msg    = "LDAP Authentication failure"
+		msg    = "LDAP Authentication failure for user %s" % username
+	else:
+		is_ldap_authenticated = ldap_authenticate( username, password )
+		
+		status = msg = ""
+		if is_ldap_authenticated:
+			print( "User: %s LDAP authenticated OK" % username )
+			status = "ok"
+			msg    = "LDAP Authentication OK"
+			
+			# now check local app login
+			is_hsn_authenticated, is_hsn_active = hsn_authenticate( request, username, password )
+			print( "is_hsn_authenticated: %s, is_hsn_active: %s" % ( is_hsn_authenticated, is_hsn_active ) )
+			
+			if is_hsn_authenticated:
+				if is_hsn_active:
+					status = "ok"
+					msg = "Hello %s" % username
+				else:
+					status = "HSN fail"
+					msg = "HSN user <b>%s</b> is not active" % username
+			else:
+				status = "HSN fail"
+				msg = "HSN user <b>%s</b> authentication failure" % username
+			
+		else:
+			print( "User: %s NOT LDAP authenticated" % username )
+			status = "LDAP fail"
+			msg    = "LDAP Authentication failure for user %s" % username
 	
 	dictionary = \
 	{
@@ -111,12 +113,25 @@ def login( request ):
 
 
 
-def hsn_authenticate( username, password ):
+def hsn_authenticate( request, username, password ):
 	print( "loginout/views/hsn_authenticate()" )
 	
 	is_authenticated = False
 	is_active = False
 	
+	user = authenticate( username = username, password = password )
+	
+	if user is not None:
+		is_authenticated = True
+		if user.is_active:
+			is_active = True
+			print( "User %s authenticated is active" % username )
+		login( request, user )
+	else:
+		print( "login failed" )
+	
+	
+	"""
 	user = authenticate( username = username, password = password )
 	
 	if user is not None:	# the password is verified for the user
@@ -134,14 +149,18 @@ def hsn_authenticate( username, password ):
 	else:
 		# the authentication system was unable to verify the username and password
 		print( "The username and password were incorrect." )
-
+	"""
+	
 	return is_authenticated, is_active
 
 
 
-@csrf_exempt
-def logout( request ):
-	print( "loginout/views/logout()" )
+@login_required
+def hsn_logout( request ):
+	print( "loginout/views/hsn_logout()" )
+	
+	# Note that logout() doesn’t throw any errors if the user wasn’t logged in.
+	logout( request )
 	
 	if request.method == "GET":
 		REQUEST = request.GET

@@ -9,7 +9,7 @@ Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
 25-Feb-2016	Django-1.8 changes, -> Django-1.9
-16-Mar-2016	Changed
+17-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -48,7 +48,7 @@ SECRET_KEY = 'not_secret'  # must be overwritten in settings_local
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # can be overwritten in settings_local
-ADMIN_ENABLED = DEBUG
+ADMIN_ENABLED = True
 
 ALLOWED_HOSTS = []  # overwritten in settings_local
 
@@ -142,14 +142,18 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
+# https://docs.djangoproject.com/en/1.9/howto/static-files/deployment/
+# Set corresponding alias in web server config, and make static dir accessible
 STATIC_URL = '/static/'
+#STATIC_URL = "/hsnmailenbeheer_static/"
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-# Dgango-registration; register url = /accounts/register/
-LOGIN_URL = "/accounts/login/"
-ACCOUNT_ACTIVATION_DAYS = 7
+# django-registration add-on module currently not used (for sending emails, etc.)
+# Django-registration; register url = /accounts/register/
+#LOGIN_URL = "/accounts/login/"
+#ACCOUNT_ACTIVATION_DAYS = 7
+LOGIN_URL = "/hsnmailenbeheer_wsgi/login/"
 
 HSN_START_DATE = 1811
 
