@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # FL-22-Oct-2015 Created
-# FL-22-Oct-2015 Changed
+# FL-08-Feb-2016 Changed
 
 # Python/Django
 # Before sourcing this script, create an environment variable 
 # PATH_AT_LOGIN that is the same as the PATH after login
 
-export PYTHON_LOCAL=~/opt/Python/python-2.7.10
+export PYTHON_LOCAL=~/opt/Python/python-2.7.11
 
 # 2.6.6 is the system python
 #alias python=/usr/bin/python

@@ -8,20 +8,21 @@ Version:	1.0.0
 Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
-17-Nov-2015	Changed
+25-Feb-2016	Django-1.8 changes, -> Django-1.9
+17-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
-from __future__ import (absolute_import, division, print_function, unicode_literals)
-from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next,
-                      oct, open, pow, range, round, str, super, zip)
+from __future__ import ( absolute_import, division, print_function, unicode_literals )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next,
+	oct, open, pow, range, round, str, super, zip )
 
 import os
 import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "17-Nov-2015 11:54"
+TIMESTAMP_SERVER = "16-Mar-2016 13:21"
 
 django_version_str = get_version()
 django_version_lst = django_version_str.split('.')
@@ -40,82 +41,93 @@ print( "PROJECT_PARENT:", PROJECT_PARENT )
 print( "PROJECT_GRANNY:", PROJECT_GRANNY )
 
 
-# See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'not_secret'  # must be overwritten in settings_local
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # can be overwritten in settings_local
-
-ADMIN_ENABLED = DEBUG
+ADMIN_ENABLED = True
 
 ALLOWED_HOSTS = []  # overwritten in settings_local
 
 
 # Application definition
-INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+INSTALLED_APPS = [
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
 
-    # 'debug_toolbar',
-    'mail',
-    'qx',
-)
+#	'debug_toolbar',
+	'loginout',
+	'mail',				# tables from hsn_mail
+	'central',			# tables from hsn_central
+	'reference',		# tables from hsn_reference
+	'qx',
+]
 
-MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  # not in Django-1.4.20
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',  # not in Django-1.4.20
-)
+MIDDLEWARE_CLASSES = [
+	'django.middleware.security.SecurityMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  # not in Django-1.4.20
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 ROOT_URLCONF = 'hsnmailenbeheer.urls'
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',  # needed by django_tables2
-)
-
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['qx'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+	{
+		'BACKEND': 'django.template.backends.django.DjangoTemplates',
+		'DIRS': [ 'qx' ],
+		'APP_DIRS': True,
+		'OPTIONS': {
+			'context_processors': [
+				'django.contrib.auth.context_processors.auth',
+				'django.contrib.messages.context_processors.messages',
+				'django.template.context_processors.debug',
+				'django.template.context_processors.i18n',
+				'django.template.context_processors.media',
+				'django.template.context_processors.static',
+				'django.template.context_processors.tz',
+			],
+		},
+	},
 ]
 
 WSGI_APPLICATION = 'hsnmailenbeheer.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 # -> in settings_local
-'''
+"""
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.sqlite3',
 		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 	}
+},
+	'central': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+	}
+},
+	'reference': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+	}
 }
-'''
+"""
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
+# https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 
 # TIME_ZONE = 'UTC'
@@ -129,22 +141,27 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+# https://docs.djangoproject.com/en/1.9/howto/static-files/deployment/
+# Set corresponding alias in web server config, and make static dir accessible
 STATIC_URL = '/static/'
+#STATIC_URL = "/hsnmailenbeheer_static/"
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-#LOGIN_URL = "login"
-LOGIN_URL = "/accounts/login/"
+# django-registration add-on module currently not used (for sending emails, etc.)
+# Django-registration; register url = /accounts/register/
+#LOGIN_URL = "/accounts/login/"
+#ACCOUNT_ACTIVATION_DAYS = 7
+LOGIN_URL = "/hsnmailenbeheer_wsgi/login/"
 
 HSN_START_DATE = 1811
 
 # local settings: db, ...
 try:
-    from hsnmailenbeheer.settings_local import *
+	from hsnmailenbeheer.settings_local import *
 except ImportError:
-    print( "No file settings_local", file = sys.stderr )
-    pass
+	print( "No file settings_local", file = sys.stderr )
+	pass
 
 # [eof]
