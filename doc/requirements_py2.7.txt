@@ -1,4 +1,4 @@
-# FL-07-Mar-2016
+# FL-22-Mar-2016
 # pip requirements file for HSNmail with a Python-2.7.10
 # setuptools, pip, and virtualenv should already be present in the (virtual) python2.7
 # python-devel and mysql-devel were needed for installing mysqlclient
@@ -7,6 +7,7 @@
 
 future >= 0.15.2
 Django >= 1.9.4
+django_extensions >= 1.6.1
 mysqlclient >= 1.3.7
 pycups >= 1.9.73
 django-registration >= 2.0.4

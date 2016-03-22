@@ -9,7 +9,7 @@ Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
 25-Feb-2016	Django-1.8 changes, -> Django-1.9
-17-Mar-2016	Changed
+22-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -22,7 +22,7 @@ import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "16-Mar-2016 13:21"
+TIMESTAMP_SERVER = "22-Mar-2016 10:44"
 
 django_version_str = get_version()
 django_version_lst = django_version_str.split('.')
@@ -44,7 +44,7 @@ print( "PROJECT_GRANNY:", PROJECT_GRANNY )
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'not_secret'  # must be overwritten in settings_local
+SECRET_KEY = 'not_secret!'  # must be overwritten in settings_local
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # can be overwritten in settings_local
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
 	'django.contrib.staticfiles',
 
 #	'debug_toolbar',
+	'django_extensions',
 	'loginout',
 	'mail',				# tables from hsn_mail
 	'central',			# tables from hsn_central
@@ -107,24 +108,7 @@ WSGI_APPLICATION = 'hsnmailenbeheer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 # -> in settings_local
-"""
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-	}
-},
-	'central': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-	}
-},
-	'reference': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-	}
-}
-"""
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
