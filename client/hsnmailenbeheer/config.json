@@ -41,7 +41,7 @@
   "let" :
   {
     "APPLICATION"  : "hsnmailenbeheer",
-  //"QOOXDOO_PATH" : "/home/fons/opt/qooxdoo-5.0.1-sdk",
+    "QOOXDOO_PATH" : "/home/fons/opt/qooxdoo-5.0.1-sdk",
     "QXTHEME"      : "hsnmailenbeheer.theme.Theme",
     "API_EXCLUDE"  : ["qx.test.*", "${APPLICATION}.theme.*", "${APPLICATION}.test.*"],
     "LOCALES"      : [ "en", "nl" ],
@@ -79,17 +79,35 @@
     // If you want to tweak a job setting, see the following sample where
     // the "format" feature of the "build-script" job is overridden.
     // To see a list of available jobs, invoke 'generate.py x'.
-    /*
+    
     ,"build-script" :
     {
+      /*
       "compile-options" :
       {
         "code" :
         {
           "format" : false
         }
+      },
+      */
+      
+      "environment" : 
+      {
+      //"hsnmail.method"   : "GET", 
+        "hsnmail.method"   : "POST", 
+      
+        "hsnmail.protocol" : "http", 
+      //"hsnmail.protocol" : "https", 
+        
+        "hsnmail.host"     : "localhost", 
+        
+        "hsnmail.port"     : 80, 
+      //"hsnmail.port"     : 443, 
+      
+        "hsnmail.location" : "/hsnmailenbeheer_wsgi", // python hook
       }
     }
-    */
+    
   }
 }

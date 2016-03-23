@@ -23,7 +23,7 @@ printmailbev( request )
 22-Jun-2015	Created
 17-Mar-2016	@login_required added
 17-Mar-2016	@csrf_exempt removed
-17-Mar-2016	Changed
+23-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -85,11 +85,6 @@ def none2empty( var ):
 @login_required
 def gethsndata( request ):
 	print( "qx/views/gethsndata()" )
-
-	if request.method == "GET":
-		REQUEST = request.GET
-	else:
-		REQUEST = request.POST
 	
 	"""
 	# It seems that the browser automatically sends these cookies, so apparently I do not 

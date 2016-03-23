@@ -15,7 +15,7 @@ def hsn_logout( request ):
 02-Mar-2016	Created
 17-Mar-2016	@login_required added
 17-Mar-2016	@csrf_exempt removed
-17-Mar-2016	Changed
+23-Mar-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -33,36 +33,32 @@ from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 from hsnmailenbeheer import settings
 from .ldap_authenticate import ldap_authenticate
 
 
+@csrf_exempt
 def hsn_login( request ):
 	print( "loginout/views/hsn_login()" )
+
+	# It seems that the browser automatically sends these cookies, so apparently I do not 
+	# have to copy the csrftoken with qooxdoo in the client into subsequent request objects. 
+	csrftoken = request.COOKIES.get( "csrftoken" )
+	sessionid = request.COOKIES.get( "sessionid" )
+	print( "csrftoken:", csrftoken )
+	print( "sessionid:", sessionid )
 	
-#	scheme_authority, sub_site = get_server_info( request )
-
-	template = "index.html"
-	dictionary = \
-	{
-	#	'SUB_SITE'      : sub_site,
-	#	'STATIC_PREFIX' : scheme_authority,
-		'STATIC_PREFIX' : '',
-	#	'STATIC_URL'    : settings.STATIC_URL,
-	#	'STATIC_URL'    : '127.0.0.1',
-		'STATIC_URL'    : '/',
-	}
-
 	# context contains csrf_token (and STATIC_URL for django >= 1.3)
 #	context = context_instance = RequestContext( request )
 	context = RequestContext( request )
-
+	
 	if request.method == "GET":
 		REQUEST = request.GET
 	else:
 		REQUEST = request.POST
-		
+	
 	username = REQUEST.get( "usr" )
 	password = REQUEST.get( "pwd" )
 
