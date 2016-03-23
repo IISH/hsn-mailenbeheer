@@ -27,9 +27,12 @@
 import sys, os, re, subprocess, codecs, optparse
 
 CMD_PYTHON = sys.executable
-QOOXDOO_PATH = '../../../../../../../opt/qooxdoo-5.0.1-sdk'
-#QOOXDOO_PATH = '../../../../../../../opt/qooxdoo-5.0-sdk'
-#QOOXDOO_PATH = '../../../../../../../opt/qooxdoo-github'
+
+
+#QOOXDOO_PATH = '../../../../../../../opt/qooxdoo-5.0.1-sdk'
+# get QOOXDOO_PATH from environment variable, e.g.: 
+# $ export QOOXDOO_PATH=/home/fons/opt/qooxdoo-5.0.1-sdk
+QOOXDOO_PATH = os.environ[ "QOOXDOO_PATH" ]
 
 QX_PYLIB = "tool/pylib"
 
