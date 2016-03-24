@@ -94,6 +94,8 @@
       
       "environment" : 
       {
+        "qx.debug"         : false,
+      
       //"hsnmail.method"   : "GET", 
         "hsnmail.method"   : "POST", 
       

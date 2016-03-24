@@ -31,10 +31,11 @@ from __future__ import ( absolute_import, division, print_function, unicode_lite
 from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
 	oct, open, pow, range, round, str, super, zip )
 
-from sys import stderr, exc_info
+from sys import stderr, exc_info, version
 import os
 import json
 
+import django
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import RequestContext
@@ -106,8 +107,13 @@ def gethsndata( request ):
 	strings        = get_text_strings()
 	mails_print    = get_mails_print()
 	
+	python_version = version
+	django_version = django.get_version()
+	
 	dictionary = \
 	{
+		"python_version"   : python_version,
+		"django_version"   : django_version,
 		"timestamp_server" : settings.TIMESTAMP_SERVER,
 		"printers"         : printers,
 		"locations"        : locations,
