@@ -202,21 +202,19 @@ qx.Class.define( "hsnmailenbeheer.Application",
 
 
     /**
-      * url
+      * baseurl
       *
-      * Construct a url
+      * Construct a url to the wsgi endpoint.
       * @param path {string} 
       */
-    /*
-    url : function( path ) 
+    baseurl : function( path )
     {
         var protocol = ( this.protocol ) ? this.protocol + '://' : '';
         var host = ( this.host ) ? this.host : '';
         var port = ( this.port && this.host ) ? ':' + this.port : '';
-        var _path = ( path ) ? '/' + path : '';
-        return protocol + host + port + this.http_loc + _path;
+        var _path = ( path ) ? path : '';
+        return protocol + host + port + this.http_location + _path;
     },
-    */
 
 
     /**
@@ -226,7 +224,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
     {    
       console.debug( "getHsnData()" );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/gethsndata";
+      var url = this.baseurl('/gethsndata');
       
       var method = this.http_method;
       if( method === "POST" ) { url += '/'; }
@@ -343,7 +341,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       if( opnum == null ) { opnum = ""; }
       console.debug( "getHsnOpData, opnum: " + opnum );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/gethsnopdata";
+      var url = this.baseurl('/gethsnopdata');
 
       var method = this.http_method;
       
@@ -514,7 +512,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "saveHsnOpData() path: " + path );
       console.debug( data );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + path;
+      var url = this.baseurl(path);
 
       var method = this.http_method;
       
@@ -5586,7 +5584,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         return;
       }
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/login";
+      var url = this.baseurl('/login');
       
       var method = this.http_method;
       var params = "";
@@ -5762,7 +5760,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         });
       window.add( label, { row : 0, column : 0 });
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/logout";
+      var url = this.baseurl('/logout');
       
       var method = this.http_method;
       var params = "";

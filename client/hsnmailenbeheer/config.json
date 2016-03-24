@@ -99,15 +99,15 @@
       //"hsnmail.method"   : "GET", 
         "hsnmail.method"   : "POST", 
       
-        "hsnmail.protocol" : "http", 
+        "hsnmail.protocol" : null,
       //"hsnmail.protocol" : "https", 
         
-        "hsnmail.host"     : "localhost", 
+        "hsnmail.host"     : null,
         
-        "hsnmail.port"     : 80, 
+        "hsnmail.port"     : null,
       //"hsnmail.port"     : 443, 
       
-        "hsnmail.location" : "/hsnmailenbeheer_wsgi", // python hook
+        "hsnmail.location" : "/hsnmailenbeheer_wsgi" // python hook
       }
     }
     
