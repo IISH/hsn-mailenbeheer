@@ -91,23 +91,14 @@
         }
       },
       */
-      
       "environment" : 
       {
-        "qx.debug"         : false,
+        "qx.debug" : false,
       
-      //"hsnmail.method"   : "GET", 
-        "hsnmail.method"   : "POST", 
+      //"hsnmail.wsgi_method"   : "GET", 
+        "hsnmail.wsgi_method"   : "POST", 
       
-        "hsnmail.protocol" : null,
-      //"hsnmail.protocol" : "https", 
-        
-        "hsnmail.host"     : null,
-        
-        "hsnmail.port"     : null,
-      //"hsnmail.port"     : 443, 
-      
-        "hsnmail.location" : "/hsnmailenbeheer_wsgi" // python hook
+        "hsnmail.wsgi_path" : "/hsnmailenbeheer_wsgi", // python hook
       }
     }
     

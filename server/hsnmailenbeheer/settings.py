@@ -22,7 +22,7 @@ import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "24-Mar-2016 11:13"
+TIMESTAMP_SERVER = "29-Mar-2016 14:11"
 
 django_version_str = get_version()
 django_version_lst = django_version_str.split('.')
