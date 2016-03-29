@@ -67,33 +67,14 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "24-Mar-2016 11:13",
-
-    test_usr : "",
-    test_pwd : "",
-    
-  //http_method : "GET",
-  //http_method : "POST",
-    
-  //protocol : "http",
-  //protocol : "https",
-    
-  //host : "localhost",
-  //host : "127.0.0.1",
-    
-  //port :   80,  // http
-  //port :  443,  // https
-  //port : 8000,  // http Django dev server default port
-  //port : 8443,  // https-alt
-    
-  //http_location : "/hsnmailenbeheer_wsgi",
+    timestamp_client : "29-Mar-2016 14:11",
     
     // hsnmail.<vars> now from config.json
-    http_method   : qx.core.Environment.get( "hsnmail.method" ),
-    protocol      : qx.core.Environment.get( "hsnmail.protocol" ),
-    host          : qx.core.Environment.get( "hsnmail.host" ),
-    port          : qx.core.Environment.get( "hsnmail.port" ),
-    http_location : qx.core.Environment.get( "hsnmail.location" ),
+    wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
+    wsgi_path   : qx.core.Environment.get( "hsnmail.wsgi_path" ),
+    
+    test_usr : "",
+    test_pwd : "",
     
     //debugIE : false,
     
@@ -178,13 +159,11 @@ qx.Class.define( "hsnmailenbeheer.Application",
       qx.locale.Manager.getInstance().setLocale( "nl" );
       console.debug( "Qooxdoo version: " + qx.core.Environment.get( 'qx.version' ) );
       
-      console.debug( 
-        "method: "     + this.http_method + 
-        ", protocol: " + this.protocol + 
-        ", host: "     + this.host + 
-        ", port: "     + this.port 
-      );
-      console.debug( "location: " + this.http_location );
+      this.js_location = window.location;
+      console.debug( this.js_location );
+      
+      console.debug( "wsgi_method: " + this.wsgi_method );
+      console.debug( "wsgi_path: " + this.wsgi_path );
       
       /*
       var csrftoken = qx.bom.Cookie.get( "csrftoken" );
@@ -202,23 +181,31 @@ qx.Class.define( "hsnmailenbeheer.Application",
 
 
     /**
-      * url
+      * wsgi_url
       *
       * Construct a url
       * @param path {string} 
       */
-    /*
-    url : function( path ) 
+    wsgi_url : function( path ) 
     {
-        var protocol = ( this.protocol ) ? this.protocol + '://' : '';
-        var host = ( this.host ) ? this.host : '';
-        var port = ( this.port && this.host ) ? ':' + this.port : '';
-        var _path = ( path ) ? '/' + path : '';
-        return protocol + host + port + this.http_loc + _path;
+        var prot = this.js_location.protocol;
+        var host = this.js_location.host;
+        var port = this.js_location.port;
+        var wsgi = this.wsgi_path;
+        /*
+        console.debug( "prot: " + prot );
+        console.debug( "host: " + host );
+        console.debug( "port: " + port );
+        console.debug( "wsgi: " + wsgi );
+        */
+        var url = prot + "//" + host + port + wsgi + path;
+        console.debug( url );
+        
+        return url;
     },
-    */
-
-
+    
+    
+    
     /**
      * getHsnData
      */
@@ -226,9 +213,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
     {    
       console.debug( "getHsnData()" );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/gethsndata";
+      var url = this.wsgi_url( "/gethsndata" );
       
-      var method = this.http_method;
+      var method = this.wsgi_method;
       if( method === "POST" ) { url += '/'; }
       console.debug( "url: " + url );
       
@@ -343,9 +330,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       if( opnum == null ) { opnum = ""; }
       console.debug( "getHsnOpData, opnum: " + opnum );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/gethsnopdata";
-
-      var method = this.http_method;
+      var url = this.wsgi_url( "/gethsnopdata" );
+      
+      var method = this.wsgi_method;
       
       var params = ""
       if( method === "GET" )        // only for testing, 
@@ -514,9 +501,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "saveHsnOpData() path: " + path );
       console.debug( data );
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + path;
-
-      var method = this.http_method;
+      var url = this.wsgi_url( path );
+      
+      var method = this.wsgi_method;
       
       if( method === "GET" )        // only for testing, 
       { url += "?"; }
@@ -5586,9 +5573,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
         return;
       }
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/login";
+      var url = this.wsgi_url( "/login" );
       
-      var method = this.http_method;
+      var method = this.wsgi_method;
       var params = "";
       
       if( method === "GET" )        // only for testing, 
@@ -5762,9 +5749,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
         });
       window.add( label, { row : 0, column : 0 });
       
-      var url = this.protocol + "://" + this.host + ":" + this.port + this.http_location + "/logout";
+      var url = this.wsgi_url( "/logout" );
       
-      var method = this.http_method;
+      var method = this.wsgi_method;
       var params = "";
       
       if( method === "GET" )        // only for testing, 
