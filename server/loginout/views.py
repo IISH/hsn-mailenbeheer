@@ -15,7 +15,7 @@ def hsn_logout( request ):
 02-Mar-2016	Created
 17-Mar-2016	@login_required added
 17-Mar-2016	@csrf_exempt removed
-24-Mar-2016	Changed
+01-Apr-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -60,8 +60,8 @@ def hsn_login( request ):
 	username = REQUEST.get( "usr" )
 	password = REQUEST.get( "pwd" )
 
-	print( "username:", username )
-	print( "password:", password )
+#	print( "username:", username )
+#	print( "password:", password )
 	
 	if username is None or password is None:
 		print( "User: %s NOT LDAP authenticated" % username )
