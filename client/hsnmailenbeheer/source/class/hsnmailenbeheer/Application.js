@@ -7,23 +7,31 @@
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
  * functions:
- * main                 : function()
- * getHsnData           : function()
- * getHsnOpData         : function( ev )
- * saveHsnOpData        : function( path, data )
- * createWindows        : function()
- * createWindow0        : function()
- * createWindow1        : function()
- * createWindow1Dialog  : function()
- * createWindow1Missing : function()
- * createWindow2        : function()
- * createWindow3        : function()
- * createWindow4        : function()
- * createWindow5        : function()
- * createWindow6        : function()
- * getUservalueCombobox : function( combobox, value, key )
- * showDialog           : function( text )
- * closeWindow          : function( window, text )
+ * main                  : function()
+ * url                   : function( path )
+ * getHsnData            : function()
+ * getHsnOpData          : function( ev )
+ * saveHsnOpData         : function( path, data )
+ * createWindows         : function()
+ * createWindow0         : function()
+ * createWindow1         : function()
+ * createWindow1Dialog   : function()
+ * createWindow1Missing  : function()
+ * createWindow2         : function()
+ * createWindow3         : function()
+ * createWindow4         : function()
+ * createWindow5         : function()
+ * createWindow6         : function()
+ * isNumeric             : function( n )
+ * isValidDate           : function( dateString )
+ * location2nr           : function( location_value )
+ * getUservalueCombobox  : function( combobox, value, key )
+ * closeWindow           : function( window, text )
+ * showDialog            : function( text )
+ * createLogin           : function()
+ * _doAuthenticate       : function( ev )
+ * _AuthenticateResponse : function( ev )
+ * createLogout          : function( ev )
  * 
  * possible table selection modes: 
  *  model.NO_SELECTION;                        // 1 
@@ -35,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-17-Nov-2015: Changed
+ * FL-24-Mar-2016: Changed
  */
 
 /**
@@ -59,24 +67,19 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "17-Nov-2015 11:54",
+    timestamp_client : "29-Mar-2016 14:11",
     
-    host : null,
-    protocol : null,
-    port :   null,  // http
-
-    http_loc : '/hsnmailenbeheer_wsgi',
+    // hsnmail.<vars> now from config.json
+    wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
+    wsgi_path   : qx.core.Environment.get( "hsnmail.wsgi_path" ),
     
-    login_loc : 'login',
-  //login_loc : "/qx",
+    test_usr : "",
+    test_pwd : "",
     
-    http_method : "GET",
-  //http_method : "POST",
+    //debugIE : false,
     
-    debugIE : false,
-    
-    username : "guest",
-    password : "guest",
+    _username : null,
+    _password : null,
   
     MAIN_WIDTH  : 800,
     MAIN_HEIGHT : 500,
@@ -144,78 +147,100 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       this.base( arguments );		// Call super class
       
-      if( qx.core.Environment.get( "qx.debug" ) ) // Enable logging in debug variant
+      var debug = qx.core.Environment.get( "qx.debug" );
+      //console.log( "debug: " + debug );
+      if( debug ) // Enable logging in debug variant
       {
         qx.log.appender.Native;   // support native logging capabilities, e.g. Firebug for Firefox
         qx.log.appender.Console;  // support additional cross-browser console. Press F7 to toggle visibility
       }
-
+      
       // actual application code...
       qx.locale.Manager.getInstance().setLocale( "nl" );
       console.debug( "Qooxdoo version: " + qx.core.Environment.get( 'qx.version' ) );
-      console.debug( "host:", + this.host + ", port: " + this.port );
       
-      this.getHsnData( this.timestamp_client );    // get 'static' data; then create and fill the windows
+      this.js_location = window.location;
+      console.debug( this.js_location );
       
+      console.debug( "wsgi_method: " + this.wsgi_method );
+      console.debug( "wsgi_path: " + this.wsgi_path );
       
-      // New Dialog
       /*
-      this.__uiWindow = new hsnmailenbeheer.UserDialog();
-      this.__uiWindow.moveTo(320, 30);
-      this.__uiWindow.open();
-
-      // Adding the listener for pressing "Ok"
-      this.__uiWindow.addListener( "changeUserData", function ( ev ) {
-        this.debug( ev.getData() );
-      });
+      var csrftoken = qx.bom.Cookie.get( "csrftoken" );
+      var sessionid = qx.bom.Cookie.get( "sessionid" )
+      
+      console.debug( "csrftoken: " + csrftoken );   // OK
+      console.debug( "sessionid: " + sessionid );   // null, initially
       */
-
+      
+      this.createLogin();
+    //this.getHsnData();    // get 'static' data; then create and fill the windows
+      
     }, // main
 
 
-      /**
-       * url
-       *
-       * Construct a url
-        * @param path
-       *
-       */
-        url : function( path ) {
-          var protocol = ( this.protocol ) ? this.protocol + '://' : '';
-          var host = ( this.host ) ? this.host : '';
-          var port = ( this.port && this.host ) ? ':' + this.port : '';
-          var _path = ( path ) ? '/' + path : '';
-          return protocol + host + port + this.http_loc + _path;
-      },
+
+    /**
+      * wsgi_url
+      *
+      * Construct a url
+      * @param path {string} 
+      */
+    wsgi_url : function( path ) 
+    {
+        var prot = this.js_location.protocol;
+        var host = this.js_location.host;
+        var port = this.js_location.port;
+        var wsgi = this.wsgi_path;
+        /*
+        console.debug( "prot: " + prot );
+        console.debug( "host: " + host );
+        console.debug( "port: " + port );
+        console.debug( "wsgi: " + wsgi );
+        */
+        var url = prot + "//" + host + port + wsgi + path;
+        console.debug( url );
+        
+        return url;
+    },
+    
+    
     
     /**
      * getHsnData
      */
-    getHsnData : function( timestamp_client )
+    getHsnData : function()
     {    
       console.debug( "getHsnData()" );
-
-      var url =  this.url('gethsndata/');
-
-      var method = this.http_method;
       
-    //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-    //params += "&pwd=" + encodeURIComponent( this.password );
+      var url = this.wsgi_url( "/gethsndata" );
       
+      var method = this.wsgi_method;
+      if( method === "POST" ) { url += '/'; }
       console.debug( "url: " + url );
       
       var request = new qx.io.request.Xhr( url );
       request.setMethod( method );
       
+      if( method === "POST" )
+      { request.setRequestHeader( "X-CSRFToken", qx.bom.Cookie.get( "csrftoken" ) ); }
+        
       request.addListener
       ( 
         "success", 
         function( ev ) 
         {
           var request = ev.getTarget();
+          /*
+          var sessionid = request.cookie.get( "sessionid" );
+          var csrftoken = request.cookie.get( "csrftoken" );
+          console.debug( "sessionid: " + sessionid );
+          console.debug( "csrftoken: " + csrftoken );
+          */
           var json_data = request.getResponse();
           var content_type = request.getResponseContentType();
         //console.debug( "getHsnData() content_type: " + content_type );
+          
           if( content_type !== "application/json" )
           { this.createAlert( "getHsnData() unexpected response:<br>" + content_type + "<br>" + request.getResponseText() ); }
           
@@ -225,6 +250,12 @@ qx.Class.define( "hsnmailenbeheer.Application",
           }
           else { this.have_printer = true; }
           
+          this.python_version   = json_data.python_version;
+          this.django_version   = json_data.django_version;
+          
+          this.info( "python_version: " + this.python_version );
+          this.info( "django_version: " + this.django_version );
+      
         //console.debug( json_data );
           this.HSN = json_data;
           
@@ -242,8 +273,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
             this.location_array.push( loc_arr );
           }
           
-          console.debug( "timestamp client: " + timestamp_client );
-          console.debug( "timestamp server: " + this.HSN.timestamp_server );
+        //console.debug( "timestamp client: " + timestamp_client );
+        //console.debug( "timestamp server: " + this.HSN.timestamp_server );
           
           // now create the windows, and fill some of their data structures
           this.createWindows();
@@ -259,6 +290,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "getHsnData() fail: " + response );
+          this.showDialog( "fail" + "<br><br>" + response );
         }, 
         this 
       );
@@ -271,6 +303,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "getHsnData() statusError: " + response );
+          this.showDialog( "statusError" + "<br><br>" + response );
         }, 
         this 
       );
@@ -297,9 +330,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       if( opnum == null ) { opnum = ""; }
       console.debug( "getHsnOpData, opnum: " + opnum );
       
-        var url = this.url('gethsnopdata');
-
-      var method = this.http_method;
+      var url = this.wsgi_url( "/gethsnopdata" );
+      
+      var method = this.wsgi_method;
       
       var params = ""
       if( method === "GET" )        // only for testing, 
@@ -307,12 +340,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       else if( method === "POST" )  // use POST for login.
       { url += '/'; }               // required: POST + Django: APPEND_SLASH
       
-    //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-    //params += "&pwd=" + encodeURIComponent( this.password );
       params += "op_num=" + opnum;
       
-      if( method === "GET" )
-      { url += params; }
+      if( method === "GET" ) { url += params; }
       console.debug( url );
       
       var request = new qx.io.request.Xhr( url );
@@ -320,7 +350,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
       request.setMethod( method );
       
       if( method === "POST" )           // set parameters in data
-      { request.setRequestData( params ); }
+      { 
+        request.setRequestHeader( "X-CSRFToken", qx.bom.Cookie.get( "csrftoken" ) );
+        request.setRequestData( params ); 
+      }
           
       request.addListener
       ( 
@@ -425,6 +458,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "fail: " + response );
+          this.showDialog( "fail" + "<br><br>" + response );
         }, 
         this 
       );
@@ -437,6 +471,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var request = ev.getTarget();
           var response = request.getResponse();
           console.debug( "statusError: " + response );
+          this.showDialog( "statusError" + "<br><br>" + response );
         }, 
         this 
       );
@@ -466,18 +501,26 @@ qx.Class.define( "hsnmailenbeheer.Application",
       console.debug( "saveHsnOpData() path: " + path );
       console.debug( data );
       
-        var url = this.url(path) ;
-
-      var method = this.http_method;
+      var url = this.wsgi_url( path );
       
-    //params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-    //params += "&pwd=" + encodeURIComponent( this.password );
+      var method = this.wsgi_method;
+      
+      if( method === "GET" )        // only for testing, 
+      { url += "?"; }
+      else if( method === "POST" )  // use POST for login.
+      { url += '/'; }               // required: POST + Django: APPEND_SLASH
+      
+      if( method === "GET" ) { url += data; }
       
       console.debug( "url: " + url );
-      
       var request = new qx.io.request.Xhr( url );
       request.setMethod( method );
-      request.setRequestData( data );
+      
+      if( method === "POST" )           // set parameters in data
+      { 
+        request.setRequestHeader( "X-CSRFToken", qx.bom.Cookie.get( "csrftoken" ) );
+        request.setRequestData( data ); 
+      }
       
       request.addListener
       ( 
@@ -591,8 +634,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         this
       );
       
-      this.window0.open();  // start screen
-    //this.createLogin();
+    this.window0.open();  // start screen
       
     }, // createWindows
     
@@ -611,7 +653,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       var ct_width = wd_width - 32;  // 22 = estimated margin
       
-      var window = new qx.ui.window.Window( "HSN - Mail" );
+      var window = new qx.ui.window.Window( "HSN - Mail en Beheer" );
       window.set({
         width         : wd_width,
         height        : wd_height,
@@ -862,6 +904,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       {
         console.debug( "button7 Stoppen met dit programma" );
         this.window0.close();
+        this.createLogout( ev );
       }, this );              
       
       return window;
@@ -926,11 +969,11 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var year  = "";
           
           var death_list = this.OP.deaths;
-          console.log( "death entries: " + death_list.length );
+          console.debug( "death entries: " + death_list.length );
           for( i = 0; i < death_list.length; i++ ) 
           {
             var death = death_list[ i ];
-            console.log( death );
+            console.debug( death );
             
             day   = death.death_day  .toString();
             month = death.death_month.toString();
@@ -1314,7 +1357,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           data.phase_cd       = phase_c_id;
           
         //this.showDialog( "NOT saving hsnmanage data" );
-          this.saveHsnOpData( "/puthsnmanage/", data );
+          this.saveHsnOpData( "/puthsnmanage", data );
           window.close();
         },
         this
@@ -1395,7 +1438,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
             
             // we send empty missing data, 
             // so the existing missing data records for this OP will be deleted
-            this.saveHsnOpData( "/puthsnmanagemissing/", data );
+            this.saveHsnOpData( "/puthsnmanagemissing", data );
           }, 
           this
         );
@@ -1961,7 +2004,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           data.missing = json_str;
           
         //this.showDialog( "NOT saving table rows<br>(update, create, delete)" );
-          this.saveHsnOpData( "/puthsnmanagemissing/", data );
+          this.saveHsnOpData( "/puthsnmanagemissing", data );
           window.close();
         },
         this
@@ -2529,7 +2572,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           if( radiobuttonParents.getValue() )      { info_journey = 3; }
           else if( radiobuttonPartner.getValue() ) { info_journey = 2; }
           else if( radiobuttonAlone.getValue() )   { info_journey = 1; }
-          console.log( "info_journey: " + info_journey );
+          console.debug( "info_journey: " + info_journey );
           
           var info_parents = checkboxParents.getValue();
           var info_partner = checkboxPartner.getValue();
@@ -3172,7 +3215,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           pk_deleted = [];  // empty array of pk's that have been deleted
           
           //this.showDialog( "NOT saving table rows<br>(update, create, delete)" );
-          this.saveHsnOpData( "/putmailbev/", data );
+          this.saveHsnOpData( "/putmailbev", data );
           window.close();
         },
         this
@@ -4083,7 +4126,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           pk_deleted = [];  // empty array of pk's that have been deleted
           
         //this.showDialog( "NOT saving table rows<br>(update, create, delete)" );
-          this.saveHsnOpData( "/putmailhuw/", data );
+          this.saveHsnOpData( "/putmailhuw", data );
           window.close();
         },
         this
@@ -4128,7 +4171,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         //window.setHeight( qx.bom.Viewport.getHeight() );
           
           var nmails_bev = this.HSN.mails_print.bev.length;
-          console.log( "nmails_bev: " + nmails_bev );
+          console.debug( "nmails_bev: " + nmails_bev );
           textfieldCount.setValue( nmails_bev.toString() );
           
           if( this.have_printer == true && nmails_bev > 0 ) 
@@ -4262,7 +4305,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var data = "";
           
         //this.showDialog( "Volgende keer gaan we printen" );
-          this.saveHsnOpData( "/printmailbev/", data );
+          this.saveHsnOpData( "/printmailbev", data );
           
           window.close();
         },
@@ -4636,7 +4679,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "execute", 
         function( ev ) 
         {
-          console.log( "buttonUpdate" );
+          console.debug( "buttonUpdate" );
           
           var date = datefieldBooking.getValue();
           var dateformat = new qx.util.format.DateFormat( "dd-MM-yyyy" );
@@ -4724,7 +4767,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           ids_update = [];
           
         //this.showDialog( "NOT saving table rows<br>(update, create, delete)" );
-          this.saveHsnOpData( "/putmailbevreceived/", data );
+          this.saveHsnOpData( "/putmailbevreceived", data );
           window.close();
         },
         this
@@ -4814,7 +4857,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
               textfieldBirthDay  .setValue( op_info.rp_b_day  .toString() ); 
               textfieldBirthMonth.setValue( op_info.rp_b_month.toString() );
               textfieldBirthYear .setValue( op_info.rp_b_year .toString() );
-          
               
               comboboxBirthplace.setValue( op_info.rp_b_place );
               textfieldGender   .setValue( op_info.rp_b_sex );
@@ -5145,7 +5187,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           data.opmutation = json_str;
           
         //this.showDialog( "NOT yet saving new mutation" );
-          this.saveHsnOpData( "/putopmutation/", data );
+          this.saveHsnOpData( "/putopmutation", data );
           window.close();
         },
         this
@@ -5193,9 +5235,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       // Check the range of the day
       return day > 0 && day <= monthLength[ month - 1 ];
-    },
+    }, // isValidDate
     
-  
+    
+    
     location2nr : function( location_value )
     {
       // with the _underscore library we would do: 
@@ -5213,7 +5256,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         }
       }
       return location_nr;
-    },
+    }, // location2nr
     
     
     
@@ -5234,65 +5277,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
       return data;
     }, // getUservalueCombobox
     
-    
-    
-    showDialog : function( text )
-    {
-      console.debug( "showDialog()" );
-    //if( ! this.__dlg )
-    //{
-        var dlg = this.__dlg = new qx.ui.window.Window().set({
-          modal          : true,
-          showMinimize   : false,
-          showMaximize   : false,
-          width          : 400,
-          contentPadding : [ 10, 10, 10, 10 ]
-        });
-        dlg.moveTo( 315, 100 );
-        
-        dlg.addListener( "appear", dlg.center );
-        
-        var layout = new qx.ui.layout.Grid( 15, 15 );
-        layout.setRowFlex( 0, 1 );
-        layout.setColumnFlex( 1, 1 );
-        dlg.setLayout( layout );
-        
-        dlg.add
-        (
-          new qx.ui.basic.Image( "icon/32/status/dialog-information.png" ),
-          { row : 0, column : 0 }
-        );
-        
-        dlg.add
-        ( 
-          new qx.ui.basic.Label().set({
-            rich       : true,
-            allowGrowY : true
-          }), 
-          { row: 0, column: 1 }
-        );
-        
-        var button = new qx.ui.form.Button( "OK" ).set({
-          alignX     : "center",
-          allowGrowX : false,
-          padding: [ 2, 10 ]
-        });
-        
-        button.addListener
-        (
-          "execute", 
-          function( ev ) { dlg.close(); }, 
-          this
-        );
-        
-        dlg.add( button, { row : 1, column : 0, colSpan : 2 } );
-    //}
-      
-      this.__dlg.getChildren()[ 1 ].setValue( text );
-      this.__dlg.open();
-      this.__dlg.getChildren()[ 2 ].focus();
-    },
-  
     
     
     /**
@@ -5384,403 +5368,473 @@ qx.Class.define( "hsnmailenbeheer.Application",
     //this.__windowClose.getChildren()[ 2 ].focus();
     }, // closeWindow
     
-
-  //===< Unused code below here >=======================================
-
-    _AuthenticateResponse : function( ev )
+    
+    
+    showDialog : function( text, title )
     {
-      this.io_login = this.IO_SUCCESS;
-      var request = ev.getTarget();
-
-      // Response parsed according to the server's response content type, e.g. JSON
-      var json_data = request.getResponse();
-      console.debug( json_data );
+      console.debug( "showDialog()" );
+      console.debug( text );
       
-      var content_type = request.getResponseContentType();
-      if( content_type !== "application/json" )
-      { this.createAlert( "unexpected response:<br>" + request.getResponseText() ); }   // unparsed
-
-      /*
-      if( this.debugIE )    // debug: still have problems with IE
-      {
-        var browsername = qx.core.Environment.get( "browser.name" );
-        if( browsername === "ie" )                            // IExplorer
-        {
-          var response_raw = request.getResponseText();       // unparsed
-          var head = response_raw.substr( 0, 400 );
-          this.createAlert( "raw response:<br>" + head );
-
-          var head = response.substr( 0, 400 );
-          this.createAlert( "parsed response:<br>" + head );
-        }
-      }
-      */
-
-      /*
-      if( this.debugIE )
-      {
-        var nativeXhr = request.getTransport().getRequest();
-
-        this.createAlert( "nativeXhr:<br>" + nativeXhr );
-        this.createAlert( "nativeXhr.response:<br>" + nativeXhr.response );
-        this.createAlert( "nativeXhr.status:<br>" + nativeXhr.status );
-        this.createAlert( "nativeXhr.statusText:<br>" + nativeXhr.statusText );
-        this.createAlert( "nativeXhr.responseText:<br>" + nativeXhr.responseText );
-
-      //console.debug( nativeXhr );
-      //console.debug( nativeXhr.response );
-      //console.debug( nativeXhr.status );
-      //console.debug( nativeXhr.statusText );
-      //console.debug( nativeXhr.responseText );
-      }
-      */
-
-      var resp_status = json_data.status;
-      this.info( "resp_status: " + resp_status );
-      this.python_version   = json_data.python_version;
-      this.django_version   = json_data.django_version;
-      this.server_timestamp = json_data.timestamp;
-    //console.debug( "server_timestamp: " + this.server_timestamp );
-
-      if( resp_status === "ok" )
-      {
-        if( this.username !== "guest" )      // enable buddy mode
-        {
-          this.rbtnBuddy.setEnabled( true );
-          this.buddyList = json_data.buddies;
-          if( this.username === "Piek" || 
-              this.username === "Attila" || 
-              this.username === "Fons" || 
-              this.username === "Isa" || 
-              this.username === "Hennie" )
-          { this.btnSourceWords.setEnabled( true ); }
-          else
-          { this.btnSourceWords.setEnabled( false ); }
-          this.menuSource.add( this.btnSourceWords );
-        }
-        else
-        {
-          this.btnTagsave.setEnabled( false );     // no tagsaving for guest account
-          this.btnUnTagsave.setEnabled( false );   // no untagging for guest account
-          this.buddyList = [];                     // no buddies for guest
-          this.createAlert( this.tr( "Welcome guest" ) );
-        }
-
-        this.nounList   = json_data.nouns;
-        this.verbList   = json_data.verbs;
-        this.adjectList = json_data.adjects;
-        this.totalList  = json_data.totals;
-
-        if( this.nounList   == undefined ) { this.nounList   = {}; }
-        if( this.verbList   == undefined ) { this.verbList   = {}; }
-        if( this.adjectList == undefined ) { this.adjectList = {}; }
-        if( this.totalList  == undefined ) { this.totalList  = {}; }
-      }
-      else
-      {
-        // no more guest auto-login
-        var server_msg = json_data.msg;
-        var msg = "Authentication...";
-        msg += "<br><br>Server response: " + resp_status;
-        msg += "<br>Message: " + server_msg;
-      //msg += "<br><br>You can proceed as guest, but your tagging actions will not be saved.";
-      //msg += "<br><br>You can retry to login by reloading the page.";
-        this.createAlert( msg );
-        this.createLogin();
-      }
-
-      if( this.client_timestamp !== this.server_timestamp )
-      { this.createAlert( "client/server timestamp mismatch<br>version " + this.client_timestamp + " client<br>version " + this.server_timestamp + " server<br><br> This can be an innocent oversight, or it could imply a potential problem. Start with flushing your browser cache, and restarting the browser." ); }
-
-      this.createConfig();      // using _buddyList
-      this.createListWindow();
-    }, // _AuthenticateResponse
-
-
-
+    //if( ! this.__dialog )
+    //{
+        var dialog = this.__dialog = new qx.ui.window.Window( title ).set({
+          modal          : true,
+          showMinimize   : false,
+          showMaximize   : false,
+          width          : 400,
+          contentPadding : [ 10, 10, 10, 10 ]
+        });
+        dialog.moveTo( 315, 100 );
+        
+        dialog.addListener( "appear", dialog.center );
+        
+        var layout = new qx.ui.layout.Grid( 15, 15 );
+        layout.setRowFlex( 0, 1 );
+        layout.setColumnFlex( 1, 1 );
+        dialog.setLayout( layout );
+        
+        dialog.add
+        (
+          new qx.ui.basic.Image( "icon/32/status/dialog-information.png" ),
+          { row : 0, column : 0 }
+        );
+        
+        dialog.add
+        ( 
+          new qx.ui.basic.Label().set({
+            rich       : true,
+            allowGrowY : true
+          }), 
+          { row: 0, column: 1 }
+        );
+        
+        var button = new qx.ui.form.Button( "OK" ).set({
+          alignX     : "center",
+          allowGrowX : false,
+          padding: [ 2, 10 ]
+        });
+        
+        button.addListener
+        (
+          "execute", 
+          function( ev ) { dialog.close(); }, 
+          this
+        );
+        
+        dialog.add( button, { row : 1, column : 0, colSpan : 2 } );
+    //}
+      
+      this.__dialog.getChildren()[ 1 ].setValue( text );
+      this.__dialog.open();
+      this.__dialog.getChildren()[ 2 ].focus();
+    }, // showDialog
+    
+    
+    
     // login related
-    __effect    : null,     // login
-    __container : null,     // login
-    __btnOk     : null,     // login
-
+    __windowLogin : null,
+    __buttonLogin : null,
     
-    
-    _doAuthenticate : function()
+    createLogin : function()
     {
-    //this.consolelog( "_doAuthenticate()" );
-    //this.__effect.start();
-     //var username = this.fieldUsername.getValue();
-     //var password = this.fieldPassword.getValue();
-      var username = "guest";
-      var password = "guest";
-
-      //this.__container.hide();
-
-      if( ! ( username === null && password === null ) )
+      console.debug( "createLogin()" );
+      console.debug( "createLogin() this.timestamp_client: " + this.timestamp_client );
+      
+      // login windowLogin
+      var layout = new qx.ui.layout.Grid( 9, 5 );
+      layout.setColumnAlign( 0, "right", "top" );
+      layout.setColumnAlign( 2, "right", "top" );
+      
+      var window = this.__windowLogin = new qx.ui.window.Window( "HSN - Mail en Beheer -- LDAP/Jira Login" ).
+      set({
+        modal          : true,
+        width          : 255,
+        contentPadding : [ 20, 20, 20, 20 ],
+        showMinimize   : false,
+        showMaximize   : false,
+        showClose      : false,
+        allowGrowX     : false,
+        allowGrowY     : false,
+        allowShrinkX   : false,
+        allowShrinkY   : false,
+        allowStretchX  : false,
+        allowStretchY  : false
+      });
+      
+      window.center();
+      window.setLayout( layout );
+      this.getRoot().add( window );
+      window.open();
+      
+      window.addListener
+      ( 
+        "appear", function()
+        {
+          window.center();
+          fieldUsername.setValue( this.test_usr );
+          fieldPassword.setValue( this.test_pwd );
+          
+          fieldUsername.focus();           // so that user can start typing his/her name right away
+        }, 
+        this
+      );
+      
+      // Labels
+    //var labels = [ this.tr("Username") + ":", this.tr("Password") + ":" ];
+      var labels = [ "Gebruikersnaam:", "Wachtwoord:" ];
+      for( var i = 0; i < labels.length; i++ )
       {
-        this.username = username;       // default username
-        this.password = password;       // default password
+        window.add( new qx.ui.basic.Label( labels[ i ] ).set({
+          allowShrinkX : false,
+          paddingTop   : 3
+        }), { row : i, column : 0 });
       }
-
-        var url = this.url(this.login_loc);
-
-    //var responseType = "text/html";
-
-      var method = this.http_method;
+      
+      // Text fields
+      var fieldUsername = this._fieldUsername = new qx.ui.form.TextField()    .set({ width : 150 });
+      var fieldPassword = this._fieldPassword = new qx.ui.form.PasswordField().set({ width : 150 });
+      
+      window.add( fieldUsername.set({
+        allowShrinkX : false,
+        paddingTop   : 3
+      }), { row : 0, column : 1 });
+      
+      window.add( fieldPassword.set({
+        allowShrinkX : false,
+        paddingTop   : 3
+      }), { row : 1, column : 1 });
+      
+      // PasswordField has no "execute" event
+      fieldPassword.addListener
+      (
+        "keypress", 
+        function( ev )
+        {
+          if( ev.getKeyIdentifier() === "Enter" ) { 
+            window.close();
+            this._doAuthenticate( ev ); 
+          }
+        }, 
+        this
+      );
+      
+      var layoutButtons = new qx.ui.layout.HBox( 5 ).set({ AlignX : "center" });
+      var containerButtons = new qx.ui.container.Composite( layoutButtons );
+      window.add( containerButtons, { row : 3, column : 1 } );
+      
+      // Cancel button
+      var buttonCancel = this.__buttonCancel =  new qx.ui.form.Button( "Annuleren" );
+      buttonCancel.setAllowStretchX( false );
+      
+      buttonCancel.addListener
+      ( 
+        "execute", 
+        function( ev ) { window.close(); },
+        this 
+      );
+      
+      // Login button
+      var buttonLogin = this.__buttonLogin =  new qx.ui.form.Button( "Aanmelden" );
+      buttonLogin.setAllowStretchX( false );
+      
+      buttonLogin.addListener
+      ( 
+        "execute", 
+        function( ev ) 
+        { 
+          window.close();
+          this._doAuthenticate( ev ); 
+        },
+        this 
+      );
+      
+      containerButtons.add( buttonCancel );
+      containerButtons.add( new qx.ui.core.Spacer( 10 ) );
+      containerButtons.add( buttonLogin );
+      
+    }, // createLogin
+    
+    
+    
+    _doAuthenticate : function( ev )
+    {
+      console.debug( "_doAuthenticate()" );
+      console.debug( "_doAuthenticate() this.timestamp_client: " + this.timestamp_client );
+      
+      this._username = this._fieldUsername.getValue();
+      this._password = this._fieldPassword.getValue();
+      
+      console.debug( "username :", this._username );
+    //console.debug( "password :", this._password );
+      
+      if( this._username === null || this._password === null )
+      { 
+        this.__windowLogin.show();
+        return;
+      }
+      
+      var url = this.wsgi_url( "/login" );
+      
+      var method = this.wsgi_method;
       var params = "";
       
       if( method === "GET" )        // only for testing, 
       { params += "?"; }
       else if( method === "POST" )  // use POST for login.
       { url += '/'; }               // required: POST + Django: APPEND_SLASH
-
-      if( this.debugIE )
-      { params += "qxenv:qx.debug.io:true"; }
+      
+      //if( this.debugIE ) { params += "qxenv:qx.debug.io:true"; }
       
       if( method === "GET" )
       {
-        params += "&usr=" + encodeURIComponent( this.username );
-        params += "&pwd=" + encodeURIComponent( this.password );
+        params += "&usr=" + encodeURIComponent( this._username );
+        params += "&pwd=" + encodeURIComponent( this._password );
       }
       else
       {
-        params += "usr="  + encodeURIComponent( this.username );   // POST: without leading '?'
-        params += "&pwd=" + encodeURIComponent( this.password );
+        params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+        params += "&pwd=" + encodeURIComponent( this._password );
       }
-
-      if( method === "GET" )
-      { url += params; }
+      
+      if( method === "GET" ) { url += params; }
       console.debug( url );
       
       var request = new qx.io.request.Xhr( url );
       request.setMethod( method );
-
+      
       if( method === "POST" )           // set parameters in data
-      { request.setRequestData( params ); }
-
-
+      {
+        request.setRequestHeader( "X-CSRFToken", qx.bom.Cookie.get( "csrftoken" ) );
+        request.setRequestData( params ); 
+      }
+      
       request.addListener
       (
         "success",
-        function( ev ) { this.AuthenticateResponse( ev ); },
+        function( ev ) { this._AuthenticateResponse( ev ); },
         this
       );
-
+      
       request.addListener
       (
         "fail",
         function( ev )
         {
-          this.io_login = this.IO_FAIL;
           var request = ev.getTarget();
-
+          
           var msg = "Authentication info:<br>failed, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
-          this.createAlert( msg );
-
+          this.showDialog( msg );
+          
           var response = request.getResponse();
-          this.createAlert( response );
+          this.showDialog( response );
         },
         this
       );
-
+      
       request.addListener
-      (
-        "load",
-        function( ev )
-        {
-          this.io_login = this.IO_LOAD;
-          this.info( "load" );
-        },
-        this
-      );
-
-      request.addListener
-      (
-        "readystatechange",
-        function( ev )
-        {
-          this.io_login = this.IO_STATECHANGE;
-          var phase = request.getPhase();
-          this.info( "phase: " + phase );
-        },
-        this
-      );
-
-      request.addListener
-      (
-        "timeout",
+      ( 
+        "statusError", 
         function( ev ) 
         {
-          this.io_login = this.IO_TIMEOUT;
-          this.createAlert( "Authentication info:<br>timeout<br><br>The server is too busy, please take a break, try again later, and reload this web app" );
+          var request = ev.getTarget();
+          
+          var msg = "Authentication info:<br>statusError, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
+          this.showDialog( msg );
+          
+          var response = request.getResponse();
+          this.showDialog( response );
+        }, 
+        this 
+      );
+      
+      request.send();             // Send the request
+      
+    }, // _doAuthenticate
+    
+    
+    
+    _AuthenticateResponse : function( ev )
+    {
+      console.debug( "_AuthenticateResponse()" );
+      console.debug( "_AuthenticateResponse() this.timestamp_client: " + this.timestamp_client );
+      
+      this.io_login = this.IO_SUCCESS;
+      var request = ev.getTarget();
+      
+      // Response parsed according to the server's response content type, e.g. JSON
+      var json_data = request.getResponse();
+      console.debug( json_data );
+      
+      console.debug( "csrftoken: " + qx.bom.Cookie.get( "csrftoken" ) );
+      console.debug( "sessionid: " + qx.bom.Cookie.get( "sessionid" ) );
+      
+      var content_type = request.getResponseContentType();
+      console.debug( "content_type: " + content_type );
+      if( content_type !== "application/json" )
+      { 
+        var msg = "unexpected response:<br>" + request.getResponseText();
+        this.showDialog( msg );
+      //this.createAlert( msg ); // unparsed
+      }   
+      
+      var resp_status = json_data.status;
+      console.log( "resp_status: " + resp_status );
+      this.timestamp_server = json_data.timestamp;
+      this.info( "timestamp_server: " + this.timestamp_server );
+      
+      if( resp_status === "ok" )
+      {
+      //this.showDialog( this.tr( "Welcome" ) + " " + this._username );
+        this.getHsnData();    // get 'static' data; then create and fill the windows
+      }
+      else
+      {
+        var server_msg = json_data.msg;
+        var msg = "Authentication";
+        msg += "<br><br>Server response: " + resp_status;
+        msg += "<br>Message: " + server_msg;
+      //msg += "<br><br>You can retry to login by reloading the page.";
+        var title = "HSN - Mail en Beheer";
+        this.showDialog( msg, title );
+        
+        this.__windowLogin.show();
+      }
+      
+      if( this.timestamp_client !== this.timestamp_server )
+      { 
+        var msg = "client/server timestamp mismatch<br>version " + this.timestamp_client + " client<br>version " + this.timestamp_server + " server<br><br> This can be an innocent oversight, or it could imply a potential problem. Start with flushing your browser cache, and restarting the browser.";
+        this.showDialog( msg );
+      }
+      
+    }, // _AuthenticateResponse
+    
+    
+    
+    createLogout : function( ev )
+    {
+      console.debug( "createLogout()" );
+    //var msg = "Afmelden van <b>" + this._username + "</b> ...";
+    //this.showDialog( msg );
+    //this.__windowLogout.show();
+      
+      // logout windowLogout
+      var layout = new qx.ui.layout.Grid( 1, 1 );
+      layout.setColumnAlign( 0, "center", "center" );
+      
+      var window = this.__windowLogout = new qx.ui.window.Window( "HSN - Mail en Beheer -- Logout" ).
+      set({
+        modal          : true,
+        width          : 255,
+        contentPadding : [ 20, 20, 20, 20 ],
+        showMinimize   : false,
+        showMaximize   : false,
+        allowGrowX     : false,
+        allowGrowY     : false,
+        allowShrinkX   : false,
+        allowShrinkY   : false,
+        allowStretchX  : false,
+        allowStretchY  : false
+      });
+      
+      window.center();
+      window.setLayout( layout );
+      this.getRoot().add( window );
+      window.open();
+      
+      var msg = "Afmelden van <b>" + this._username + "</b> ...";
+      var label = new qx.ui.basic.Label( msg ).set({
+          allowShrinkX : false,
+          paddingTop   : 3,
+          rich         : true
+        });
+      window.add( label, { row : 0, column : 0 });
+      
+      var url = this.wsgi_url( "/logout" );
+      
+      var method = this.wsgi_method;
+      var params = "";
+      
+      if( method === "GET" )        // only for testing, 
+      { params += "?"; }
+      else if( method === "POST" )  // use POST for login.
+      { url += '/'; }               // required: POST + Django: APPEND_SLASH
+      
+      //if( this.debugIE ) { params += "qxenv:qx.debug.io:true"; }
+      
+      if( method === "GET" )
+      {
+        params += "&usr=" + encodeURIComponent( this._username );
+      //params += "&pwd=" + encodeURIComponent( this._password );
+      }
+      else
+      {
+        params += "usr="  + encodeURIComponent( this._username );   // POST: without leading '?'
+      //params += "&pwd=" + encodeURIComponent( this._password );
+      }
+      
+      if( method === "GET" ) { url += params; }
+      console.debug( url );
+      
+      var request = new qx.io.request.Xhr( url );
+      request.setMethod( method );
+      
+      if( method === "POST" )           // set parameters in data
+      { 
+        request.setRequestHeader( "X-CSRFToken", qx.bom.Cookie.get( "csrftoken" ) );
+        request.setRequestData( params ); 
+      }
+      
+      request.addListener
+      (
+        "success",
+        function( ev ) {
+          console.debug( "Logout: success" );
+          this.__windowLogout.close();
+          this.__windowLogin.open();
         },
         this
       );
-
-      request.send();             // Send the request
-    }, // _doAuthenticate
-
-    /*
-    __prepareEffect : function()
-    {
-      this.__effect = new qx.fx.effect.combination.Shake( this.__container.getContainerElement().getDomElement() );
-    }, // __prepareEffect
-    */
-
-
-    createLogin : function()
-    {
-    //this.consolelog( "createLogin()" );
-    //this.base(arguments);
-
-      // Container layout
-      var layout = new qx.ui.layout.Grid( 9, 5 );
-      layout.setColumnAlign( 0, "right", "top" );
-      layout.setColumnAlign( 2, "right", "top" );
-
-      // Container widget
-      this.__container = new qx.ui.groupbox.GroupBox().set({
-        contentPadding: [ 16, 16, 16, 16 ]
-      });
-      this.__container.setLayout( layout );
-
-      this.__container.addListener( "resize", function( ev )
-      {
-        var bounds = this.__container.getBounds();
-        this.__container.set({
-          marginTop  : Math.round( -bounds.height / 2 ),
-          marginLeft : Math.round( -bounds.width  / 2 )
-        });
-      }, this);
-
-      this.getRoot().add(this.__container, { left : "50%", top : "41%" });
-
-      // Labels
-      var labels = [ this.tr("Username"), this.tr("Password") ];
-      for( var i = 0; i < labels.length; i++ )
-      {
-        this.__container.add( new qx.ui.basic.Label( labels[i] ).set({
-          allowShrinkX : false,
-          paddingTop   : 3
-        }), {row : i, column : 0});
-      }
-
-      // Text fields
-      var fieldUsr = new qx.ui.form.TextField();
-      var fieldPwd = new qx.ui.form.PasswordField();
-      this.fieldUsername = fieldUsr;
-      this.fieldPassword = fieldPwd;
-
-      this.__container.add( fieldUsr.set({
-        allowShrinkX : false,
-        paddingTop   : 3
-      }), { row : 0, column : 1 });
-
-      this.__container.add(fieldPwd.set({
-        allowShrinkX : false,
-        paddingTop   : 3
-      }), { row : 1, column : 1 });
-
-      // PasswordField has no "execute" event
-      fieldPwd.addListener
+      
+      request.addListener
       (
-        "keypress", 
+        "fail",
         function( ev )
         {
-          if( ev.getKeyIdentifier() === "Enter" )
-          { this.doAuthenticate(); }
-        }, 
+          console.debug( "Logout: fail" );
+          this.__windowLogout.close();
+          
+          var request = ev.getTarget();
+          var msg = "Logout info:<br>failed, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
+          this.showDialog( msg );
+          
+          var response = request.getResponse();
+          this.showDialog( response );
+        },
         this
       );
-
-      // Button
-      var btnLogin = this.__btnOk =  new qx.ui.form.Button( this.tr( "Login" ) );
-      btnLogin.setAllowStretchX( false );
-
-      this.__container.add(
-        btnLogin,
+      
+      request.addListener
+      ( 
+        "statusError", 
+        function( ev ) 
         {
-          row    : 3,
-          column : 1
-        }
+          console.debug( "Logout: fail" );
+          this.__windowLogout.close();
+          
+          var request = ev.getTarget();
+          var msg = "Logout info:<br>statusError, using:<br>host: " + this.prototocol + "://" + this.host + ", @ port: " + this.port;
+          this.showDialog( msg );
+          
+          var response = request.getResponse();
+          this.showDialog( response );
+        }, 
+        this 
       );
-
-      // Check input on click
-      btnLogin.addListener( "execute", this._doAuthenticate, this );
-
-      this.__container.addListener( "appear", function()
-      {
-        this.__prepareEffect();     // shake widget when login is wrong
-        fieldUsr.focus();           // so that user can start typing his/her name right away
-      }, this);
-    }, // createLogin
-    
-    
-    
-    /**
-     * createAlert
-     */
-    /*
-    createAlert : function( msg )
-    {
-      (
-      //new dialog.Alert({
-      //new dutchsemcor.Alert({
-        new hsnmailenbeheer.Alert({
-          message : msg
-        })
-      ).show();
-    } // createAlert
-    */
-    
-    
-    statics: 
-    {
-      DATA: 
-      [
-        ["1","libgtop-2.0/glibtop_server"],
-        ["2","libgtop-2.0/glibtop"],
-        ["3","libgtop-2.0/libgtopconfig"],
-        ["4","libgtop-2.0/glibtop_machine"],
-        ["5","libgtop-2.0/glibtop/mem"],
-        ["6","libgtop-2.0/glibtop/command"],
-        ["7","libgtop-2.0/glibtop/sem_limits"],
-        ["8","libgtop-2.0/glibtop/version"],
-        ["9","libgtop-2.0/glibtop/procmem"],
-        ["10","libgtop-2.0/glibtop/prockernel"],
-        ["11","libgtop-2.0/glibtop/procaffinity"],
-        ["12","libgtop-2.0/glibtop/fsusage"],
-        ["13","libgtop-2.0/glibtop/netlist"],
-        ["14","libgtop-2.0/glibtop/procsignal"],
-        ["15","libgtop-2.0/glibtop/gnuserv"],
-        ["16","libgtop-2.0/glibtop/proclist"],
-        ["17","libgtop-2.0/glibtop/netload"],
-        ["18","libgtop-2.0/glibtop/procuid"],
-        ["19","libgtop-2.0/glibtop/sysinfo"],
-        ["20","libgtop-2.0/glibtop/swap"],
-        ["21","libgtop-2.0/glibtop/procmap"],
-        ["22","libgtop-2.0/glibtop/proctime"],
-        ["23","libgtop-2.0/glibtop/sysdeps"],
-        ["24","libgtop-2.0/glibtop/parameter"],
-        ["25","libgtop-2.0/glibtop/loadavg"],
-        ["26","libgtop-2.0/glibtop/procstate"],
-        ["27","libgtop-2.0/glibtop/cpu"],
-        ["28","libgtop-2.0/glibtop/mountlist"],
-        ["29","libgtop-2.0/glibtop/procargs"],
-        ["30","libgtop-2.0/glibtop/shm_limits"],
-        ["31","libgtop-2.0/glibtop/global"],
-        ["32","libgtop-2.0/glibtop/procsegment"],
-        ["33","libgtop-2.0/glibtop/msg_limits"],
-        ["34","libgtop-2.0/glibtop/procopenfiles"],
-        ["35","libgtop-2.0/glibtop/union"],
-        ["36","libgtop-2.0/glibtop/open"],
-        ["37","libgtop-2.0/glibtop/uptime"],
-        ["38","libgtop-2.0/glibtop/signal"],
-        ["39","libgtop-2.0/glibtop/procwd"],
-        ["40","libgtop-2.0/glibtop/ppp"],
-        ["41","libgtop-2.0/glibtop/close"]
-      ]
-    }
+      
+      request.send();             // Send the request
+      
+    } // createLogout
+      
   } // members
 });
 

@@ -4,7 +4,7 @@
 #
 # Build script for the project to produce a packaged distribution.
 #
-# Example: ./build.sh hsn-mailenbeheer 1.0.0 /home/hsn-mailenbeheer /usr/share/python/2.7.10
+# Example: ./build.sh hsn-mailenbeheer 1.0.0 /home/hsn-mailenbeheer /usr/share/python/2.7.11
 #
 # Requirements: virtualenv and pip must be installed with the targeted python distribution.
 
@@ -65,8 +65,8 @@ $p/bin/virtualenv $builddir/virtualenv
 . $builddir/virtualenv/bin/activate
 
 
-# Retrieve the dependencies
-pip install -r $builddir/requirements.txt --cache-dir=$workspace
+# Retrieve the dependencies for python 2.7
+pip install -r $builddir/doc/requirements_py2.7.txt --cache-dir=$workspace
 
 
 # Build the javascript libraries

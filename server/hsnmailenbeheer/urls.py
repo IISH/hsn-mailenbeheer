@@ -3,12 +3,14 @@
 """
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
-Name:		urls.py
+Name:		hsnmailenbeheer/urls.py
 Version:	1.0.0
 Goal:		URL dispatcher
 
 26-May-2015	Created
-17-Nov-2015	Changed
+25-Feb-2016	Login
+02-Mar-2016	Logout
+02-Mar-2016	Changed
 """
 
 from django.conf.urls import include, url
@@ -17,15 +19,20 @@ from django.contrib.auth import views as auth_views
 
 from hsnmailenbeheer import settings
 
-urlpatterns = [
-#	url( r'^accounts/',        include( 'registration.backends.simple.urls' ) ),
-#	url( r'^accounts/login/$', auth_views.login ),
-	url( r'',                  include( 'qx.urls' ) ),
-]
+
+urlpatterns = []
 
 if settings.ADMIN_ENABLED:
-	urlpatterns += patterns( '',
-		( r'^admin/(.*)', include( admin.site.urls ) ),
-	)
+	urlpatterns += [
+		url( r'^admin/', admin.site.urls ),
+	]
+
+urlpatterns += [
+#	url( r'^accounts/login/$', include( auth_views.login ) ),
+#	url( r'^accounts/',        include( 'registration.backends.simple.urls' ) ),	# django-registration
+
+	url( r'',                  include( 'loginout.urls' ) ),
+	url( r'',                  include( 'qx.urls' ) ),
+]
 
 # [eof]
