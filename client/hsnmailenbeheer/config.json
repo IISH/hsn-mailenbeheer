@@ -98,7 +98,7 @@
       //"hsnmail.wsgi_method"   : "GET", 
         "hsnmail.wsgi_method"   : "POST", 
       
-        "hsnmail.wsgi_path" : "/hsnmailenbeheer_wsgi", // python hook
+        "hsnmail.wsgi_path" : "/hsnmailenbeheer_wsgi"  // python hook
       }
     }
     

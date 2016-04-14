@@ -158,10 +158,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
       // actual application code...
       qx.locale.Manager.getInstance().setLocale( "nl" );
       console.debug( "Qooxdoo version: " + qx.core.Environment.get( 'qx.version' ) );
-      
-      this.js_location = window.location;
-      console.debug( this.js_location );
-      
       console.debug( "wsgi_method: " + this.wsgi_method );
       console.debug( "wsgi_path: " + this.wsgi_path );
       
@@ -188,19 +184,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
       */
     wsgi_url : function( path ) 
     {
-        var prot = this.js_location.protocol;
-        var host = this.js_location.host;
-        var port = this.js_location.port;
         var wsgi = this.wsgi_path;
-        /*
-        console.debug( "prot: " + prot );
-        console.debug( "host: " + host );
-        console.debug( "port: " + port );
-        console.debug( "wsgi: " + wsgi );
-        */
-        var url = prot + "//" + host + port + wsgi + path;
+        var url = wsgi + path;
         console.debug( url );
-        
         return url;
     },
     
