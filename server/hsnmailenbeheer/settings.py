@@ -75,7 +75,7 @@ MIDDLEWARE_CLASSES = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
-	'django.middleware.csrf.CsrfViewMiddleware',
+	#'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  # not in Django-1.4.20
 	'django.contrib.messages.middleware.MessageMiddleware',
