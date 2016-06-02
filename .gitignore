@@ -1,0 +1,12 @@
+.directory
+*~
+*.pyc
+__pycache__/
+client/hsnmailenbeheer/build/
+migrations/
+print/
+settings_local.py
+static/
+wsgi.py
+.idea
+puppet

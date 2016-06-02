@@ -1,0 +1,23 @@
+{% extends "registration/registration_base.html" %}
+
+{% comment %}
+**registration/registration_closed.html**
+Used to display the message that registration is closed
+{% endcomment %}
+
+
+{% block content %}
+<h1>Registration is closed</h1>
+<form action="" method="POST">
+    {% csrf_token %}
+    Registrating a new account has been disabled
+    <!--
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" name="submit" value="Submit">
+    -->
+</form>
+
+{% endblock %}
+
