@@ -14,8 +14,8 @@ def hsn_logout( request ):
 
 02-Mar-2016	Created
 17-Mar-2016	@login_required added
-17-Mar-2016	@csrf_exempt removed
-01-Apr-2016	Changed
+02-Jun-2016	@csrf_exempt only for function hsn_login
+02-Jun-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -33,15 +33,20 @@ from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 from hsnmailenbeheer import settings
 from .ldap_authenticate import ldap_authenticate
 
 
+@csrf_exempt
 def hsn_login( request ):
 	print( "loginout/views/hsn_login()" )
 
-	# It seems that the browser automatically sends these cookies, so apparently I do not 
+	# 02-Jun-2016 with @csrf_exempt on this function, a csrftoken automatically
+	# shows up in firebug, after the cookies were manually removed.
+
+	# It seems that the browser automatically sends these cookies, so apparently I do not
 	# have to copy the csrftoken with qooxdoo in the client into subsequent request objects. 
 	csrftoken = request.COOKIES.get( "csrftoken" )
 	sessionid = request.COOKIES.get( "sessionid" )
