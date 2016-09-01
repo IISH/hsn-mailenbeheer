@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.0
+ * Version:     1.0.1
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -43,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-24-Mar-2016: Changed
+ * FL-01-Sep-2016: A few Marja wishes
  */
 
 /**
@@ -67,7 +67,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "29-Mar-2016 14:11",
+    timestamp_client : "01-Sep-2016 15:40",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -985,11 +985,33 @@ qx.Class.define( "hsnmailenbeheer.Application",
             }
           }
           
-          if( editable ) {
+          if( editable ) 
+          {
             textfieldDeathDay    .setEnabled( true );
             textfieldDeathMonth  .setEnabled( true );
             textfieldDeathYear   .setEnabled( true );
             comboboxDeathLocation.setEnabled( true );
+            
+            textfieldDeathDay.addListener( "input", function( ev ) {
+              var day = textfieldDeathDay.get( "value" );
+              if( isNaN( day ) ) { textfieldDeathDay.setValue( "" ); }            // ignore NaNs
+              else if( day.length > 2 ) { textfieldDeathDay.setValue( "" ); }     // too long
+              else if( day.length == 2 ){ textfieldDeathMonth.focus(); }          // OK, next field
+            });
+            
+            textfieldDeathMonth.addListener( "input", function( ev ) {
+              var month = textfieldDeathMonth.get( "value" );
+              if( isNaN( month ) ) { textfieldDeathMonth.setValue( "" ); }        // ignore NaNs
+              else if( month.length > 2 ) { textfieldDeathMonth.setValue( "" ); } // too long
+              else if( month.length == 2 ){ textfieldDeathYear.focus(); }         // OK, next field
+            });
+            
+            textfieldDeathYear.addListener( "input", function( ev ) {
+              var year = textfieldDeathYear.get( "value" );
+              if( isNaN( year ) ) { textfieldDeathYear.setValue( "" ); }          // ignore NaNs
+              else if( year.length > 4 ) { textfieldDeathYear.setValue( "" ); }   // too long
+              else if( year.length == 4 ){ comboboxDeathLocation.focus(); }       // OK, next field
+            });
             
             if( death_list.length == 0 || ( day == 0 && month == 0 && year == 0 )) 
             { labelDeathLegend.setValue( "" ); }
@@ -1604,6 +1626,27 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerDateBegin.add( textfieldBeginMonth );
       containerDateBegin.add( textfieldBeginYear );
       
+      textfieldBeginDay.addListener( "input", function( ev ) {
+        var day = textfieldBeginDay.get( "value" );
+        if( isNaN( day ) ) { textfieldBeginDay.setValue( "" ); }            // ignore NaNs
+        else if( day.length > 2 ) { textfieldBeginDay.setValue( "" ); }     // too long
+        else if( day.length == 2 ){ textfieldBeginMonth.focus(); }          // OK, next field
+      });
+      
+      textfieldBeginMonth.addListener( "input", function( ev ) {
+        var month = textfieldBeginMonth.get( "value" );
+        if( isNaN( month ) ) { textfieldBeginMonth.setValue( "" ); }        // ignore NaNs
+        else if( month.length > 2 ) { textfieldBeginMonth.setValue( "" ); } // too long
+        else if( month.length == 2 ){ textfieldBeginYear.focus(); }         // OK, next field
+      });
+      
+      textfieldBeginYear.addListener( "input", function( ev ) {
+        var year = textfieldBeginYear.get( "value" );
+        if( isNaN( year ) ) { textfieldBeginYear.setValue( "" ); }          // ignore NaNs
+        else if( year.length > 4 ) { textfieldBeginYear.setValue( "" ); }   // too long
+        else if( year.length == 4 ){ textfieldEndDay.focus(); }             // OK, next field
+      });
+      
       var textfieldEndDay   = new qx.ui.form.TextField().set({ width : 30, placeholder : "DD", textAlign : "center" });
       var textfieldEndMonth = new qx.ui.form.TextField().set({ width : 30, placeholder : "MM", textAlign : "center" });
       var textfieldEndYear  = new qx.ui.form.TextField().set({ width : 40, placeholder :"JJJJ",textAlign : "center" });
@@ -1612,6 +1655,26 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerDateEnd.add( textfieldEndMonth );
       containerDateEnd.add( textfieldEndYear );
       
+      textfieldEndDay.addListener( "input", function( ev ) {
+        var day = textfieldEndDay.get( "value" );
+        if( isNaN( day ) ) { textfieldEndDay.setValue( "" ); }              // ignore NaNs
+        else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }       // too long
+        else if( day.length == 2 ){ textfieldEndMonth.focus(); }            // OK, next field
+      });
+      
+      textfieldEndMonth.addListener( "input", function( ev ) {
+        var month = textfieldEndMonth.get( "value" );
+        if( isNaN( month ) ) { textfieldEndMonth.setValue( "" ); }          // ignore NaNs
+        else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); }   // too long
+        else if( month.length == 2 ){ textfieldEndYear.focus(); }           // OK, next field
+      });
+      
+      textfieldEndYear.addListener( "input", function( ev ) {
+        var year = textfieldEndYear.get( "value" );
+        if( isNaN( year ) ) { textfieldEndYear.setValue( "" ); }            // ignore NaNs
+        else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }     // too long
+        else if( year.length == 4 ){ comboboxMissingLocation.focus(); }     // OK, next field
+      });
       
       var width_column1 = 300;
       // ComboTable is a combination of a ComboBox and a Table for autocompletion
@@ -3620,7 +3683,14 @@ qx.Class.define( "hsnmailenbeheer.Application",
           rows.push( row );
           var clearSorting = false;
           tableModel.addRows( rows, numrows, clearSorting );
-
+          
+          // clear fields for possible next mail
+          textfieldPartnerlastname  .setValue( "" );
+          textfieldPartnerfirstnames.setValue( "" );
+          textfieldMarriage         .setValue( "" );
+          textfieldPeriod           .setValue( "" );
+          textfieldLocationNr       .setValue( "" );
+          comboboxLocation          .setValue( "" );
         },
         this
       );
@@ -4948,6 +5018,26 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerMutationDate.add( textfieldMutationMonth );
       containerMutationDate.add( textfieldMutationYear );
       
+      textfieldMutationDay.addListener( "input", function( ev ) {
+        var day = textfieldMutationDay.get( "value" );
+        if( isNaN( day ) ) { textfieldMutationDay.setValue( "" ); }             // ignore NaNs
+        else if( day.length > 2 ) { textfieldMutationDay.setValue( "" ); }      // too long
+        else if( day.length == 2 ){ textfieldMutationMonth.focus(); }           // OK, next field
+      });
+      
+      textfieldMutationMonth.addListener( "input", function( ev ) {
+        var month = textfieldMutationMonth.get( "value" );
+        if( isNaN( month ) ) { textfieldMutationMonth.setValue( "" ); }         // ignore NaNs
+        else if( month.length > 2 ) { textfieldMutationMonth.setValue( "" ); }  // too long
+        else if( month.length == 2 ){ textfieldMutationYear.focus(); }          // OK, next field
+      });
+      
+      textfieldMutationYear.addListener( "input", function( ev ) {
+        var year = textfieldMutationYear.get( "value" );
+        if( isNaN( year ) ) { textfieldMutationYear.setValue( "" ); }           // ignore NaNs
+        else if( year.length > 4 ) { textfieldMutationYear.setValue( "" ); }    // too long
+        else if( year.length == 4 ){ textfieldRemark.focus(); }                 // OK, next field
+      });
       
       var textfieldRemark = new qx.ui.form.TextField();
       containerMutationAdd.add( textfieldRemark, { row : 2, column : 1, colSpan : 2 } );
