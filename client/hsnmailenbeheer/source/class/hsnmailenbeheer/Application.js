@@ -43,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-01-Sep-2016: A few Marja wishes
+ * FL-05-Sep-2016: A few Marja wishes
  */
 
 /**
@@ -67,7 +67,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "01-Sep-2016 15:40",
+    timestamp_client : "05-Sep-2016 14:16",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -945,9 +945,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
           // clear data from previous OP
           textareaMarriages.setValue( "" );
           
-          textfieldDeathDay  .setValue( null );
-          textfieldDeathMonth.setValue( null );
-          textfieldDeathYear .setValue( null );
+          textfieldDeathDay  .setValue( "" );
+          textfieldDeathMonth.setValue( "" );
+          textfieldDeathYear .setValue( "" );
           
           comboboxDeathLocation.setValue( null );
           
@@ -1028,9 +1028,11 @@ qx.Class.define( "hsnmailenbeheer.Application",
           
           console.debug( "ovldag: " + day + ", ovlmnd: " + month + ", ovljaar: " + year );
           //datefield.setValue( new Date( year, month-1, day ) );   // month starts at 0, not 1
-          textfieldDeathDay  .setValue( day );
-          textfieldDeathMonth.setValue( month );
-          textfieldDeathYear .setValue( year );
+          if( ! ( day == 0 && month == 0 && year == 0) ) { // ignore meaningless date
+            textfieldDeathDay  .setValue( day );
+            textfieldDeathMonth.setValue( month );
+            textfieldDeathYear .setValue( year );
+          }
           
           
           var hsnmanage = this.OP.hsnmanage;
@@ -1657,23 +1659,23 @@ qx.Class.define( "hsnmailenbeheer.Application",
       
       textfieldEndDay.addListener( "input", function( ev ) {
         var day = textfieldEndDay.get( "value" );
-        if( isNaN( day ) ) { textfieldEndDay.setValue( "" ); }              // ignore NaNs
-        else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }       // too long
-        else if( day.length == 2 ){ textfieldEndMonth.focus(); }            // OK, next field
+        if( isNaN( day ) ) { textfieldEndDay.setValue( "" ); }            // ignore NaNs
+        else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
+        else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
       });
       
       textfieldEndMonth.addListener( "input", function( ev ) {
         var month = textfieldEndMonth.get( "value" );
-        if( isNaN( month ) ) { textfieldEndMonth.setValue( "" ); }          // ignore NaNs
-        else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); }   // too long
-        else if( month.length == 2 ){ textfieldEndYear.focus(); }           // OK, next field
+        if( isNaN( month ) ) { textfieldEndMonth.setValue( "" ); }        // ignore NaNs
+        else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); } // too long
+        else if( month.length == 2 ){ textfieldEndYear.focus(); }         // OK, next field
       });
       
       textfieldEndYear.addListener( "input", function( ev ) {
         var year = textfieldEndYear.get( "value" );
-        if( isNaN( year ) ) { textfieldEndYear.setValue( "" ); }            // ignore NaNs
-        else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }     // too long
-        else if( year.length == 4 ){ comboboxMissingLocation.focus(); }     // OK, next field
+        if( isNaN( year ) ) { textfieldEndYear.setValue( "" ); }          // ignore NaNs
+        else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }   // too long
+        else if( year.length == 4 ){ comboboxMissingLocation.focus(); }   // OK, next field
       });
       
       var width_column1 = 300;
