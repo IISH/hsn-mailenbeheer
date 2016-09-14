@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		settings.py
-Version:	1.0.0
+Version:	1.0.2
 Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
@@ -22,7 +22,7 @@ import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "05-Sep-2016 14:16"
+TIMESTAMP_SERVER = "14-Sep-2016 13:33"
 
 django_version_str = get_version()
 django_version_lst = django_version_str.split('.')

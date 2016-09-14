@@ -20,7 +20,7 @@ def update_status( id ):
 
 17-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-15-Mar-2016	Changed
+14-Sep-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -36,12 +36,15 @@ import datetime
 import codecs
 import cups
 
+from django.conf import settings
 from hsnmailenbeheer import settings
 from mail.models import ArchiefGemeente, HsnBeheer, Mail
 from reference.views import get_opsex
 from op_select.op import get_op_info
 	
 from .cupstree import get_printers
+
+debug = settings.DEBUG
 
 # now from settings_local
 #ID_IN_FN = True		# mail pk id in ps filename
@@ -57,7 +60,7 @@ MAIL_UPDATE_TABLE_DEFAULT    = True
 
 
 def print_mailbev():
-	print( "mail/print/print_mailbev(" )
+	if debug: print( "mail/print/print_mailbev(" )
 	
 	# notice, no cups.py, but just a .cups.so
 	#print( os.path.abspath( cups.__file__ ) )
@@ -76,25 +79,25 @@ def print_mailbev():
 		
 		if mail_qs is None:
 			msg = "Mail does not contain entries with status = 0"
-			print( msg )
+			if debug: print( msg )
 		else:
 			nmails_bev = mail_qs.count()
-			print( "Number of mails with status = 0:", nmails_bev )
+			if debug: print( "Number of mails with status = 0:", nmails_bev )
 			
 			for mail in mail_qs:
-				print( mail )
+				if debug: print( mail )
 				id = str( mail.id )
 				ids.append( id )
 				
 				opsex    = none2empty( get_opsex(    mail.idnr ) )
 				mailtype = none2empty( get_mailtype( mail.idnr ) )
-				print( "opsex:", opsex, ", mailtype:", mailtype )
+				if debug: print( "opsex:", opsex, ", mailtype:", mailtype )
 				
 				archive = none2empty( get_archive( mail.gemnr ) )
-				print( "archive:", archive )
+				if debug: print( "archive:", archive )
 				
 				info_list = none2empty( get_op_info( mail.idnr ) )
-				print( "info_list:", info_list )
+				if debug: print( "info_list:", info_list )
 				
 				pathname_psfile = get_pathname_psfile( mail.gemnr, id )
 				
@@ -198,13 +201,13 @@ def get_archive( gemnr ):
 
 
 def get_pathname_psfile( gemnr, id ):
-	print( "get_pathname_psfile()" )
+	if debug: print( "get_pathname_psfile()" )
 	
 	try:
 		MAIL_PRINT_DIR = settings.MAIL_PRINT_DIR
 	except:
 		MAIL_PRINT_DIR = MAIL_PRINT_DIR_DEFAULT
-	print( "MAIL_PRINT_DIR:", MAIL_PRINT_DIR )
+	if debug: print( "MAIL_PRINT_DIR:", MAIL_PRINT_DIR )
 	
 	basename_psfile = basename_print
 	
@@ -221,9 +224,9 @@ def get_pathname_psfile( gemnr, id ):
 		
 	
 	filename_psfile = basename_psfile + ".ps"
-	print( filename_psfile )
+	if debug: print( filename_psfile )
 	pathname_psfile = os.path.join( MAIL_PRINT_DIR, filename_psfile )
-	print( pathname_psfile )
+	if debug: print( pathname_psfile )
 
 	return pathname_psfile
 
@@ -233,10 +236,10 @@ def create_ps_letter( pathname_print_out, OP ):
 	"""
 	Create a PostScript file with the letter contents for a given OP
 	"""
-	print( "create_ps_letter()" )
+	if debug: print( "create_ps_letter()" )
 	
 	try:
-		print( "open:", pathname_print_out )
+		if debug: print( "open:", pathname_print_out )
 		printps_file = codecs.open( pathname_print_out, 'wb', "latin-1" )
 	except:
 		status = "ERROR"
@@ -277,22 +280,23 @@ def create_ps_letter( pathname_print_out, OP ):
 	else:
 		infopartner = False
 	
-	print( "mailtype:   ", mailtype   .encode( 'utf8' ) )
-	print( "kind:       ", kind       .encode( 'utf8' ) )
-	print( "gemnr:      ", gemnr )
-	print( "archive:    ", archive    .encode( 'utf8' ) )
-	print( "datum:      ", datum      .encode( 'utf8' ) )
-	print( "periode:    ", periode    .encode( 'utf8' ) )
-	print( "naamgem:    ", naamgem    .encode( 'utf8' ) )
-	print( "opmerk:     ", opmerk     .encode( 'utf8' ) )
-	print( "opsex:      ", opsex      .encode( 'utf8' ) )
-	print( "opident:    ", opident    .encode( 'utf8' ) )
-	print( "oppartner:  ", oppartner  .encode( 'utf8' ) )
-	print( "opvader:    ", opvader    .encode( 'utf8' ) )
-	print( "opmoeder:   ", opmoeder   .encode( 'utf8' ) )
-	print( "infoouders: ", infoouders )		# bool
-	print( "infopartner:", infopartner )	# bool
-	print( "inforeis:   ", inforeis )		# bool
+	if debug: 
+		print( "mailtype:   ", mailtype   .encode( 'utf8' ) )
+		print( "kind:       ", kind       .encode( 'utf8' ) )
+		print( "gemnr:      ", gemnr )
+		print( "archive:    ", archive    .encode( 'utf8' ) )
+		print( "datum:      ", datum      .encode( 'utf8' ) )
+		print( "periode:    ", periode    .encode( 'utf8' ) )
+		print( "naamgem:    ", naamgem    .encode( 'utf8' ) )
+		print( "opmerk:     ", opmerk     .encode( 'utf8' ) )
+		print( "opsex:      ", opsex      .encode( 'utf8' ) )
+		print( "opident:    ", opident    .encode( 'utf8' ) )
+		print( "oppartner:  ", oppartner  .encode( 'utf8' ) )
+		print( "opvader:    ", opvader    .encode( 'utf8' ) )
+		print( "opmoeder:   ", opmoeder   .encode( 'utf8' ) )
+		print( "infoouders: ", infoouders )		# bool
+		print( "infopartner:", infopartner )	# bool
+		print( "inforeis:   ", inforeis )		# bool
 	
 	# PostScript units: 
 	# 72 points for an inch, 28.3465 points for a cm
@@ -308,7 +312,7 @@ def create_ps_letter( pathname_print_out, OP ):
 	
 	now = datetime.datetime.now()
 	date_str = "%s %s %s" % ( now.day, month_names[ now.month-1 ], now.year )
-#	print( date_str )
+	#if debug: print( date_str )
 	
 	try:
 		printps_file.write( "%!PS\n\n" )
@@ -447,13 +451,13 @@ def create_ps_letter( pathname_print_out, OP ):
 		opident = opident.replace( '-', '\255' )		# minus sign -> hyphen: \uad (utf8), 0255 (octal), 173
 		printps_file.write( "(" + opident + ") show\n" )
 		
-		print( "info_list length:", len( info_list ) )
+		if debug: print( "info_list length:", len( info_list ) )
 		if len( info_list ) > 1:
 			y -= (2 * d)
 			printps_file.write( str( x ) + " " + str( y ) + " moveto\n" )
 			printps_file.write( "(" + "Let op! Er zijn veranderingen in de identiteitsgegevens:" + ") show\n" )
 			for info in info_list:
-				print( "info;", info.encode( 'utf8' ) )
+				if debug: print( "info:", info )
 				id_origin = info.get( "id_origin" )
 				if int( id_origin ) != 10:
 					display_str = info.get( "display_str" )
@@ -504,7 +508,7 @@ def create_ps_letter( pathname_print_out, OP ):
 		printps_file.write( "(Ter informatie:) show\n" )
 
 		if inforeis == 1:
-		#	print( "inforeis 1" )
+			#if debug: print( "inforeis 1" )
 			y -= d
 			printps_file.write( str( x ) + " " + str( y ) + " moveto\n" )
 			printps_file.write( "(Deze persoon reisde alleen.) show\n" )
@@ -563,7 +567,7 @@ def create_ps_letter( pathname_print_out, OP ):
 				y = print_ps_line( printps_file, s, d, x, y )
 			
 		elif inforeis == 2:
-		#	print( "inforeis 2" )
+			#if debug: print( "inforeis 2" )
 			if oppartner != "":
 				s = "Deze persoon reisde met "
 				if opsex == 'm':
@@ -579,7 +583,7 @@ def create_ps_letter( pathname_print_out, OP ):
 				y = print_ps_line( printps_file, s, d, x, y )
 		
 		elif inforeis == 3:
-		#	print( "inforeis 3" )
+			#if debug: print( "inforeis 3" )
 			if opvader != "" or opmoeder != "":
 				s = "Deze persoon reisde met "
 				if opsex == 'm':
@@ -648,7 +652,7 @@ def create_ps_letter( pathname_print_out, OP ):
 		return status, msg
 	
 	try:
-		print( "close:", pathname_print_out )
+		if debug: print( "close:", pathname_print_out )
 		printps_file.close()
 	except:
 		status = "ERROR"
@@ -666,7 +670,7 @@ def print_ps_line( psfile, string, d, x, y ):
 	We use 12 points as default.
 	"""
 
-	print( "print_ps_line()" )
+	if debug: print( "print_ps_line()" )
 #	print( string.encode( 'utf8' ) )
 	
 	# minus sign -> hyphen: \uad (utf8), 0255 (octal), 173
@@ -674,7 +678,7 @@ def print_ps_line( psfile, string, d, x, y ):
 	
 	string = string.replace( "(", "\(" )
 	string = string.replace( ")", "\)" )
-	print( string.encode( 'utf8' ) )
+	if debug: print( string.encode( 'utf8' ) )
 	
 	psfile.write(  str( x ) + " " + str( y ) + " moveto\n" )
 	words = string.split( ' ' )
@@ -684,7 +688,7 @@ def print_ps_line( psfile, string, d, x, y ):
 	for word in words:
 	#	print( word.encode( 'utf8' ) )
 		if length + len( word ) + 1 > maxcharsline:
-			print( "piece:", piece.encode( 'utf8' ) )
+			if debug: print( "piece:", piece.encode( 'utf8' ) )
 			psfile.write( "(" + piece + ") show\n" )
 			# new line
 			y -= d
@@ -695,16 +699,16 @@ def print_ps_line( psfile, string, d, x, y ):
 			piece  += word + " "
 			length += len( word ) + 1
 		
-	print( "piece:", piece.encode( 'utf8' ) )
+	if debug: print( "piece:", piece.encode( 'utf8' ) )
 	psfile.write( "(" + piece + ") show\n" )
-	print( "print_ps_line)(" )
+	if debug: print( "print_ps_line)(" )
 		
 	return y
 
 
 
 def print_ps_letter( id, pathname_print_out ):
-	print( "print_ps_letter()" )
+	if debug: print( "print_ps_letter()" )
 	status = ""
 	msg = ""
 			
@@ -727,7 +731,7 @@ def print_ps_letter( id, pathname_print_out ):
 				title += id
 
 			options = {}
-			print( "print to:", printer, ", file:", pathname_print_out )
+			if debug: print( "print to:", printer, ", file:", pathname_print_out )
 			cups_con.printFile( printer, pathname_print_out, title, options );
 		else:
 			status = ""
@@ -745,13 +749,13 @@ def print_ps_letter( id, pathname_print_out ):
 
 
 def update_status_date( id ):
-	print( "update_status() id: ", id )
+	if debug: print( "update_status() id: ", id )
 	ret_status = ""
 	msg = ""
 	
 	now = datetime.datetime.now()
 	date_str = "%s-%s-%s" % ( now.day, now.month, now.year )
-#	print( date_str )
+	#if debug: print( date_str )
 
 	fields = { 
 		"status"     : 1 ,				# printed: status 0 -> 1
@@ -763,7 +767,7 @@ def update_status_date( id ):
 	except ObjectDoesNotExist:
 		# not found
 		ret_status = "NOT FOUND"
-		print( "update_status() id %s not present in table Mail" % id )
+		if debug: print( "update_status() id %s not present in table Mail" % id )
 	except:
 		ret_status = "ERROR"
 		print( "update_status(), id: ", id )

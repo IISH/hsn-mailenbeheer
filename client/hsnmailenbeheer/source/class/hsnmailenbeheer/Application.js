@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.1
+ * Version:     1.0.2
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -43,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-05-Sep-2016: A few Marja wishes
+ * FL-14-Sep-2016: A few Marja wishes
  */
 
 /**
@@ -67,7 +67,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "05-Sep-2016 14:16",
+    timestamp_client : "14-Sep-2016 13:33",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -428,7 +428,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
             this.buttonWindow3.setEnabled( false );
             this.buttonWindow5.setEnabled( false );
             this.buttonWindow6.setEnabled( false );
-            this.buttonWindow7.setEnabled( false );
+            //this.buttonWindow7.setEnabled( false );   // 'Stoppen' always enabled
             
             op_info_str = this.OP.op_err_str; 
             this.opinfo_html = "<h3><b>" + op_info_str + "</b></h3>"
