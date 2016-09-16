@@ -43,7 +43,7 @@
  * FL-19-Jun-2015: Created
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
- * FL-14-Sep-2016: A few Marja wishes
+ * FL-16-Sep-2016: A few Marja wishes
  */
 
 /**
@@ -67,7 +67,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "14-Sep-2016 13:33",
+    timestamp_client : "16-Sep-2016 12:58",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -1796,7 +1796,18 @@ qx.Class.define( "hsnmailenbeheer.Application",
           console.debug( msg );
           
           // convert to row data, and append to table
-          var idvolgnr = 1 + tableModel.getRowCount();
+          var table_data = tableModel.getData();
+          var nrows = table_data.length;
+          var idvolgnr_max = 0;
+          for( var r = 0; r < nrows; r++ )    // get max value of volgnr's
+          {
+            var row_data = table_data[ r ];
+            var idvolgnr_row = row_data[ this.MISSING_idvolgnr ];
+            if( idvolgnr_row > idvolgnr_max ) { idvolgnr_max = idvolgnr_row }
+          }
+          var idvolgnr = idvolgnr_max + 1;
+          //console.debug( "new idvolgnr: " + idvolgnr );
+          
           var op_num = this.OP.op_num;
           
           var nr = "";  // the "#" column, only filled when filling the whole table

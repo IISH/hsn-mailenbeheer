@@ -9,7 +9,7 @@ Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
 25-Feb-2016	Django-1.8 changes, -> Django-1.9
-05-Sep-2016	Changed
+16-Sep-2016	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -22,7 +22,7 @@ import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "14-Sep-2016 13:33"
+TIMESTAMP_SERVER = "16-Sep-2016 12:58"
 
 django_version_str = get_version()
 django_version_lst = django_version_str.split('.')
