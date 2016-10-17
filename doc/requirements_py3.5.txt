@@ -1,4 +1,4 @@
-# FL-04-Apr-2016
+# FL-03-May-2016
 # pip requirements file for HSNmail with a Python-3.5.1
 # setuptools, pip, and venv are already present in the (virtual) python3.5
 # python-devel and mysql-devel were needed for installing mysqlclient

@@ -43,10 +43,10 @@ from .ldap_authenticate import ldap_authenticate
 def hsn_login( request ):
 	print( "loginout/views/hsn_login()" )
 
-	# 02-Jun-2016 with @csrf_exempt on this function, a csrftoken automatically
-	# shows up in firebug, after the cookies were manually removed.
+	# 02-Jun-2016 with @csrf_exempt on this function, a csrftoken automatically 
+	# shows up in firebug, after the cookies were manually removed. 
 
-	# It seems that the browser automatically sends these cookies, so apparently I do not
+	# It seems that the browser automatically sends these cookies, so apparently I do not 
 	# have to copy the csrftoken with qooxdoo in the client into subsequent request objects. 
 	csrftoken = request.COOKIES.get( "csrftoken" )
 	sessionid = request.COOKIES.get( "sessionid" )

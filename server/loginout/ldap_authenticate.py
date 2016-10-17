@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		loginout/ldap_authenticate.py
-Version:	1.0.0
+Version:	1.0.2
 Goal:		LDAP authentication
 
 
@@ -23,7 +23,7 @@ LDAP Methods with names ending in _s are the synchronous form and wait for and
 return with the server's result, or with None if no data is expected.
 
 01-Mar-2016	Created
-17-Mar-2016	Changed
+14-Sep-2016	Changed
 """
 
 import sys
@@ -69,16 +69,17 @@ def show_resp( resp ):
 			if isinstance( iter0, collections.Iterable):
 				for iter1 in iter0:
 					if type( iter1 ) == dict:
-						show_dict( iter1 )
+						if debug: show_dict( iter1 )
 					else:
-					#	print( type( iter1 ) )
-						print( iter1 )
+						if debug: print( iter1 )
 			else:
-				print( type( iter0 ) )
-				print( iter0 )
+				if debug:
+					print( type( iter0 ) )
+					print( iter0 )
 	else:
-		print( type( resp ) )
-		print( resp )
+		if debug:
+			print( type( resp ) )
+			print( resp )
 
 
 
@@ -135,7 +136,7 @@ def authenticate_remote( ldap_client, username, password ):
 	
 	print( "ldap_client.simple_bind_s()" )
 	print( "dn_user: %s" % dn_user )
-	print( "password: %s" % password )
+#	print( "password: %s" % password )
 
 	is_authenticated = True
 	try:
@@ -155,9 +156,9 @@ def ldap_authenticate( username, password ):
 	if debug:
 		print( "ldap_authenticate()" )
 		print( "LDAP_SEARCH_USERNAME: %s" % LDAP_SEARCH_USERNAME )
-		print( "LDAP_SEARCH_PASSWORD: %s" % LDAP_SEARCH_PASSWORD )
+		#print( "LDAP_SEARCH_PASSWORD: %s" % LDAP_SEARCH_PASSWORD )
 		print( "LDAP_USER_USERNAME:  %s" % username )
-		print( "LDAP_USER_PASSWORD:  %s" % password )
+		#print( "LDAP_USER_PASSWORD:  %s" % password )
 		print( "" )
 		print( "LDAP_URI:  %s" % LDAP_URI )
 		print( "DC_HOST:   %s" % DC_HOST )
