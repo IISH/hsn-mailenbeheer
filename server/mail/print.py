@@ -20,7 +20,7 @@ def update_status( id ):
 
 17-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-14-Sep-2016	Changed
+16-Dec-2016	Letter contents changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -474,10 +474,14 @@ def create_ps_letter( pathname_print_out, OP ):
 		
 		y -= (2 * d)
 		printps_file.write( str( x ) + " " + str( y ) + " moveto\n" )
-		printps_file.write( "(Graag zouden wij een kopie ontvangen van de bevolkingsregisters en/of gezinskaarten waarop) show\n" )
+	#	printps_file.write( "(Graag zouden wij een kopie ontvangen van de bevolkingsregisters en/of gezinskaarten waarop) show\n" )
+		printps_file.write( "(Graag zouden wij een kopie ontvangen van alle pagina's van de bevolkingsregisters) show\n" )
 		y -= d
 		printps_file.write( str( x ) + " " + str( y ) + " moveto\n" )
-		printps_file.write( "(deze persoon voorkomt.) show\n" )
+		printps_file.write( "(en/of gezinskaarten waarop deze persoon voorkomt voor de periode en gemeente zoals) show\n" )
+		y -= d
+		printps_file.write( str( x ) + " " + str( y ) + " moveto\n" )
+		printps_file.write( "(hieronder genoemd.) show\n" )
 		
 		y -= (2 * d)
 		printps_file.write( str( x ) + " " + str( y ) + " moveto\n" )
