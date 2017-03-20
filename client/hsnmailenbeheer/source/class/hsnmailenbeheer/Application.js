@@ -44,6 +44,7 @@
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
  * FL-16-Sep-2016: A few Marja wishes
+ * FL-20-Mar-2017: Marja bug: "5) Verwerken binnengekomen mail" only saves a single mail (set to '9')
  */
 
 /**
@@ -4471,7 +4472,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
               mail.opmoeder,                  // 17
               mail.type,                      // 18
               mail.infoouders,                // 19
-              mail.infopartner,                // 20
+              mail.infopartner,               // 20
               mail.inforeis                   // 21
             ];
             rows.push( row );
@@ -4837,7 +4838,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           
           var json   = new Object();
           json.idnr  = this.OP.op_num;
-          json.ids   = ids_update;
+          json.ids   = ids_update;      // the ids (can be more than 1) for this op_num
           json.fdate = fdate;
           console.debug( json );
           

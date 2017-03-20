@@ -20,7 +20,8 @@ def put_opmutation( opmutation_req ):
 
 26-May-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-15-Mar-2016	Changed
+20-Mar-2017	update bug in put_mailbevreceived()
+20-Mar-2017	Changed
 """
 
 # python-future for Python 2/3 compatibility
@@ -636,15 +637,16 @@ def put_mailbevreceived( mailbevreceived_req ):
 	
 	mailbev_dict = { "status" : 9, "ontvdat" : fdate }
 
-	for id in ids:
+	for id_str in ids:
+		id = int( id_str )
 		print( "updating id: %s of idnr: %s" % ( id, idnr ) )
 		try:
 			status = "OK"
 			mail = Mail.objects.using( "mail" ).filter( id = id ).update( **mailbev_dict )
-			print( "updated id: %s for idnr: %s" % ( mail.id, idnr ) )
+			print( "updated id: %s for idnr: %s" % ( id_str, idnr ) )
 		except:
 			status = "ERROR"
-			print( "mail/views/put_mailbevreceived() id = %s, idnr = %s" % ( id, idnr ) )
+			print( "mail/views/put_mailbevreceived() id = %s, idnr = %s" % ( id_str, idnr ) )
 			type, value, tb = exc_info()
 			msg = "Mail.objects.update failed: %s" % value
 			print( "%s\n" % msg )
