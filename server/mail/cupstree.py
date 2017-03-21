@@ -4,21 +4,21 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		print.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		Show printers
 Notice:		Derived from cupstree; original cupstree code from: 
 			/usr/share/doc/python-cups-doc-1.9.63/examples/cupstree.py
 			which is from the rpm: python-cups-doc-1.9.63-6.el7.x86_64
 
 17-Jun-2015	Created
-29-Sep-2015	Changed
+20-Mar-2017	Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 from future.utils import iteritems
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
-	oct, open, pow, range, round, str, super, zip )
 
 from sys import stderr, exc_info
 import cups

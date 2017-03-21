@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.2
+ * Version:     1.0.3
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -44,7 +44,7 @@
  * FL-26-Jun-2015: New Dialog class
  * FL-03-Jul-2015: Fixed strings from db
  * FL-16-Sep-2016: A few Marja wishes
- * FL-20-Mar-2017: Marja bug: "5) Verwerken binnengekomen mail" only saves a single mail (set to '9')
+ * FL-21-Mar-2017: Marja bug: "5) Verwerken binnengekomen mail" only saves a single mail (set to '9')
  */
 
 /**
@@ -68,7 +68,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "16-Sep-2016 12:58",
+    timestamp_client : "21-Mar-2017 13:31",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -528,9 +528,12 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "success", 
         function( ev ) 
         {
-          var request = ev.getTarget();
+          var request  = ev.getTarget();
           var response = request.getResponse();
-          console.debug( "saveHsnOpData() success: " + response.status );
+          var status   = response.status
+          console.debug( "saveHsnOpData() success status: " + status );
+          if( status !== "OK" ) 
+          { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever has been saved, update the OP data in this client
         }, 
@@ -542,9 +545,12 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "fail", 
         function( ev ) 
         {
-          var request = ev.getTarget();
+          var request  = ev.getTarget();
           var response = request.getResponse();
-          console.debug( "saveHsnOpData() fail: " + response.status );
+          var status   = response.status
+          console.debug( "saveHsnOpData() fail status: " + status );
+          if( status !== "OK" ) 
+          { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever happened, update the OP data in this client
         }, 
@@ -556,9 +562,12 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "statusError", 
         function( ev ) 
         {
-          var request = ev.getTarget();
+          var request  = ev.getTarget();
           var response = request.getResponse();
-          console.debug( "saveHsnOpData() statusError: " + response.status );
+          var status   = response.status
+          console.debug( "saveHsnOpData() statusError status: " + response.status );
+          if( status !== "OK" ) 
+          { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever happened, update the OP data in this client
         }, 

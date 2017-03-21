@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		mail/views.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		Views for mail
 
 Functions:
@@ -24,10 +24,10 @@ def put_opmutation( opmutation_req ):
 20-Mar-2017	Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
-	oct, open, pow, range, round, str, super, zip )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 
 import os
 from sys import stderr, exc_info
@@ -634,9 +634,11 @@ def put_mailbevreceived( mailbevreceived_req ):
 	
 	status = "OK"
 	msg = ""
+	updated = []
 	
 	mailbev_dict = { "status" : 9, "ontvdat" : fdate }
 
+	"""
 	for id_str in ids:
 		id = int( id_str )
 		print( "updating id: %s of idnr: %s" % ( id, idnr ) )
@@ -653,7 +655,22 @@ def put_mailbevreceived( mailbevreceived_req ):
 			print( mailbev_dict )
 
 			return status, msg
-
+	"""
+	
+	for id in ids:
+		print( "updating id: %s of idnr: %s" % ( id, idnr ) )
+		try:
+			mail = Mail.objects.using( "mail" ).filter( id = id ).update( **mailbev_dict )
+			updated.append( id )
+		except:
+			status = "ERROR"
+			print( "mail/views/put_mailbevreceived() id = %s, idnr = %s" % ( id, idnr ) )
+			type, value, tb = exc_info()
+			msg = "Mail.objects.update failed: %s" % value
+			print( "%s\n" % msg )
+			print( mailbev_dict )
+			
+	print( "updated ids: %s for idnr: %s" % ( str( updated ), idnr ) )
 	return status, msg
 
 

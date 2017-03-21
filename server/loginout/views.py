@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		loginout/views.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		Views for login & logout
 
 Functions:
@@ -15,13 +15,13 @@ def hsn_logout( request ):
 02-Mar-2016	Created
 17-Mar-2016	@login_required added
 02-Jun-2016	@csrf_exempt only for function hsn_login
-02-Jun-2016	Changed
+20-Mar-2017	Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
-	oct, open, pow, range, round, str, super, zip )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 
 from sys import stderr, exc_info
 import os

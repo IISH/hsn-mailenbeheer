@@ -1,5 +1,5 @@
 FL-22-Oct-2015 Created
-FL-22-Mar-2016 Changed
+FL-21-Mar-2017 Changed
 
 hsnmailenbeheer installation
 
@@ -78,36 +78,34 @@ hsnmailenbeheer installation
 		$ mysql -u [usr] -p [db_name] < [dump_name].sql
 
 -6- Qooxdoo
-	The hsnmailenbeheer GUI is made with the JavaScript framework Qooxdoo, see:
-	We used the lastest version 5.0.1, its generator needs at least Python-2.6. See:
+	The hsnmailenbeheer GUI is made with the JavaScript framework Qooxdoo, see: 
 	http://qooxdoo.org/
 	http://manual.qooxdoo.org/current/qooxdoo.pdf
+	We used the lastest version, 5.0.2, its generator needs at least Python-2.6. 
 	Download the Qooxdoo-SDK from: 
-	http://downloads.sourceforge.net/qooxdoo/qooxdoo-5.0.1-sdk.zip
+	https://github.com/qooxdoo/qooxdoo/releases/download/release_5_0_2/qooxdoo-5.0.2-sdk.zip
 	and unpack it (somewhere outside the git hsnmailenbeheer tree).
-		
-	Edit the Qooxdoo SDK path in config.json
-	Edit the line #75 in hsnmailenbeheer/client/hsnmailenbeheer/source/class/hsnmailenbeheer/Application.js containing:
-		host : "localhost",
-	Replace localhost with IP address of your server. 
+	Create an environment variable QOOXDOO_PATH that points to the unpacked sdk directory. 
 	Then: 
 		$ cd hsn-mailenbeheer/client/hsnmailenbeheer
 		$ python generate.py source
+	This creates the hsnmailenbeheer/source tree. 
 		$ python generate.py build
+	This creates the hsnmailenbeheer/build tree.
 
 -7- Apache web server
-	The client-server connection has the following entry points:
+	The client-server connection has the following entry points: 
 	hsnmailenbeheer/client/hsnmailenbeheer/build/index.html
-		the entry point for Apache to retrieve the GUI
+	This is the entry point for the web server to retrieve the GUI. 
 	
 	hsnmailenbeheer/server/hsnmailenbeheer/wsgi.py
-	is the entry point for Apache to execute the Python code; 
-	and it activates the python version to be used. 
+	This is is the entry point for the web server to execute the Python code; 
+	and it activates the (virtual) python version to be used. 
 	In order to be able do this, apache needs the mod_wsgi extension. 
 	In order to work, the python version that was used to built mod_wsgi, 
-	must be the major version that is used for running the hsnmailenbeheer Django.
+	must have the same major version that is used for running the hsnmailenbeheer Django.
 	Only the major version number matters, so, e.g. 2.7.6 (mod_wsgi) and 
-	2.7.11 (Django) can be mixed, but combining 2.6, 2.7 or 3.5 will fail. 
+	2.7.13 (Django) can be mixed, but combining 2.6, 2.7 or 3.6 will fail. 
 	
 [eof]
 
