@@ -21,7 +21,7 @@ def update_status( id ):
 17-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
 16-Dec-2016	Letter contents changed
-20-Mar-2017 Changed
+22-Mar-2017 Changed
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -129,18 +129,20 @@ def print_mailbev():
 					MAIL_SENT_TO_PRINTER = settings.MAIL_SENT_TO_PRINTER
 				except:
 					MAIL_SENT_TO_PRINTER = MAIL_SENT_TO_PRINTER_DEFAULT
+				
+				try:
+					MAIL_UPDATE_TABLE = settings.MAIL_UPDATE_TABLE
+				except:
+					MAIL_UPDATE_TABLE = MAIL_UPDATE_TABLE_DEFAULT
 		
 				if MAIL_SENT_TO_PRINTER:
 					ret_status, msg = print_ps_letter( id, pathname_psfile )
 					
-					try:
-						MAIL_UPDATE_TABLE = settings.MAIL_UPDATE_TABLE
-					except:
-						MAIL_UPDATE_TABLE = MAIL_UPDATE_TABLE_DEFAULT
-		
 					if ret_status == "OK" and MAIL_UPDATE_TABLE:
 						update_status_date( id )
-				
+				else:
+					if MAIL_UPDATE_TABLE:
+						update_status_date( id )
 				
 			#	break	# test: create/print only 1 letter
 
