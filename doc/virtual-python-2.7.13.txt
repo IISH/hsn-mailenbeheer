@@ -1,12 +1,11 @@
 FL-16-Jan-2017 Created
-FL-16-Jan-2017 Changed
+FL-24-Mar-2017 Changed
 
 Create a virtualenv Python-2.7.13
 
-On NB-030018 with CentOS-7.3
-	use the _new_ setuptools
-	use pip instead of easy_install
-	use unicode ucs4 instead of ucs2
+use the _new_ setuptools
+use pip instead of easy_install
+use unicode ucs4 instead of ucs2
 
 -1- Create a normal Python-2.7.13 from its source. 
 	Get Python-2.7.13 from https://www.python.org/downloads/release/python-2713/
