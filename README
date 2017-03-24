@@ -1,5 +1,5 @@
 FL-22-Oct-2015 Created
-FL-21-Mar-2017 Changed
+FL-24-Mar-2017 Changed
 
 hsnmailenbeheer installation
 
@@ -32,12 +32,12 @@ hsnmailenbeheer installation
 		
 -2- Documentation
 	README
-	doc/python2711
-		shell script  to activate a locally compiled pythpn-2.7.11
+	doc/python2713
+		shell script  to activate a locally compiled pythpn-2.7.13
 	/requirements.txt
 		pip requirements file to install a few additional python modules
-	doc/virtual-python-2.7.11.txt
-		description to create a virtualenv python-2.7.11
+	doc/virtual-python-2.7.13.txt
+		description to create a virtualenv python-2.7.13
 
 -3- Files not in the repository
 	Some files are installation dependent, and have to be created (from sample files). 
