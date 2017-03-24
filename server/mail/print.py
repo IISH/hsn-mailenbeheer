@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		print.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		Send letters to printer
 Notice:		A PostScript letter is created, saved, and sent trough CUPS to the default printer
 
@@ -21,12 +21,13 @@ def update_status( id ):
 17-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
 16-Dec-2016	Letter contents changed
+22-Mar-2017 Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
-	oct, open, pow, range, round, str, super, zip )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 
 import os.path
 from sys import stderr, exc_info
@@ -128,18 +129,20 @@ def print_mailbev():
 					MAIL_SENT_TO_PRINTER = settings.MAIL_SENT_TO_PRINTER
 				except:
 					MAIL_SENT_TO_PRINTER = MAIL_SENT_TO_PRINTER_DEFAULT
+				
+				try:
+					MAIL_UPDATE_TABLE = settings.MAIL_UPDATE_TABLE
+				except:
+					MAIL_UPDATE_TABLE = MAIL_UPDATE_TABLE_DEFAULT
 		
 				if MAIL_SENT_TO_PRINTER:
 					ret_status, msg = print_ps_letter( id, pathname_psfile )
 					
-					try:
-						MAIL_UPDATE_TABLE = settings.MAIL_UPDATE_TABLE
-					except:
-						MAIL_UPDATE_TABLE = MAIL_UPDATE_TABLE_DEFAULT
-		
 					if ret_status == "OK" and MAIL_UPDATE_TABLE:
 						update_status_date( id )
-				
+				else:
+					if MAIL_UPDATE_TABLE:
+						update_status_date( id )
 				
 			#	break	# test: create/print only 1 letter
 

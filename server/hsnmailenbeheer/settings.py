@@ -4,30 +4,28 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		settings.py
-Version:	1.0.2
+Version:	1.0.3
 Goal:		Django settings for hsnmailenbeheer project
 
 26-May-2015	Created
 25-Feb-2016	Django-1.8 changes, -> Django-1.9
-16-Sep-2016	Changed
+21-Mar-2017	Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next,
-	oct, open, pow, range, round, str, super, zip )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 
 import os
 import sys
 
 from django import get_version
 
-TIMESTAMP_SERVER = "16-Sep-2016 12:58"
+TIMESTAMP_SERVER = "21-Mar-2017 13:31"
 
-django_version_str = get_version()
-django_version_lst = django_version_str.split('.')
-DJANGO_MAJ_MIN = float(django_version_lst[0] + '.' + django_version_lst[1])  # ignore [2] = rev
-print("Django version: %s" % DJANGO_MAJ_MIN, file=sys.stderr)
+print( "Python version: %s" % sys.version )
+print( "Django version: %s" % get_version() )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
