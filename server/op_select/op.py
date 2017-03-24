@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		op.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		'OP' te Onderzoeken Persoon (person to be investigated) functions
 HsnIdmut
 Functions:
@@ -14,13 +14,13 @@ def get_id_change_manual( op_number ):
 
 09-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-15-Mar-2016	Changed
+20-Mar-2017	Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
-	oct, open, pow, range, round, str, super, zip )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 
 from sys import stderr, exc_info
 

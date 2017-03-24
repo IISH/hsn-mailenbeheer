@@ -4,17 +4,17 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		models.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		Model classes for the hsn_central tables
 
 08-Mar-2016	Created
-08-Mar-2016	Changed
+20-Mar-2017	Changed
 """
 
-# python-future for Python 2/3 compatibility
+# future-0.16.0 imports for Python 2/3 compatibility
 from __future__ import ( absolute_import, division, print_function, unicode_literals )
-from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, map, next, 
-	oct, open, pow, range, round, str, super, zip )
+from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
+    next, object, oct, open, pow, range, round, super, str, zip )
 
 from django.db import models
 
