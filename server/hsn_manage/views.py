@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		hsn_manage/views.py
-Version:	1.0.1
+Version:	1.0.2
 Goal:		View for hsn_manage
 
 Functions:
@@ -27,7 +27,7 @@ def put_hsnmanagemissing( missing_req )
 
 02-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-21-Mar-2017	Changed
+27-Mar-2017	Changed
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -653,7 +653,7 @@ def get_voortgang( invoerstatus ):
 
 def put_hsnmanage( fields ):
 	
-	status = ""
+	status = "OK"
 	
 	print( fields )
 	idnr = fields.pop( "idnr" )		# pk
@@ -677,8 +677,8 @@ def put_hsnmanage( fields ):
 		print( "%s\n" % msg )
 	else:
 		# no exception
-		status = "UPDATED"
-		print( "put_hsnmanage() record updated for OP %s in table HsnBeheer" % idnr )
+		status = "OK"
+		print( "put_hsnmanage() %s: record updated for OP %s in table HsnBeheer" % ( status, idnr ) )
 	
 	return status
 
