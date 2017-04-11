@@ -23,6 +23,7 @@
  * createWindow5         : function()
  * createWindow6         : function()
  * isNumeric             : function( n )
+ * isNum                 : function( n )
  * isValidDate           : function( dateString )
  * location2nr           : function( location_value )
  * getUservalueCombobox  : function( combobox, value, key )
@@ -68,7 +69,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "21-Mar-2017 13:31",
+    timestamp_client : "11-Apr-2017 16:37",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -178,9 +179,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
     //this.getHsnData();    // get 'static' data; then create and fill the windows
       
     }, // main
-
-
-
+    
+    
+    
     /**
       * wsgi_url
       *
@@ -1529,7 +1530,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       window.addListener( "resize", window.center );
       window.setLayout( new qx.ui.layout.VBox( 5 ) );
       
-       window.addListener
+      window.addListener
       ( 
         "appear", 
         function( ev ) 
@@ -1638,26 +1639,46 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerDateBegin.add( textfieldBeginMonth );
       containerDateBegin.add( textfieldBeginYear );
       
-      textfieldBeginDay.addListener( "input", function( ev ) {
-        var day = textfieldBeginDay.get( "value" );
-        if( isNaN( day ) ) { textfieldBeginDay.setValue( "" ); }            // ignore NaNs
-        else if( day.length > 2 ) { textfieldBeginDay.setValue( "" ); }     // too long
-        else if( day.length == 2 ){ textfieldBeginMonth.focus(); }          // OK, next field
-      });
+      textfieldBeginDay.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var day = textfieldBeginDay.get( "value" );
+          if( day === "-" ) { ; }                                               // wait for more
+          else if( ! this.isNum( day ) ) { textfieldBeginDay.setValue( "" ); }  // ignore NaNs
+          else if( day.length > 2 ) { textfieldBeginDay.setValue( "" ); }       // too long
+          else if( day.length == 2 ){ textfieldBeginMonth.focus(); }            // OK, next field
+        }, 
+        this
+      );
       
-      textfieldBeginMonth.addListener( "input", function( ev ) {
-        var month = textfieldBeginMonth.get( "value" );
-        if( isNaN( month ) ) { textfieldBeginMonth.setValue( "" ); }        // ignore NaNs
-        else if( month.length > 2 ) { textfieldBeginMonth.setValue( "" ); } // too long
-        else if( month.length == 2 ){ textfieldBeginYear.focus(); }         // OK, next field
-      });
+      textfieldBeginMonth.addListener
+      ( 
+        "input", function( ev ) 
+        {
+          var month = textfieldBeginMonth.get( "value" );
+          if( month === "-" ) { ; }                                               // wait for more
+          else if( ! this.isNum( month ) ) { textfieldBeginMonth.setValue( "" ); }// ignore NaNs
+          else if( month.length > 2 ) { textfieldBeginMonth.setValue( "" ); }     // too long
+          else if( month.length == 2 ){ textfieldBeginYear.focus(); }             // OK, next field
+        },
+        this
+      );
       
-      textfieldBeginYear.addListener( "input", function( ev ) {
-        var year = textfieldBeginYear.get( "value" );
-        if( isNaN( year ) ) { textfieldBeginYear.setValue( "" ); }          // ignore NaNs
-        else if( year.length > 4 ) { textfieldBeginYear.setValue( "" ); }   // too long
-        else if( year.length == 4 ){ textfieldEndDay.focus(); }             // OK, next field
-      });
+      textfieldBeginYear.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var year = textfieldBeginYear.get( "value" );
+          if( year === "-" ) { ; }                                              // wait for more
+          else if( ! this.isNum( year ) ) { textfieldBeginYear.setValue( "" ); }// ignore NaNs
+          else if( year.length > 4 ) { textfieldBeginYear.setValue( "" ); }     // too long
+          else if( year.length == 4 ){ textfieldEndDay.focus(); }               // OK, next field
+        },
+        this
+      );
       
       var textfieldEndDay   = new qx.ui.form.TextField().set({ width : 30, placeholder : "DD", textAlign : "center" });
       var textfieldEndMonth = new qx.ui.form.TextField().set({ width : 30, placeholder : "MM", textAlign : "center" });
@@ -1667,26 +1688,47 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerDateEnd.add( textfieldEndMonth );
       containerDateEnd.add( textfieldEndYear );
       
-      textfieldEndDay.addListener( "input", function( ev ) {
-        var day = textfieldEndDay.get( "value" );
-        if( isNaN( day ) ) { textfieldEndDay.setValue( "" ); }            // ignore NaNs
-        else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
-        else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
-      });
+      textfieldEndDay.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var day = textfieldEndDay.get( "value" );
+          if( day === "-" ) { ; }                  \                        // wait for more
+          else if( ! this.isNum( day ) ) { textfieldEndDay.setValue( "" ); }// ignore NaNs
+          else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
+          else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
+        },
+        this
+      );
       
-      textfieldEndMonth.addListener( "input", function( ev ) {
-        var month = textfieldEndMonth.get( "value" );
-        if( isNaN( month ) ) { textfieldEndMonth.setValue( "" ); }        // ignore NaNs
-        else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); } // too long
-        else if( month.length == 2 ){ textfieldEndYear.focus(); }         // OK, next field
-      });
+      textfieldEndMonth.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var month = textfieldEndMonth.get( "value" );
+          if( month === "-" ) { ; }                                             // wait for more
+          else if( ! this.isNum( month ) ) { textfieldEndMonth.setValue( "" ); }// ignore NaNs
+          else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); }     // too long
+          else if( month.length == 2 ){ textfieldEndYear.focus(); }             // OK, next field
+        },
+        this
+      );
       
-      textfieldEndYear.addListener( "input", function( ev ) {
-        var year = textfieldEndYear.get( "value" );
-        if( isNaN( year ) ) { textfieldEndYear.setValue( "" ); }          // ignore NaNs
-        else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }   // too long
-        else if( year.length == 4 ){ comboboxMissingLocation.focus(); }   // OK, next field
-      });
+      textfieldEndYear.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var year = textfieldEndYear.get( "value" );
+          if( year === "-" ) { ; }                                            // wait for more
+          else if( ! this.isNum( year ) ) { textfieldEndYear.setValue( "" ); }// ignore NaNs
+          else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }     // too long
+          else if( year.length == 4 ){ comboboxMissingLocation.focus(); }     // OK, next field
+        },
+        this
+      );
       
       var width_column1 = 300;
       // ComboTable is a combination of a ComboBox and a Table for autocompletion
@@ -5349,6 +5391,24 @@ qx.Class.define( "hsnmailenbeheer.Application",
       // Check the range of the day
       return day > 0 && day <= monthLength[ month - 1 ];
     }, // isValidDate
+    
+    
+    
+    /**
+     * isNum
+     * accept '-' plus digits
+     */
+    isNum : function( num ) 
+    {
+      if( num.match( /^-[0-9]+$/ ) == null ) {
+        //console.debug( "'" + num + "' not num" );
+        return false;
+      }
+      else {
+        //console.debug( "'" + num + "' num ok" );
+        return true;
+      }
+    }, // isNum
     
     
     
