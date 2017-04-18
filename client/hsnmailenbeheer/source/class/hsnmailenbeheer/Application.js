@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.3
+ * Version:     1.0.4
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -46,6 +46,8 @@
  * FL-03-Jul-2015: Fixed strings from db
  * FL-16-Sep-2016: A few Marja wishes
  * FL-21-Mar-2017: Marja bug: "5) Verwerken binnengekomen mail" only saves a single mail (set to '9')
+ * FL-11-Apr-2017: Marja bug: HSNM-119 : accept initial '-' sign
+ * FL-18-Apr-2017: Marja bug: HSNM-122 : clear table on save (also on 'appear')
  */
 
 /**
@@ -69,7 +71,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "11-Apr-2017 16:37",
+    timestamp_client : "18-Apr-2017 13:58",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -533,7 +535,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var response = request.getResponse();
           var status   = response.status
           console.debug( "saveHsnOpData() success status: " + status );
-          if( status !== "OK" ) 
+          if( status === "ERROR" ) 
           { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever has been saved, update the OP data in this client
@@ -550,7 +552,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var response = request.getResponse();
           var status   = response.status
           console.debug( "saveHsnOpData() fail status: " + status );
-          if( status !== "OK" ) 
+          if( status === "ERROR" ) 
           { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever happened, update the OP data in this client
@@ -567,7 +569,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var response = request.getResponse();
           var status   = response.status
           console.debug( "saveHsnOpData() statusError status: " + response.status );
-          if( status !== "OK" ) 
+          if( status === "ERROR" ) 
           { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever happened, update the OP data in this client
@@ -1694,7 +1696,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev ) 
         {
           var day = textfieldEndDay.get( "value" );
-          if( day === "-" ) { ; }                  \                        // wait for more
+          if( day === "-" ) { ; }                                           // wait for more
           else if( ! this.isNum( day ) ) { textfieldEndDay.setValue( "" ); }// ignore NaNs
           else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
           else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
@@ -2186,7 +2188,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           pk_deleted = [];  // empty array of pk's that have been deleted
           
           var numrows = tableModel.getRowCount();
-          tableModel.removeRows( 0, numrows );
+          tableModel.removeRows( 0, numrows );    // clear table
           
           var op_info = null;
           for( var i = 0; i < this.OP.op_info_list.length; i++ )
@@ -2929,7 +2931,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
           {
             if( tbuttonEdit.getValue() == true && status == 0 )   // row is editable
             {
-              
               // but only some columns are editable
               if
               ( column_idx === this.MAIL_datum       ||
@@ -3342,7 +3343,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
           pk_changed = [];  // empty array of pk's of rows that have been updated
           pk_deleted = [];  // empty array of pk's that have been deleted
           
-          //this.showDialog( "NOT saving table rows<br>(update, create, delete)" );
+          var numrows = tableModel.getRowCount();
+          tableModel.removeRows( 0, numrows );    // clear table
+          
+          //this.showDialog( "NOT saving table rows<br>(update, create, delete)" ); // debug
           this.saveHsnOpData( "/putmailbev", data );
           window.close();
         },
