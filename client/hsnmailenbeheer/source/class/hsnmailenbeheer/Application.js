@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.3
+ * Version:     1.0.4
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -23,6 +23,7 @@
  * createWindow5         : function()
  * createWindow6         : function()
  * isNumeric             : function( n )
+ * isNum                 : function( n )
  * isValidDate           : function( dateString )
  * location2nr           : function( location_value )
  * getUservalueCombobox  : function( combobox, value, key )
@@ -45,6 +46,8 @@
  * FL-03-Jul-2015: Fixed strings from db
  * FL-16-Sep-2016: A few Marja wishes
  * FL-21-Mar-2017: Marja bug: "5) Verwerken binnengekomen mail" only saves a single mail (set to '9')
+ * FL-11-Apr-2017: Marja bug: HSNM-119 : accept initial '-' sign
+ * FL-18-Apr-2017: Marja bug: HSNM-122 : clear table on save (also on 'appear')
  */
 
 /**
@@ -68,7 +71,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "21-Mar-2017 13:31",
+    timestamp_client : "18-Apr-2017 13:58",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -178,9 +181,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
     //this.getHsnData();    // get 'static' data; then create and fill the windows
       
     }, // main
-
-
-
+    
+    
+    
     /**
       * wsgi_url
       *
@@ -532,7 +535,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var response = request.getResponse();
           var status   = response.status
           console.debug( "saveHsnOpData() success status: " + status );
-          if( status !== "OK" ) 
+          if( status === "ERROR" ) 
           { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever has been saved, update the OP data in this client
@@ -549,7 +552,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var response = request.getResponse();
           var status   = response.status
           console.debug( "saveHsnOpData() fail status: " + status );
-          if( status !== "OK" ) 
+          if( status === "ERROR" ) 
           { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever happened, update the OP data in this client
@@ -566,7 +569,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           var response = request.getResponse();
           var status   = response.status
           console.debug( "saveHsnOpData() statusError status: " + response.status );
-          if( status !== "OK" ) 
+          if( status === "ERROR" ) 
           { this.showDialog( "saveHsnOpData()<br><br><b>" + status + "<br><br><b>" + response.msg ); }
           
           this.getHsnOpData();  // whatever happened, update the OP data in this client
@@ -1529,7 +1532,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       window.addListener( "resize", window.center );
       window.setLayout( new qx.ui.layout.VBox( 5 ) );
       
-       window.addListener
+      window.addListener
       ( 
         "appear", 
         function( ev ) 
@@ -1638,26 +1641,46 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerDateBegin.add( textfieldBeginMonth );
       containerDateBegin.add( textfieldBeginYear );
       
-      textfieldBeginDay.addListener( "input", function( ev ) {
-        var day = textfieldBeginDay.get( "value" );
-        if( isNaN( day ) ) { textfieldBeginDay.setValue( "" ); }            // ignore NaNs
-        else if( day.length > 2 ) { textfieldBeginDay.setValue( "" ); }     // too long
-        else if( day.length == 2 ){ textfieldBeginMonth.focus(); }          // OK, next field
-      });
+      textfieldBeginDay.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var day = textfieldBeginDay.get( "value" );
+          if( day === "-" ) { ; }                                               // wait for more
+          else if( ! this.isNum( day ) ) { textfieldBeginDay.setValue( "" ); }  // ignore NaNs
+          else if( day.length > 2 ) { textfieldBeginDay.setValue( "" ); }       // too long
+          else if( day.length == 2 ){ textfieldBeginMonth.focus(); }            // OK, next field
+        }, 
+        this
+      );
       
-      textfieldBeginMonth.addListener( "input", function( ev ) {
-        var month = textfieldBeginMonth.get( "value" );
-        if( isNaN( month ) ) { textfieldBeginMonth.setValue( "" ); }        // ignore NaNs
-        else if( month.length > 2 ) { textfieldBeginMonth.setValue( "" ); } // too long
-        else if( month.length == 2 ){ textfieldBeginYear.focus(); }         // OK, next field
-      });
+      textfieldBeginMonth.addListener
+      ( 
+        "input", function( ev ) 
+        {
+          var month = textfieldBeginMonth.get( "value" );
+          if( month === "-" ) { ; }                                               // wait for more
+          else if( ! this.isNum( month ) ) { textfieldBeginMonth.setValue( "" ); }// ignore NaNs
+          else if( month.length > 2 ) { textfieldBeginMonth.setValue( "" ); }     // too long
+          else if( month.length == 2 ){ textfieldBeginYear.focus(); }             // OK, next field
+        },
+        this
+      );
       
-      textfieldBeginYear.addListener( "input", function( ev ) {
-        var year = textfieldBeginYear.get( "value" );
-        if( isNaN( year ) ) { textfieldBeginYear.setValue( "" ); }          // ignore NaNs
-        else if( year.length > 4 ) { textfieldBeginYear.setValue( "" ); }   // too long
-        else if( year.length == 4 ){ textfieldEndDay.focus(); }             // OK, next field
-      });
+      textfieldBeginYear.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var year = textfieldBeginYear.get( "value" );
+          if( year === "-" ) { ; }                                              // wait for more
+          else if( ! this.isNum( year ) ) { textfieldBeginYear.setValue( "" ); }// ignore NaNs
+          else if( year.length > 4 ) { textfieldBeginYear.setValue( "" ); }     // too long
+          else if( year.length == 4 ){ textfieldEndDay.focus(); }               // OK, next field
+        },
+        this
+      );
       
       var textfieldEndDay   = new qx.ui.form.TextField().set({ width : 30, placeholder : "DD", textAlign : "center" });
       var textfieldEndMonth = new qx.ui.form.TextField().set({ width : 30, placeholder : "MM", textAlign : "center" });
@@ -1667,26 +1690,47 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerDateEnd.add( textfieldEndMonth );
       containerDateEnd.add( textfieldEndYear );
       
-      textfieldEndDay.addListener( "input", function( ev ) {
-        var day = textfieldEndDay.get( "value" );
-        if( isNaN( day ) ) { textfieldEndDay.setValue( "" ); }            // ignore NaNs
-        else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
-        else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
-      });
+      textfieldEndDay.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var day = textfieldEndDay.get( "value" );
+          if( day === "-" ) { ; }                                           // wait for more
+          else if( ! this.isNum( day ) ) { textfieldEndDay.setValue( "" ); }// ignore NaNs
+          else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
+          else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
+        },
+        this
+      );
       
-      textfieldEndMonth.addListener( "input", function( ev ) {
-        var month = textfieldEndMonth.get( "value" );
-        if( isNaN( month ) ) { textfieldEndMonth.setValue( "" ); }        // ignore NaNs
-        else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); } // too long
-        else if( month.length == 2 ){ textfieldEndYear.focus(); }         // OK, next field
-      });
+      textfieldEndMonth.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var month = textfieldEndMonth.get( "value" );
+          if( month === "-" ) { ; }                                             // wait for more
+          else if( ! this.isNum( month ) ) { textfieldEndMonth.setValue( "" ); }// ignore NaNs
+          else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); }     // too long
+          else if( month.length == 2 ){ textfieldEndYear.focus(); }             // OK, next field
+        },
+        this
+      );
       
-      textfieldEndYear.addListener( "input", function( ev ) {
-        var year = textfieldEndYear.get( "value" );
-        if( isNaN( year ) ) { textfieldEndYear.setValue( "" ); }          // ignore NaNs
-        else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }   // too long
-        else if( year.length == 4 ){ comboboxMissingLocation.focus(); }   // OK, next field
-      });
+      textfieldEndYear.addListener
+      ( 
+        "input", 
+        function( ev ) 
+        {
+          var year = textfieldEndYear.get( "value" );
+          if( year === "-" ) { ; }                                            // wait for more
+          else if( ! this.isNum( year ) ) { textfieldEndYear.setValue( "" ); }// ignore NaNs
+          else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }     // too long
+          else if( year.length == 4 ){ comboboxMissingLocation.focus(); }     // OK, next field
+        },
+        this
+      );
       
       var width_column1 = 300;
       // ComboTable is a combination of a ComboBox and a Table for autocompletion
@@ -2144,7 +2188,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           pk_deleted = [];  // empty array of pk's that have been deleted
           
           var numrows = tableModel.getRowCount();
-          tableModel.removeRows( 0, numrows );
+          tableModel.removeRows( 0, numrows );    // clear table
           
           var op_info = null;
           for( var i = 0; i < this.OP.op_info_list.length; i++ )
@@ -2887,7 +2931,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
           {
             if( tbuttonEdit.getValue() == true && status == 0 )   // row is editable
             {
-              
               // but only some columns are editable
               if
               ( column_idx === this.MAIL_datum       ||
@@ -3300,7 +3343,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
           pk_changed = [];  // empty array of pk's of rows that have been updated
           pk_deleted = [];  // empty array of pk's that have been deleted
           
-          //this.showDialog( "NOT saving table rows<br>(update, create, delete)" );
+          var numrows = tableModel.getRowCount();
+          tableModel.removeRows( 0, numrows );    // clear table
+          
+          //this.showDialog( "NOT saving table rows<br>(update, create, delete)" ); // debug
           this.saveHsnOpData( "/putmailbev", data );
           window.close();
         },
@@ -5349,6 +5395,24 @@ qx.Class.define( "hsnmailenbeheer.Application",
       // Check the range of the day
       return day > 0 && day <= monthLength[ month - 1 ];
     }, // isValidDate
+    
+    
+    
+    /**
+     * isNum
+     * accept '-' plus digits
+     */
+    isNum : function( num ) 
+    {
+      if( num.match( /^-[0-9]+$/ ) == null ) {
+        //console.debug( "'" + num + "' not num" );
+        return false;
+      }
+      else {
+        //console.debug( "'" + num + "' num ok" );
+        return true;
+      }
+    }, // isNum
     
     
     
