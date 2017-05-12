@@ -48,6 +48,7 @@
  * FL-21-Mar-2017: Marja bug: "5) Verwerken binnengekomen mail" only saves a single mail (set to '9')
  * FL-11-Apr-2017: Marja bug: HSNM-119 : accept initial '-' sign
  * FL-18-Apr-2017: Marja bug: HSNM-122 : clear table on save (also on 'appear')
+ * FL-12-May-2017: Suppress isNUm() use
  */
 
 /**
@@ -1648,7 +1649,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var day = textfieldBeginDay.get( "value" );
           if( day === "-" ) { ; }                                               // wait for more
-          else if( ! this.isNum( day ) ) { textfieldBeginDay.setValue( "" ); }  // ignore NaNs
+        //else if( ! this.isNum( day ) ) { textfieldBeginDay.setValue( "" ); }  // ignore NaNs
           else if( day.length > 2 ) { textfieldBeginDay.setValue( "" ); }       // too long
           else if( day.length == 2 ){ textfieldBeginMonth.focus(); }            // OK, next field
         }, 
@@ -1661,7 +1662,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var month = textfieldBeginMonth.get( "value" );
           if( month === "-" ) { ; }                                               // wait for more
-          else if( ! this.isNum( month ) ) { textfieldBeginMonth.setValue( "" ); }// ignore NaNs
+        //else if( ! this.isNum( month ) ) { textfieldBeginMonth.setValue( "" ); }// ignore NaNs
           else if( month.length > 2 ) { textfieldBeginMonth.setValue( "" ); }     // too long
           else if( month.length == 2 ){ textfieldBeginYear.focus(); }             // OK, next field
         },
@@ -1675,7 +1676,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var year = textfieldBeginYear.get( "value" );
           if( year === "-" ) { ; }                                              // wait for more
-          else if( ! this.isNum( year ) ) { textfieldBeginYear.setValue( "" ); }// ignore NaNs
+        //else if( ! this.isNum( year ) ) { textfieldBeginYear.setValue( "" ); }// ignore NaNs
           else if( year.length > 4 ) { textfieldBeginYear.setValue( "" ); }     // too long
           else if( year.length == 4 ){ textfieldEndDay.focus(); }               // OK, next field
         },
@@ -1697,7 +1698,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var day = textfieldEndDay.get( "value" );
           if( day === "-" ) { ; }                                           // wait for more
-          else if( ! this.isNum( day ) ) { textfieldEndDay.setValue( "" ); }// ignore NaNs
+        //else if( ! this.isNum( day ) ) { textfieldEndDay.setValue( "" ); }// ignore NaNs
           else if( day.length > 2 ) { textfieldEndDay.setValue( "" ); }     // too long
           else if( day.length == 2 ){ textfieldEndMonth.focus(); }          // OK, next field
         },
@@ -1711,7 +1712,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var month = textfieldEndMonth.get( "value" );
           if( month === "-" ) { ; }                                             // wait for more
-          else if( ! this.isNum( month ) ) { textfieldEndMonth.setValue( "" ); }// ignore NaNs
+        //else if( ! this.isNum( month ) ) { textfieldEndMonth.setValue( "" ); }// ignore NaNs
           else if( month.length > 2 ) { textfieldEndMonth.setValue( "" ); }     // too long
           else if( month.length == 2 ){ textfieldEndYear.focus(); }             // OK, next field
         },
@@ -1725,7 +1726,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         {
           var year = textfieldEndYear.get( "value" );
           if( year === "-" ) { ; }                                            // wait for more
-          else if( ! this.isNum( year ) ) { textfieldEndYear.setValue( "" ); }// ignore NaNs
+        //else if( ! this.isNum( year ) ) { textfieldEndYear.setValue( "" ); }// ignore NaNs
           else if( year.length > 4 ) { textfieldEndYear.setValue( "" ); }     // too long
           else if( year.length == 4 ){ comboboxMissingLocation.focus(); }     // OK, next field
         },
