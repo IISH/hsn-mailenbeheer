@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.4
+ * Version:     1.0.5
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -49,6 +49,7 @@
  * FL-11-Apr-2017: Marja bug: HSNM-119 : accept initial '-' sign
  * FL-18-Apr-2017: Marja bug: HSNM-122 : clear table on save (also on 'appear')
  * FL-12-May-2017: Suppress isNUm() use
+ * FL-12-May-2017: Latest change
  */
 
 /**
@@ -72,7 +73,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "18-Apr-2017 13:58",
+    timestamp_client : "19-Jun-2017 13:09",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -2089,8 +2090,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev ) 
         {
           console.debug( "Listener buttonSave execute" );
-          tbuttonEdit.setValue( false );
-          tbuttonEdit.setLabel( "Bewerken is uit" );
+          tbuttonEdit.setValue( false );                // disable editing (for next time)
+          tbuttonEdit.setLabel( "Bewerken is uit" );    // disable editing (for next time)
           
           // Save all rows of table missing periods
           var table_data = tableModel.getData();

@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		hsn_manage/views.py
-Version:	1.0.2
+Version:	1.0.3
 Goal:		View for hsn_manage
 
 Functions:
@@ -27,7 +27,7 @@ def put_hsnmanagemissing( missing_req )
 
 02-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
-27-Mar-2017	Changed
+19-Jun-2017	Changed put_hsnmanagemissing() update_or_create params
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -729,8 +729,8 @@ def put_hsnmanagemissing( missing_req ):
 		try:
 			status = "OK"
 			obj, created = HsnKwyt.objects.using( "mail" ).update_or_create(
-				idnr = idnr, idvolgnr = idvolgnr, defaults = None, **missing_dict )
-		#	print( "idnr: %s, idvolgnr: %s, created: %s" % ( idnr, idvolgnr, created ) )
+				idnr = idnr, idvolgnr = idvolgnr, defaults = missing_dict )
+			print( "idnr: %s, idvolgnr: %s, created: %s" % ( idnr, idvolgnr, created ) )
 			
 			if created: 
 				ncreated += 1
