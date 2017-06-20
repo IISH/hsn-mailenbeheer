@@ -60,6 +60,10 @@ fi
 rsync -av --progress --exclude='build.sh' --exclude='.git' . $builddir
 
 
+# Rename the settings file.
+mv "${builddir}/server/hsnmailenbeheer/settings_local_sample.py" "${builddir}/server/hsnmailenbeheer/settings_local.py"
+
+
 # Setup and activate a virtual environment
 $p/bin/virtualenv $builddir/virtualenv
 . $builddir/virtualenv/bin/activate
