@@ -49,7 +49,7 @@
  * FL-11-Apr-2017: Marja bug: HSNM-119 : accept initial '-' sign
  * FL-18-Apr-2017: Marja bug: HSNM-122 : clear table on save (also on 'appear')
  * FL-12-May-2017: Suppress isNUm() use
- * FL-12-May-2017: Latest change
+ * FL-30-Jun-2017: Do not allow duplicate volgnr's in createWindow1Missing table
  */
 
 /**
@@ -73,7 +73,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "19-Jun-2017 13:09",
+    timestamp_client : "30-Jun-2017 14:52",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -2002,7 +2002,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
             buttonSave.setEnabled( true );
             
             var numcols = tableModel.getColumnCount();
-            for( var i = 0; i < numcols; i++ ) 
+            for( var i = 1; i < numcols; i++ )      // '#' (1 = 0) column not editable
             { tableModel.setColumnEditable( i, true ); }
             
             tsm.setSelectionMode( selModel.MULTIPLE_INTERVAL_SELECTION_TOGGLE );
@@ -2093,6 +2093,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
           tbuttonEdit.setValue( false );                // disable editing (for next time)
           tbuttonEdit.setLabel( "Bewerken is uit" );    // disable editing (for next time)
           
+          // Check the editable column "ID volgnr"; abort saving on duplicate values
+          var do_save = true;
+          var idvolg_nrs = [];
+          
           // Save all rows of table missing periods
           var table_data = tableModel.getData();
           var nrows = table_data.length;
@@ -2121,6 +2125,16 @@ qx.Class.define( "hsnmailenbeheer.Application",
             
             rows.push( row );
             console.debug( row );
+            
+            if( idvolg_nrs.indexOf( row.idvolgnr ) == -1 ) { idvolg_nrs.push( row.idvolgnr ); }
+            else {
+              do_save = false;
+              console.error( "duplicate volgnr: " + row.idvolgnr );
+            }
+          }
+          if( do_save == false ) {
+            this.showDialog( "De volgnummers moeten uniek zijn!" );
+            return;   // not saving the current table contents
           }
           
           // We send the op_num separately; in case we are sending an empty table, 
