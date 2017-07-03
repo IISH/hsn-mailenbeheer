@@ -17,7 +17,7 @@ Goal:		Model classes for the hsn_mail tables
 01-Oct-2015	Other new tables
 12-Oct-2015	Removed superfloues tables
 08-Mar-2016	Split off hsn_central and hsn_reference tables
-20-Mar-2017	Changed
+03-Jul-2017	Mail table new column Aanmaakdatum
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -107,28 +107,29 @@ class HsnKwyt( models.Model ):
 
 
 class Mail( models.Model ):
-	id          = models.AutoField(    db_column = 'ID', primary_key = True )
-	idnr        = models.IntegerField( db_column = 'Idnr',        blank = True, null = True )
-	briefnr     = models.IntegerField( db_column = 'Briefnr',     blank = True, null = True )
-	aard        = models.CharField(    db_column = 'Aard',        blank = True, null = True, max_length =  1 )
-	datum       = models.CharField(    db_column = 'Datum',       blank = True, null = True, max_length = 12 )
-	periode     = models.CharField(    db_column = 'Periode',     blank = True, null = True, max_length = 20 )
-	gemnr       = models.IntegerField( db_column = 'Gemnr',       blank = True, null = True )
-	naamgem     = models.CharField(    db_column = 'Naamgem',     blank = True, null = True, max_length = 50 )
-	status      = models.IntegerField( db_column = 'Status',      blank = True, null = True )
-	printdatum  = models.CharField(    db_column = 'Printdatum',  blank = True, null = True, max_length = 15 )
-	printen     = models.IntegerField( db_column = 'Printen',     blank = True, null = True )
-	ontvdat     = models.CharField(    db_column = 'Ontvdat',     blank = True, null = True, max_length = 15 )
-	opmerk      = models.TextField(    db_column = 'Opmerk',      blank = True, null = True )
-	opident     = models.CharField(    db_column = 'Opident',     blank = True, null = True, max_length = 150 )
-	oppartner   = models.CharField(    db_column = 'Oppartner',   blank = True, null = True, max_length = 150 )
-	opvader     = models.CharField(    db_column = 'OpVader',     blank = True, null = True, max_length = 100 )
-	opmoeder    = models.CharField(    db_column = 'Opmoeder',    blank = True, null = True, max_length = 100 )
-	type        = models.CharField(    db_column = 'Type',        blank = True, null = True, max_length =  50 )
-	infoouders  = models.IntegerField( db_column = 'InfoOuders',  blank = True, null = True )
-	infopartner = models.IntegerField( db_column = 'InfoPartner', blank = True, null = True )
-	inforeis    = models.IntegerField( db_column = 'InfoReis',    blank = True, null = True )
-
+	id           = models.AutoField(    db_column = 'ID', primary_key = True )
+	idnr         = models.IntegerField( db_column = 'Idnr',         blank = True, null = True )
+	briefnr      = models.IntegerField( db_column = 'Briefnr',      blank = True, null = True )
+	aard         = models.CharField(    db_column = 'Aard',         blank = True, null = True, max_length =  1 )
+	datum        = models.CharField(    db_column = 'Datum',        blank = True, null = True, max_length = 12 )
+	periode      = models.CharField(    db_column = 'Periode',      blank = True, null = True, max_length = 20 )
+	gemnr        = models.IntegerField( db_column = 'Gemnr',        blank = True, null = True )
+	naamgem      = models.CharField(    db_column = 'Naamgem',      blank = True, null = True, max_length = 50 )
+	status       = models.IntegerField( db_column = 'Status',       blank = True, null = True )
+	printdatum   = models.CharField(    db_column = 'Printdatum',   blank = True, null = True, max_length = 15 )
+	printen      = models.IntegerField( db_column = 'Printen',      blank = True, null = True )
+	ontvdat      = models.CharField(    db_column = 'Ontvdat',      blank = True, null = True, max_length = 15 )
+	opmerk       = models.TextField(    db_column = 'Opmerk',       blank = True, null = True )
+	opident      = models.CharField(    db_column = 'Opident',      blank = True, null = True, max_length = 150 )
+	oppartner    = models.CharField(    db_column = 'Oppartner',    blank = True, null = True, max_length = 150 )
+	opvader      = models.CharField(    db_column = 'OpVader',      blank = True, null = True, max_length = 100 )
+	opmoeder     = models.CharField(    db_column = 'Opmoeder',     blank = True, null = True, max_length = 100 )
+	type         = models.CharField(    db_column = 'Type',         blank = True, null = True, max_length =  50 )
+	infoouders   = models.IntegerField( db_column = 'InfoOuders',   blank = True, null = True )
+	infopartner  = models.IntegerField( db_column = 'InfoPartner',  blank = True, null = True )
+	inforeis     = models.IntegerField( db_column = 'InfoReis',     blank = True, null = True )
+	aanmaakdatum = models.CharField(    db_column = 'Aanmaakdatum', blank = True, null = True, max_length = 15 )
+	
 	class Meta:
 		managed  = False
 		db_table = 'MAIL'
