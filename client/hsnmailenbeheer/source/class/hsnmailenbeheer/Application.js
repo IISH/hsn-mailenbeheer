@@ -51,7 +51,7 @@
  * FL-12-May-2017: Suppress isNUm() use
  * FL-30-Jun-2017: Do not allow duplicate volgnr's in createWindow1Missing table
  * FL-03-Jul-2017: createWindow3, kind (Aard) = "B" -> "W"    // W = Wedding
- * FL-03-Jul-2017: Mail table, new column Aanmaakdatum
+ * FL-04-Jul-2017: Mail table, new column Aanmaakdatum
  */
 
 /**
@@ -75,7 +75,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "30-Jun-2017 14:52",
+    timestamp_client : "04-Jul-2017 12:53",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -124,28 +124,29 @@ qx.Class.define( "hsnmailenbeheer.Application",
     MISSING_found    : 12,
     
     // columns of screen table Mail
-    MAIL_nr          :  0,   // (not in db) screen table row counter: 1,2,3...
-    MAIL_id          :  1,   // primary key
-    MAIL_idnr        :  2,
-    MAIL_briefnr     :  3,
-    MAIL_aard        :  4,
-    MAIL_datum       :  5,
-    MAIL_periode     :  6,
-    MAIL_gemnr       :  7,
-    MAIL_naamgem     :  8,
-    MAIL_status      :  9,
-    MAIL_printdatum  : 10,
-    MAIL_printen     : 11,
-    MAIL_ontvdat     : 12,
-    MAIL_opmerk      : 13,
-    MAIL_opident     : 14,
-    MAIL_oppartner   : 15,
-    MAIL_opvader     : 16,
-    MAIL_opmoeder    : 17,
-    MAIL_type        : 18,
-    MAIL_infoouders  : 19,
-    MAIL_infopartner : 20,
-    MAIL_inforeis    : 21,
+    MAIL_nr           :  0,   // (not in db) screen table row counter: 1,2,3...
+    MAIL_id           :  1,   // primary key
+    MAIL_idnr         :  2,
+    MAIL_briefnr      :  3,
+    MAIL_aard         :  4,
+    MAIL_datum        :  5,
+    MAIL_periode      :  6,
+    MAIL_gemnr        :  7,
+    MAIL_naamgem      :  8,
+    MAIL_status       :  9,
+    MAIL_printdatum   : 10,
+    MAIL_printen      : 11,
+    MAIL_ontvdat      : 12,
+    MAIL_opmerk       : 13,
+    MAIL_opident      : 14,
+    MAIL_oppartner    : 15,
+    MAIL_opvader      : 16,
+    MAIL_opmoeder     : 17,
+    MAIL_type         : 18,
+    MAIL_infoouders   : 19,
+    MAIL_infopartner  : 20,
+    MAIL_inforeis     : 21,
+    MAIL_aanmaakdatum : 22,
     
     input_opnum : null,
     
@@ -2305,7 +2306,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
               mail.type,                      // 18
               mail.infoouders,                // 19
               mail.infopartner,               // 20
-              mail.inforeis                   // 21
+              mail.inforeis,                  // 21
+              mail.aanmaakdatum               // 22
             ];
             rows.push( row );
           }
@@ -2716,15 +2718,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
           console.debug( "Window 2: Mail toevoegen" );
           buttonSave.setEnabled( true );
           
-          var today = new Date();
-          var dd = today.getDate();
-          var mm = today.getMonth()+1; //January is 0!
-
-          var yyyy = today.getFullYear();
-          if( dd < 10 ) { dd = '0' + dd; } 
-          if( mm < 10 ) { mm = '0' + mm;  }
-          var creation_date = dd + '/' + mm + '/' + yyyy;
-          
           var info_journey = null;
           if( radiobuttonParents.getValue() )      { info_journey = 3; }
           else if( radiobuttonPartner.getValue() ) { info_journey = 2; }
@@ -2831,7 +2824,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
             info_parents,           // 19 
             info_partner,           // 20 
             info_journey,           // 21 
-            creation_date           // 22
+            ""                      // 22 aanmaakdatum: set by server
           ];
           
           var rows = [];
@@ -2893,7 +2886,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           "Info Ouders",
           "Info Partner",
           "Info Reis",
-          "Aanmaak datum",
+          "Aanmaak datum"
       ];
       tableModel.setColumns( column_names );
      
@@ -3353,7 +3346,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
               row.info_parents  = row_data[ this.MAIL_infoouders ];
               row.info_partner  = row_data[ this.MAIL_infopartner ];
               row.info_journey  = row_data[ this.MAIL_inforeis ];
-              row.creation_date = row_data[ this.MAIL_aanmaakdatum ];
+            //row.creation_date = row_data[ this.MAIL_aanmaakdatum ]; // set by server
               
               rows.push( row );
               console.debug( row );
@@ -3542,6 +3535,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           
           // fill the table with "huwelijksakten" mails
           var mails = this.OP.mails.huw;
+          console.debug( mails );
           var rows = [];
           var nhuw = 0
           
@@ -3575,7 +3569,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
                 mail.type,                      // 18
                 mail.infoouders,                // 19
                 mail.infopartner,               // 20
-                mail.inforeis                   // 21
+                mail.inforeis,                  // 21
+                mail.aanmaakdatum               // 22
               ];
               rows.push( row );
             }
@@ -3779,7 +3774,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
             type,                   // 18 type
             "",                     // 19 infoouders
             "",                     // 20 infopartner
-            ""                      // 21 inforeis
+            "",                     // 21 inforeis
+            ""                      // 22 aanmaakdatum
           ];
           
           var rows = [];
@@ -3834,7 +3830,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
           "Type",
           "Info Ouders",
           "Info Partner",
-          "Info Reis"
+          "Info Reis",
+          "Aanmaak Datum"
       ];
       tableModel.setColumns( column_names );
       
@@ -3979,52 +3976,54 @@ qx.Class.define( "hsnmailenbeheer.Application",
       var resizeBehavior = tcm.getBehavior();
       
       //preferred column widths
-      resizeBehavior.set( this.MAIL_nr,          { width  :"1*", minWidth :  20, maxWidth :  20 } );  //  0 Nr
-      resizeBehavior.set( this.MAIL_id,          { width  :"1*", minWidth :  60, maxWidth :  60 } );  //  1 Id
-      resizeBehavior.set( this.MAIL_idnr,        { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  2
-      resizeBehavior.set( this.MAIL_briefnr,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  //  3
-      resizeBehavior.set( this.MAIL_aard,        { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  4 Aard
-      resizeBehavior.set( this.MAIL_datum,       { width  :"1*", minWidth :  70, maxWidth :  70 } );  //  5 Datum
-      resizeBehavior.set( this.MAIL_periode,     { width  :"1*", minWidth :  80, maxWidth :  80 } );  //  6 Periode
-      resizeBehavior.set( this.MAIL_gemnr,       { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  7 GemeenteNr
-      resizeBehavior.set( this.MAIL_naamgem,     { width  :"1*", minWidth : 100                 } );  //  8 Gemeente
-      resizeBehavior.set( this.MAIL_status,      { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  9 Status
-      resizeBehavior.set( this.MAIL_printdatum,  { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 10 PrintDatum
-      resizeBehavior.set( this.MAIL_printen,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 11
-      resizeBehavior.set( this.MAIL_ontvdat,     { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 12 
-      resizeBehavior.set( this.MAIL_opmerk,      { width  :"1*", minWidth : 100 } );                  // 13 Opmerkingen
-      resizeBehavior.set( this.MAIL_opident,     { width  :"1*", minWidth : 100 } );                  // 14 
-      resizeBehavior.set( this.MAIL_oppartner,   { width  :"1*", minWidth : 100 } );                  // 15
-      resizeBehavior.set( this.MAIL_opvader,     { width  :"1*", minWidth : 100 } );                  // 16
-      resizeBehavior.set( this.MAIL_opmoeder,    { width  :"1*", minWidth : 100 } );                  // 17
-      resizeBehavior.set( this.MAIL_type,        { width  :"1*", minWidth :  40, maxWidth :  40 } );  // 18 Type
-      resizeBehavior.set( this.MAIL_infoouders,  { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 19 
-      resizeBehavior.set( this.MAIL_infopartner, { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 20
-      resizeBehavior.set( this.MAIL_inforeis,    { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 21
+      resizeBehavior.set( this.MAIL_nr,           { width  :"1*", minWidth :  20, maxWidth :  20 } );  //  0 Nr
+      resizeBehavior.set( this.MAIL_id,           { width  :"1*", minWidth :  60, maxWidth :  60 } );  //  1 Id
+      resizeBehavior.set( this.MAIL_idnr,         { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  2
+      resizeBehavior.set( this.MAIL_briefnr,      { width  :"1*", minWidth :  30, maxWidth :  30 } );  //  3
+      resizeBehavior.set( this.MAIL_aard,         { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  4 Aard
+      resizeBehavior.set( this.MAIL_datum,        { width  :"1*", minWidth :  70, maxWidth :  70 } );  //  5 Datum
+      resizeBehavior.set( this.MAIL_periode,      { width  :"1*", minWidth :  80, maxWidth :  80 } );  //  6 Periode
+      resizeBehavior.set( this.MAIL_gemnr,        { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  7 GemeenteNr
+      resizeBehavior.set( this.MAIL_naamgem,      { width  :"1*", minWidth : 100                 } );  //  8 Gemeente
+      resizeBehavior.set( this.MAIL_status,       { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  9 Status
+      resizeBehavior.set( this.MAIL_printdatum,   { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 10 PrintDatum
+      resizeBehavior.set( this.MAIL_printen,      { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 11
+      resizeBehavior.set( this.MAIL_ontvdat,      { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 12 
+      resizeBehavior.set( this.MAIL_opmerk,       { width  :"1*", minWidth : 100 } );                  // 13 Opmerkingen
+      resizeBehavior.set( this.MAIL_opident,      { width  :"1*", minWidth : 100 } );                  // 14 
+      resizeBehavior.set( this.MAIL_oppartner,    { width  :"1*", minWidth : 100 } );                  // 15
+      resizeBehavior.set( this.MAIL_opvader,      { width  :"1*", minWidth : 100 } );                  // 16
+      resizeBehavior.set( this.MAIL_opmoeder,     { width  :"1*", minWidth : 100 } );                  // 17
+      resizeBehavior.set( this.MAIL_type,         { width  :"1*", minWidth :  40, maxWidth :  40 } );  // 18 Type
+      resizeBehavior.set( this.MAIL_infoouders,   { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 19 
+      resizeBehavior.set( this.MAIL_infopartner,  { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 20
+      resizeBehavior.set( this.MAIL_inforeis,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 21
+      resizeBehavior.set( this.MAIL_aanmaakdatum, { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 22 AanmaakDatum
       
       // default visibility
-    //tcm.setColumnVisible( this.MAIL_nr,          false );  //  0,
-    //tcm.setColumnVisible( this.MAIL_id,          false );  //  1,
-    //tcm.setColumnVisible( this.MAIL_idnr,        false );  //  2,
-      tcm.setColumnVisible( this.MAIL_briefnr,     false );  //  3,
-    //tcm.setColumnVisible( this.MAIL_aard,        false );  //  4,
-    //tcm.setColumnVisible( this.MAIL_datum,       false );  //  5,
-    //tcm.setColumnVisible( this.MAIL_periode,     false );  //  6,
-      tcm.setColumnVisible( this.MAIL_gemnr,       false );  //  7,
-    //tcm.setColumnVisible( this.MAIL_naamgem,     false );  //  8,
-    //tcm.setColumnVisible( this.MAIL_status,      false );  //  9,
-    //tcm.setColumnVisible( this.MAIL_printdatum,  false );  // 10,
-      tcm.setColumnVisible( this.MAIL_printen,     false );  // 11,
-      tcm.setColumnVisible( this.MAIL_ontvdat,     false );  // 12,
-      tcm.setColumnVisible( this.MAIL_opmerk,      false );  // 13,
-    //tcm.setColumnVisible( this.MAIL_opident,     false );  // 14,
-    //tcm.setColumnVisible( this.MAIL_oppartner,   false );  // 15,
-      tcm.setColumnVisible( this.MAIL_opvader,     false );  // 16,
-      tcm.setColumnVisible( this.MAIL_opmoeder,    false );  // 17,
-    //tcm.setColumnVisible( this.MAIL_type,        false );  // 19,
-      tcm.setColumnVisible( this.MAIL_infoouders,  false );  // 20,
-      tcm.setColumnVisible( this.MAIL_infopartner, false );  // 21,
-      tcm.setColumnVisible( this.MAIL_inforeis,    false );  // 22
+    //tcm.setColumnVisible( this.MAIL_nr,           false );  //  0,
+    //tcm.setColumnVisible( this.MAIL_id,           false );  //  1,
+    //tcm.setColumnVisible( this.MAIL_idnr,         false );  //  2,
+      tcm.setColumnVisible( this.MAIL_briefnr,      false );  //  3,
+    //tcm.setColumnVisible( this.MAIL_aard,         false );  //  4,
+    //tcm.setColumnVisible( this.MAIL_datum,        false );  //  5,
+    //tcm.setColumnVisible( this.MAIL_periode,      false );  //  6,
+      tcm.setColumnVisible( this.MAIL_gemnr,        false );  //  7,
+    //tcm.setColumnVisible( this.MAIL_naamgem,      false );  //  8,
+    //tcm.setColumnVisible( this.MAIL_status,       false );  //  9,
+    //tcm.setColumnVisible( this.MAIL_printdatum,   false );  // 10,
+      tcm.setColumnVisible( this.MAIL_printen,      false );  // 11,
+      tcm.setColumnVisible( this.MAIL_ontvdat,      false );  // 12,
+      tcm.setColumnVisible( this.MAIL_opmerk,       false );  // 13,
+    //tcm.setColumnVisible( this.MAIL_opident,      false );  // 14,
+    //tcm.setColumnVisible( this.MAIL_oppartner,    false );  // 15,
+      tcm.setColumnVisible( this.MAIL_opvader,      false );  // 16,
+      tcm.setColumnVisible( this.MAIL_opmoeder,     false );  // 17,
+    //tcm.setColumnVisible( this.MAIL_type,         false );  // 18,
+      tcm.setColumnVisible( this.MAIL_infoouders,   false );  // 19,
+      tcm.setColumnVisible( this.MAIL_infopartner,  false );  // 20,
+      tcm.setColumnVisible( this.MAIL_inforeis,     false );  // 21,
+      tcm.setColumnVisible( this.MAIL_aanmaakdatum, false );  // 22,
       
       
       // Buttons container: Bekijk meer/minder, Bewerken is aan/uit, Verwijder regel(s), Opslaan
@@ -4047,56 +4046,58 @@ qx.Class.define( "hsnmailenbeheer.Application",
             tbuttonView.setLabel( "Bekijk minder" );
             
             // more visibility
-            tcm.setColumnVisible( this.MAIL_nr,                   true );  //  0,
-            tcm.setColumnVisible( this.MAIL_id,                   true );  //  1,
-            tcm.setColumnVisible( this.MAIL_idnr,                 true );  //  2,
-            tcm.setColumnVisible( this.MAIL_briefnr,              true );  //  3,
-            tcm.setColumnVisible( this.MAIL_aard,        true );  //  4,
-            tcm.setColumnVisible( this.MAIL_datum,       true );  //  5,
-            tcm.setColumnVisible( this.MAIL_periode,     true );  //  6,
-            tcm.setColumnVisible( this.MAIL_gemnr,       true );  //  7,
-            tcm.setColumnVisible( this.MAIL_naamgem,     true );  //  8,
-            tcm.setColumnVisible( this.MAIL_status,      true );  //  9,
-            tcm.setColumnVisible( this.MAIL_printdatum,  true );  // 10,
-            tcm.setColumnVisible( this.MAIL_printen,     true );  // 11,
-            tcm.setColumnVisible( this.MAIL_ontvdat,     true );  // 12,
-            tcm.setColumnVisible( this.MAIL_opmerk,      true );  // 13,
-            tcm.setColumnVisible( this.MAIL_opident,     true );  // 14,
-            tcm.setColumnVisible( this.MAIL_oppartner,   true );  // 15,
-            tcm.setColumnVisible( this.MAIL_opvader,     true );  // 16,
-            tcm.setColumnVisible( this.MAIL_opmoeder,    true );  // 17,
-            tcm.setColumnVisible( this.MAIL_type,        true );  // 18,
-            tcm.setColumnVisible( this.MAIL_infoouders,  true );  // 19,
-            tcm.setColumnVisible( this.MAIL_infopartner, true );  // 20,
-            tcm.setColumnVisible( this.MAIL_inforeis,    true );  // 21
+            tcm.setColumnVisible( this.MAIL_nr,           true );  //  0,
+            tcm.setColumnVisible( this.MAIL_id,           true );  //  1,
+            tcm.setColumnVisible( this.MAIL_idnr,         true );  //  2,
+            tcm.setColumnVisible( this.MAIL_briefnr,      true );  //  3,
+            tcm.setColumnVisible( this.MAIL_aard,         true );  //  4,
+            tcm.setColumnVisible( this.MAIL_datum,        true );  //  5,
+            tcm.setColumnVisible( this.MAIL_periode,      true );  //  6,
+            tcm.setColumnVisible( this.MAIL_gemnr,        true );  //  7,
+            tcm.setColumnVisible( this.MAIL_naamgem,      true );  //  8,
+            tcm.setColumnVisible( this.MAIL_status,       true );  //  9,
+            tcm.setColumnVisible( this.MAIL_printdatum,   true );  // 10,
+            tcm.setColumnVisible( this.MAIL_printen,      true );  // 11,
+            tcm.setColumnVisible( this.MAIL_ontvdat,      true );  // 12,
+            tcm.setColumnVisible( this.MAIL_opmerk,       true );  // 13,
+            tcm.setColumnVisible( this.MAIL_opident,      true );  // 14,
+            tcm.setColumnVisible( this.MAIL_oppartner,    true );  // 15,
+            tcm.setColumnVisible( this.MAIL_opvader,      true );  // 16,
+            tcm.setColumnVisible( this.MAIL_opmoeder,     true );  // 17,
+            tcm.setColumnVisible( this.MAIL_type,         true );  // 18,
+            tcm.setColumnVisible( this.MAIL_infoouders,   true );  // 19,
+            tcm.setColumnVisible( this.MAIL_infopartner,  true );  // 20,
+            tcm.setColumnVisible( this.MAIL_inforeis,     true );  // 21,
+            tcm.setColumnVisible( this.MAIL_aanmaakdatum, true );  // 22
           }
           else 
           {
             tbuttonView.setLabel( "Bekijk meer" );
             
             // less visibility
-            tcm.setColumnVisible( this.MAIL_nr,          true  );  //  0,
-            tcm.setColumnVisible( this.MAIL_id,          true  );  //  1,
-            tcm.setColumnVisible( this.MAIL_idnr,        true  );  //  2,
-            tcm.setColumnVisible( this.MAIL_briefnr,     false );  //  3,
-            tcm.setColumnVisible( this.MAIL_aard,        true  );  //  4,
-            tcm.setColumnVisible( this.MAIL_datum,       true  );  //  5,
-            tcm.setColumnVisible( this.MAIL_periode,     true  );  //  6,
-            tcm.setColumnVisible( this.MAIL_gemnr,       false );  //  7,
-            tcm.setColumnVisible( this.MAIL_naamgem,     true  );  //  8,
-            tcm.setColumnVisible( this.MAIL_status,      true  );  //  9,
-            tcm.setColumnVisible( this.MAIL_printdatum,  true  );  // 10,
-            tcm.setColumnVisible( this.MAIL_printen,     false );  // 11,
-            tcm.setColumnVisible( this.MAIL_ontvdat,     false );  // 12,
-            tcm.setColumnVisible( this.MAIL_opmerk,      false );  // 13,
-            tcm.setColumnVisible( this.MAIL_opident,     true  );  // 14,
-            tcm.setColumnVisible( this.MAIL_oppartner,   true  );  // 15,
-            tcm.setColumnVisible( this.MAIL_opvader,     false );  // 16,
-            tcm.setColumnVisible( this.MAIL_opmoeder,    false );  // 17,
-            tcm.setColumnVisible( this.MAIL_type,        true  );  // 18,
-            tcm.setColumnVisible( this.MAIL_infoouders,  false );  // 19,
-            tcm.setColumnVisible( this.MAIL_infopartner, false );  // 20,
-            tcm.setColumnVisible( this.MAIL_inforeis,    false );  // 21,
+            tcm.setColumnVisible( this.MAIL_nr,           true  );  //  0,
+            tcm.setColumnVisible( this.MAIL_id,           true  );  //  1,
+            tcm.setColumnVisible( this.MAIL_idnr,         true  );  //  2,
+            tcm.setColumnVisible( this.MAIL_briefnr,      false );  //  3,
+            tcm.setColumnVisible( this.MAIL_aard,         true  );  //  4,
+            tcm.setColumnVisible( this.MAIL_datum,        true  );  //  5,
+            tcm.setColumnVisible( this.MAIL_periode,      true  );  //  6,
+            tcm.setColumnVisible( this.MAIL_gemnr,        false );  //  7,
+            tcm.setColumnVisible( this.MAIL_naamgem,      true  );  //  8,
+            tcm.setColumnVisible( this.MAIL_status,       true  );  //  9,
+            tcm.setColumnVisible( this.MAIL_printdatum,   true  );  // 10,
+            tcm.setColumnVisible( this.MAIL_printen,      false );  // 11,
+            tcm.setColumnVisible( this.MAIL_ontvdat,      false );  // 12,
+            tcm.setColumnVisible( this.MAIL_opmerk,       false );  // 13,
+            tcm.setColumnVisible( this.MAIL_opident,      true  );  // 14,
+            tcm.setColumnVisible( this.MAIL_oppartner,    true  );  // 15,
+            tcm.setColumnVisible( this.MAIL_opvader,      false );  // 16,
+            tcm.setColumnVisible( this.MAIL_opmoeder,     false );  // 17,
+            tcm.setColumnVisible( this.MAIL_type,         true  );  // 18,
+            tcm.setColumnVisible( this.MAIL_infoouders,   false );  // 19,
+            tcm.setColumnVisible( this.MAIL_infopartner,  false );  // 20,
+            tcm.setColumnVisible( this.MAIL_inforeis,     false );  // 21,
+            tcm.setColumnVisible( this.MAIL_aanmaakdatum, true  );  // 22
           }
         },
         this
@@ -4562,7 +4563,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
               mail.type,                      // 18
               mail.infoouders,                // 19
               mail.infopartner,               // 20
-              mail.inforeis                   // 21
+              mail.inforeis,                  // 21
+              mail.aanmaakdatum               // 22
             ];
             rows.push( row );
           }
@@ -4622,7 +4624,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
         "Type",
         "Info Ouders",
         "Info Partner",
-        "Info Reis"
+        "Info Reis",
+        "Aanmaak Datum"
       ];
       tableModel.setColumns( column_names );
       
@@ -4690,52 +4693,54 @@ qx.Class.define( "hsnmailenbeheer.Application",
       var resizeBehavior = tcm.getBehavior();
       
       //preferred column widths
-      resizeBehavior.set( this.MAIL_nr,          { width  :"1*", minWidth :  20, maxWidth :  20 } );  //  0 Nr
-      resizeBehavior.set( this.MAIL_id,          { width  :"1*", minWidth :  60, maxWidth :  60 } );  //  1 Id
-      resizeBehavior.set( this.MAIL_idnr,        { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  2
-      resizeBehavior.set( this.MAIL_briefnr,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  //  3
-      resizeBehavior.set( this.MAIL_aard,        { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  4 Aard
-      resizeBehavior.set( this.MAIL_datum,       { width  :"1*", minWidth :  70, maxWidth :  70 } );  //  5 Datum
-      resizeBehavior.set( this.MAIL_periode,     { width  :"1*", minWidth :  80, maxWidth :  80 } );  //  6 Periode
-      resizeBehavior.set( this.MAIL_gemnr,       { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  7 GemeenteNr
-      resizeBehavior.set( this.MAIL_naamgem,     { width  :"1*", minWidth : 100                 } );  //  8 Gemeente
-      resizeBehavior.set( this.MAIL_status,      { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  9 Status
-      resizeBehavior.set( this.MAIL_printdatum,  { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 10 PrintDatum
-      resizeBehavior.set( this.MAIL_printen,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 11
-      resizeBehavior.set( this.MAIL_ontvdat,     { width  :"1*", minWidth : 100, maxWidth : 100 } );  // 12 
-      resizeBehavior.set( this.MAIL_opmerk,      { width  :"1*", minWidth : 100 } );                  // 13 Opmerkingen
-      resizeBehavior.set( this.MAIL_opident,     { width  :"1*", minWidth : 100 } );                  // 14 
-      resizeBehavior.set( this.MAIL_oppartner,   { width  :"1*", minWidth : 100 } );                  // 15
-      resizeBehavior.set( this.MAIL_opvader,     { width  :"1*", minWidth : 100 } );                  // 15
-      resizeBehavior.set( this.MAIL_opmoeder,    { width  :"1*", minWidth : 100 } );                  // 17
-      resizeBehavior.set( this.MAIL_type,        { width  :"1*", minWidth :  40, maxWidth :  40 } );  // 18 Type
-      resizeBehavior.set( this.MAIL_infoouders,  { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 19 
-      resizeBehavior.set( this.MAIL_infopartner, { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 20
-      resizeBehavior.set( this.MAIL_inforeis,    { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 21
+      resizeBehavior.set( this.MAIL_nr,           { width  :"1*", minWidth :  20, maxWidth :  20 } );  //  0 Nr
+      resizeBehavior.set( this.MAIL_id,           { width  :"1*", minWidth :  60, maxWidth :  60 } );  //  1 Id
+      resizeBehavior.set( this.MAIL_idnr,         { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  2
+      resizeBehavior.set( this.MAIL_briefnr,      { width  :"1*", minWidth :  30, maxWidth :  30 } );  //  3
+      resizeBehavior.set( this.MAIL_aard,         { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  4 Aard
+      resizeBehavior.set( this.MAIL_datum,        { width  :"1*", minWidth :  70, maxWidth :  70 } );  //  5 Datum
+      resizeBehavior.set( this.MAIL_periode,      { width  :"1*", minWidth :  80, maxWidth :  80 } );  //  6 Periode
+      resizeBehavior.set( this.MAIL_gemnr,        { width  :"1*", minWidth :  40, maxWidth :  40 } );  //  7 GemeenteNr
+      resizeBehavior.set( this.MAIL_naamgem,      { width  :"1*", minWidth : 100                 } );  //  8 Gemeente
+      resizeBehavior.set( this.MAIL_status,       { width  :"1*", minWidth :  50, maxWidth :  50 } );  //  9 Status
+      resizeBehavior.set( this.MAIL_printdatum,   { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 10 PrintDatum
+      resizeBehavior.set( this.MAIL_printen,      { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 11
+      resizeBehavior.set( this.MAIL_ontvdat,      { width  :"1*", minWidth : 100, maxWidth : 100 } );  // 12 
+      resizeBehavior.set( this.MAIL_opmerk,       { width  :"1*", minWidth : 100 } );                  // 13 Opmerkingen
+      resizeBehavior.set( this.MAIL_opident,      { width  :"1*", minWidth : 100 } );                  // 14 
+      resizeBehavior.set( this.MAIL_oppartner,    { width  :"1*", minWidth : 100 } );                  // 15
+      resizeBehavior.set( this.MAIL_opvader,      { width  :"1*", minWidth : 100 } );                  // 15
+      resizeBehavior.set( this.MAIL_opmoeder,     { width  :"1*", minWidth : 100 } );                  // 17
+      resizeBehavior.set( this.MAIL_type,         { width  :"1*", minWidth :  40, maxWidth :  40 } );  // 18 Type
+      resizeBehavior.set( this.MAIL_infoouders,   { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 19 
+      resizeBehavior.set( this.MAIL_infopartner,  { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 20
+      resizeBehavior.set( this.MAIL_inforeis,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 21
+      resizeBehavior.set( this.MAIL_aanmaakdatum, { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 22 AanmaakDatum
       
       // default visibility
-    //tcm.setColumnVisible( this.MAIL_nr,          false );  //  0,
-    //tcm.setColumnVisible( this.MAIL_id,          false );  //  1,
-      tcm.setColumnVisible( this.MAIL_idnr,        false );  //  2,
-      tcm.setColumnVisible( this.MAIL_briefnr,     false );  //  3,
-    //tcm.setColumnVisible( this.MAIL_aard,        false );  //  4,
-    //tcm.setColumnVisible( this.MAIL_datum,       false );  //  5,
-    //tcm.setColumnVisible( this.MAIL_periode,     false );  //  6,
-      tcm.setColumnVisible( this.MAIL_gemnr,       false );  //  7,
-    //tcm.setColumnVisible( this.MAIL_naamgem,     false );  //  8,
-    //tcm.setColumnVisible( this.MAIL_status,      false );  //  9,
-    //tcm.setColumnVisible( this.MAIL_printdatum,  false );  // 10,
-    //tcm.setColumnVisible( this.MAIL_printen,     false );  // 11,
-    //tcm.setColumnVisible( this.MAIL_ontvdat,     false );  // 12,
-      tcm.setColumnVisible( this.MAIL_opmerk,      false );  // 13,
-      tcm.setColumnVisible( this.MAIL_opident,     false );  // 14,
-      tcm.setColumnVisible( this.MAIL_oppartner,   false );  // 15,
-      tcm.setColumnVisible( this.MAIL_opvader,     false );  // 16,
-      tcm.setColumnVisible( this.MAIL_opmoeder,    false );  // 17,
-    //tcm.setColumnVisible( this.MAIL_type,        false );  // 18,
-      tcm.setColumnVisible( this.MAIL_infoouders,  false );  // 19,
-      tcm.setColumnVisible( this.MAIL_infopartner, false );  // 20,
-      tcm.setColumnVisible( this.MAIL_inforeis,    false );  // 21,
+    //tcm.setColumnVisible( this.MAIL_nr,           false );  //  0,
+    //tcm.setColumnVisible( this.MAIL_id,           false );  //  1,
+      tcm.setColumnVisible( this.MAIL_idnr,         false );  //  2,
+      tcm.setColumnVisible( this.MAIL_briefnr,      false );  //  3,
+    //tcm.setColumnVisible( this.MAIL_aard,         false );  //  4,
+    //tcm.setColumnVisible( this.MAIL_datum,        false );  //  5,
+    //tcm.setColumnVisible( this.MAIL_periode,      false );  //  6,
+      tcm.setColumnVisible( this.MAIL_gemnr,        false );  //  7,
+    //tcm.setColumnVisible( this.MAIL_naamgem,      false );  //  8,
+    //tcm.setColumnVisible( this.MAIL_status,       false );  //  9,
+    //tcm.setColumnVisible( this.MAIL_printdatum,   false );  // 10,
+    //tcm.setColumnVisible( this.MAIL_printen,      false );  // 11,
+    //tcm.setColumnVisible( this.MAIL_ontvdat,      false );  // 12,
+      tcm.setColumnVisible( this.MAIL_opmerk,       false );  // 13,
+      tcm.setColumnVisible( this.MAIL_opident,      false );  // 14,
+      tcm.setColumnVisible( this.MAIL_oppartner,    false );  // 15,
+      tcm.setColumnVisible( this.MAIL_opvader,      false );  // 16,
+      tcm.setColumnVisible( this.MAIL_opmoeder,     false );  // 17,
+    //tcm.setColumnVisible( this.MAIL_type,         false );  // 18,
+      tcm.setColumnVisible( this.MAIL_infoouders,   false );  // 19,
+      tcm.setColumnVisible( this.MAIL_infopartner,  false );  // 20,
+      tcm.setColumnVisible( this.MAIL_inforeis,     false );  // 21,
+    //tcm.setColumnVisible( this.MAIL_aanmaakdatum, false );  // 22,
       
       var layoutBooking = new qx.ui.layout.HBox( 5 );
       var containerBooking = new qx.ui.container.Composite( layoutBooking );
@@ -4787,56 +4792,58 @@ qx.Class.define( "hsnmailenbeheer.Application",
             tbuttonView.setLabel( "Bekijk minder" );
             
             // more visibility
-            tcm.setColumnVisible( this.MAIL_nr,          true );  //  0,
-            tcm.setColumnVisible( this.MAIL_id,          true );  //  1,
-            tcm.setColumnVisible( this.MAIL_idnr,        true );  //  2,
-            tcm.setColumnVisible( this.MAIL_briefnr,     true );  //  3,
-            tcm.setColumnVisible( this.MAIL_aard,        true );  //  4,
-            tcm.setColumnVisible( this.MAIL_datum,       true );  //  5,
-            tcm.setColumnVisible( this.MAIL_periode,     true );  //  6,
-            tcm.setColumnVisible( this.MAIL_gemnr,       true );  //  7,
-            tcm.setColumnVisible( this.MAIL_naamgem,     true );  //  8,
-            tcm.setColumnVisible( this.MAIL_status,      true );  //  9,
-            tcm.setColumnVisible( this.MAIL_printdatum,  true );  // 10,
-            tcm.setColumnVisible( this.MAIL_printen,     true );  // 11,
-            tcm.setColumnVisible( this.MAIL_ontvdat,     true );  // 12,
-            tcm.setColumnVisible( this.MAIL_opmerk,      true );  // 13,
-            tcm.setColumnVisible( this.MAIL_opident,     true );  // 14,
-            tcm.setColumnVisible( this.MAIL_oppartner,   true );  // 15,
-            tcm.setColumnVisible( this.MAIL_opvader,     true );  // 16,
-            tcm.setColumnVisible( this.MAIL_opmoeder,    true );  // 17,
-            tcm.setColumnVisible( this.MAIL_type,        true );  // 18,
-            tcm.setColumnVisible( this.MAIL_infoouders,  true );  // 19,
-            tcm.setColumnVisible( this.MAIL_infopartner, true );  // 20,
-            tcm.setColumnVisible( this.MAIL_inforeis,    true );  // 21,
+            tcm.setColumnVisible( this.MAIL_nr,           true );  //  0,
+            tcm.setColumnVisible( this.MAIL_id,           true );  //  1,
+            tcm.setColumnVisible( this.MAIL_idnr,         true );  //  2,
+            tcm.setColumnVisible( this.MAIL_briefnr,      true );  //  3,
+            tcm.setColumnVisible( this.MAIL_aard,         true );  //  4,
+            tcm.setColumnVisible( this.MAIL_datum,        true );  //  5,
+            tcm.setColumnVisible( this.MAIL_periode,      true );  //  6,
+            tcm.setColumnVisible( this.MAIL_gemnr,        true );  //  7,
+            tcm.setColumnVisible( this.MAIL_naamgem,      true );  //  8,
+            tcm.setColumnVisible( this.MAIL_status,       true );  //  9,
+            tcm.setColumnVisible( this.MAIL_printdatum,   true );  // 10,
+            tcm.setColumnVisible( this.MAIL_printen,      true );  // 11,
+            tcm.setColumnVisible( this.MAIL_ontvdat,      true );  // 12,
+            tcm.setColumnVisible( this.MAIL_opmerk,       true );  // 13,
+            tcm.setColumnVisible( this.MAIL_opident,      true );  // 14,
+            tcm.setColumnVisible( this.MAIL_oppartner,    true );  // 15,
+            tcm.setColumnVisible( this.MAIL_opvader,      true );  // 16,
+            tcm.setColumnVisible( this.MAIL_opmoeder,     true );  // 17,
+            tcm.setColumnVisible( this.MAIL_type,         true );  // 18,
+            tcm.setColumnVisible( this.MAIL_infoouders,   true );  // 19,
+            tcm.setColumnVisible( this.MAIL_infopartner,  true );  // 20,
+            tcm.setColumnVisible( this.MAIL_inforeis,     true );  // 21,
+            tcm.setColumnVisible( this.MAIL_aanmaakdatum, true );  // 22,
           }
           else 
           {
             tbuttonView.setLabel( "Bekijk meer" );
             
             // less visibility
-            tcm.setColumnVisible( this.MAIL_nr,          true  );  //  0,
-            tcm.setColumnVisible( this.MAIL_id,          true  );  //  1,
-            tcm.setColumnVisible( this.MAIL_idnr,        true  );  //  2,
-            tcm.setColumnVisible( this.MAIL_briefnr,     false );  //  3,
-            tcm.setColumnVisible( this.MAIL_aard,        true  );  //  4,
-            tcm.setColumnVisible( this.MAIL_datum,       true  );  //  5,
-            tcm.setColumnVisible( this.MAIL_periode,     true  );  //  6,
-            tcm.setColumnVisible( this.MAIL_gemnr,       false );  //  7,
-            tcm.setColumnVisible( this.MAIL_naamgem,     true  );  //  8,
-            tcm.setColumnVisible( this.MAIL_status,      true  );  //  9,
-            tcm.setColumnVisible( this.MAIL_printdatum,  true  );  // 10,
-            tcm.setColumnVisible( this.MAIL_printen,     true  );  // 11,
-            tcm.setColumnVisible( this.MAIL_ontvdat,     true  );  // 12,
-            tcm.setColumnVisible( this.MAIL_opmerk,      false );  // 13,
-            tcm.setColumnVisible( this.MAIL_opident,     false );  // 14,
-            tcm.setColumnVisible( this.MAIL_oppartner,   false );  // 15,
-            tcm.setColumnVisible( this.MAIL_opvader,     false );  // 16,
-            tcm.setColumnVisible( this.MAIL_opmoeder,    false );  // 17,
-            tcm.setColumnVisible( this.MAIL_type,        true  );  // 18,
-            tcm.setColumnVisible( this.MAIL_infoouders,  false );  // 19,
-            tcm.setColumnVisible( this.MAIL_infopartner, false );  // 20,
-            tcm.setColumnVisible( this.MAIL_inforeis,    false );  // 21,
+            tcm.setColumnVisible( this.MAIL_nr,           true  );  //  0,
+            tcm.setColumnVisible( this.MAIL_id,           true  );  //  1,
+            tcm.setColumnVisible( this.MAIL_idnr,         true  );  //  2,
+            tcm.setColumnVisible( this.MAIL_briefnr,      false );  //  3,
+            tcm.setColumnVisible( this.MAIL_aard,         true  );  //  4,
+            tcm.setColumnVisible( this.MAIL_datum,        true  );  //  5,
+            tcm.setColumnVisible( this.MAIL_periode,      true  );  //  6,
+            tcm.setColumnVisible( this.MAIL_gemnr,        false );  //  7,
+            tcm.setColumnVisible( this.MAIL_naamgem,      true  );  //  8,
+            tcm.setColumnVisible( this.MAIL_status,       true  );  //  9,
+            tcm.setColumnVisible( this.MAIL_printdatum,   true  );  // 10,
+            tcm.setColumnVisible( this.MAIL_printen,      true  );  // 11,
+            tcm.setColumnVisible( this.MAIL_ontvdat,      true  );  // 12,
+            tcm.setColumnVisible( this.MAIL_opmerk,       false );  // 13,
+            tcm.setColumnVisible( this.MAIL_opident,      false );  // 14,
+            tcm.setColumnVisible( this.MAIL_oppartner,    false );  // 15,
+            tcm.setColumnVisible( this.MAIL_opvader,      false );  // 16,
+            tcm.setColumnVisible( this.MAIL_opmoeder,     false );  // 17,
+            tcm.setColumnVisible( this.MAIL_type,         true  );  // 18,
+            tcm.setColumnVisible( this.MAIL_infoouders,   false );  // 19,
+            tcm.setColumnVisible( this.MAIL_infopartner,  false );  // 20,
+            tcm.setColumnVisible( this.MAIL_inforeis,     false );  // 21,
+            tcm.setColumnVisible( this.MAIL_aanmaakdatum, false );  // 22,
           }
         },
         this

@@ -17,7 +17,7 @@ Goal:		Model classes for the hsn_mail tables
 01-Oct-2015	Other new tables
 12-Oct-2015	Removed superfloues tables
 08-Mar-2016	Split off hsn_central and hsn_reference tables
-03-Jul-2017	Mail table new column Aanmaakdatum
+04-Jul-2017	Mail table new column Aanmaakdatum
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
