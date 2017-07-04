@@ -124,6 +124,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
     MISSING_found    : 12,
     
     // columns of screen table Mail
+    // swapped positions of "Print Datum" & // "Aanmaak Datum"
     MAIL_nr           :  0,   // (not in db) screen table row counter: 1,2,3...
     MAIL_id           :  1,   // primary key
     MAIL_idnr         :  2,
@@ -134,7 +135,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
     MAIL_gemnr        :  7,
     MAIL_naamgem      :  8,
     MAIL_status       :  9,
-    MAIL_printdatum   : 10,
+  //MAIL_printdatum   : 10,
+    MAIL_aanmaakdatum : 10,
     MAIL_printen      : 11,
     MAIL_ontvdat      : 12,
     MAIL_opmerk       : 13,
@@ -146,7 +148,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
     MAIL_infoouders   : 19,
     MAIL_infopartner  : 20,
     MAIL_inforeis     : 21,
-    MAIL_aanmaakdatum : 22,
+  //MAIL_aanmaakdatum : 22,
+    MAIL_printdatum   : 22,
     
     input_opnum : null,
     
@@ -3543,7 +3546,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           {
             var mail = mails[ i ];
           //console.debug( "i: " + i + " " + mail );
-            
+            // swapped GUI positions of printdatum & aanmaakdatum
             if( mail.type === "HUW" )     // HUWelijksakten
             {
               nhuw++;
@@ -3558,7 +3561,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
                 mail.gemnr.toString(),          //  7
                 mail.naamgem,                   //  8
                 mail.status,                    //  9
-                mail.printdatum,                // 10
+              //mail.printdatum,                // 10
+                mail.aanmaakdatum,              // 10
                 mail.printen,                   // 11
                 mail.ontvdat,                   // 12
                 mail.opmerk,                    // 13
@@ -3570,7 +3574,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
                 mail.infoouders,                // 19
                 mail.infopartner,               // 20
                 mail.inforeis,                  // 21
-                mail.aanmaakdatum               // 22
+              //mail.aanmaakdatum               // 22
+                mail.printdatum                 // 22
               ];
               rows.push( row );
             }
@@ -3808,6 +3813,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       window.add( containerMarriages, { flex : 1 } );
       
       var tableModel = this._tableModel = new qx.ui.table.model.Simple();
+      // swapped positions of "Print Datum" & // "Aanmaak Datum"
       var column_names = [
           "#",
           "Id",
@@ -3819,7 +3825,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           "Gemeente Nr",
           "Gemeente",
           "Status",
-          "Print Datum",
+          "Aanmaak Datum",      // "Print Datum",
           "Printen",
           "Ontvang Datum",
           "Opmerkingen",
@@ -3831,7 +3837,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
           "Info Ouders",
           "Info Partner",
           "Info Reis",
-          "Aanmaak Datum"
+          "Print Datum"         // "Aanmaak Datum"
       ];
       tableModel.setColumns( column_names );
       
@@ -3998,7 +4004,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       resizeBehavior.set( this.MAIL_infoouders,   { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 19 
       resizeBehavior.set( this.MAIL_infopartner,  { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 20
       resizeBehavior.set( this.MAIL_inforeis,     { width  :"1*", minWidth :  30, maxWidth :  30 } );  // 21
-      resizeBehavior.set( this.MAIL_aanmaakdatum, { width  :"1*", minWidth :  70, maxWidth :  70 } );  // 22 AanmaakDatum
+      resizeBehavior.set( this.MAIL_aanmaakdatum, { width  :"1*", minWidth : 100, maxWidth : 100 } );  // 22 AanmaakDatum
       
       // default visibility
     //tcm.setColumnVisible( this.MAIL_nr,           false );  //  0,
@@ -4011,7 +4017,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       tcm.setColumnVisible( this.MAIL_gemnr,        false );  //  7,
     //tcm.setColumnVisible( this.MAIL_naamgem,      false );  //  8,
     //tcm.setColumnVisible( this.MAIL_status,       false );  //  9,
-    //tcm.setColumnVisible( this.MAIL_printdatum,   false );  // 10,
+      tcm.setColumnVisible( this.MAIL_printdatum,   false );  // 10,
       tcm.setColumnVisible( this.MAIL_printen,      false );  // 11,
       tcm.setColumnVisible( this.MAIL_ontvdat,      false );  // 12,
       tcm.setColumnVisible( this.MAIL_opmerk,       false );  // 13,
@@ -4023,7 +4029,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       tcm.setColumnVisible( this.MAIL_infoouders,   false );  // 19,
       tcm.setColumnVisible( this.MAIL_infopartner,  false );  // 20,
       tcm.setColumnVisible( this.MAIL_inforeis,     false );  // 21,
-      tcm.setColumnVisible( this.MAIL_aanmaakdatum, false );  // 22,
+      tcm.setColumnVisible( this.MAIL_aanmaakdatum, true );   // 22
       
       
       // Buttons container: Bekijk meer/minder, Bewerken is aan/uit, Verwijder regel(s), Opslaan
@@ -4085,7 +4091,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
             tcm.setColumnVisible( this.MAIL_gemnr,        false );  //  7,
             tcm.setColumnVisible( this.MAIL_naamgem,      true  );  //  8,
             tcm.setColumnVisible( this.MAIL_status,       true  );  //  9,
-            tcm.setColumnVisible( this.MAIL_printdatum,   true  );  // 10,
+            tcm.setColumnVisible( this.MAIL_printdatum,   false );  // 10,
             tcm.setColumnVisible( this.MAIL_printen,      false );  // 11,
             tcm.setColumnVisible( this.MAIL_ontvdat,      false );  // 12,
             tcm.setColumnVisible( this.MAIL_opmerk,       false );  // 13,
