@@ -4,7 +4,7 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		mail/views.py
-Version:	1.0.1
+Version:	1.0.2
 Goal:		Views for mail
 
 Functions:
@@ -21,7 +21,7 @@ def put_opmutation( opmutation_req ):
 26-May-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
 20-Mar-2017	update bug in put_mailbevreceived()
-20-Mar-2017	Changed
+04-Jul-2017	Mail table new column Aanmaakdatum
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -29,6 +29,7 @@ from __future__ import ( absolute_import, division, print_function, unicode_lite
 from builtins import ( ascii, bytes, chr, dict, filter, hex, input, int, list, map, 
     next, object, oct, open, pow, range, round, super, str, zip )
 
+import datetime
 import os
 from sys import stderr, exc_info
 
@@ -270,27 +271,28 @@ def get_mails( op_number ):
 			print( "Mail has %d entries for OP %s" % ( nmails, op_number ) )
 			for mail in mail_qs:
 				mail_dict = {
-					"id"          : mail.id,					# AI PK
-					"idnr"        : none2empty( mail.idnr ),
-					"briefnr"     : none2empty( mail.briefnr ),
-					"aard"        : none2empty( mail.aard ),
-					"datum"       : none2empty( mail.datum ),
-					"periode"     : none2empty( mail.periode ),
-					"gemnr"       : none2empty( mail.gemnr ),
-					"naamgem"     : none2empty( mail.naamgem ),
-					"status"      : none2empty( mail.status ),
-					"printdatum"  : none2empty( mail.printdatum ),
-					"printen"     : none2empty( mail.printen ),
-					"ontvdat"     : none2empty( mail.ontvdat ),
-					"opmerk"      : none2empty( mail.opmerk ),
-					"opident"     : none2empty( mail.opident ),
-					"oppartner"   : none2empty( mail.oppartner ),
-					"opvader"     : none2empty( mail.opvader ),
-					"opmoeder"    : none2empty( mail.opmoeder ),
-					"type"        : none2empty( mail.type ),
-					"infoouders"  : none2empty( mail.infoouders ),
-					"infopartner" : none2empty( mail.infopartner ),
-					"inforeis"    : none2empty( mail.inforeis )
+					"id"           : mail.id,					# AI PK
+					"idnr"         : none2empty( mail.idnr ),
+					"briefnr"      : none2empty( mail.briefnr ),
+					"aard"         : none2empty( mail.aard ),
+					"datum"        : none2empty( mail.datum ),
+					"periode"      : none2empty( mail.periode ),
+					"gemnr"        : none2empty( mail.gemnr ),
+					"naamgem"      : none2empty( mail.naamgem ),
+					"status"       : none2empty( mail.status ),
+					"printdatum"   : none2empty( mail.printdatum ),
+					"printen"      : none2empty( mail.printen ),
+					"ontvdat"      : none2empty( mail.ontvdat ),
+					"opmerk"       : none2empty( mail.opmerk ),
+					"opident"      : none2empty( mail.opident ),
+					"oppartner"    : none2empty( mail.oppartner ),
+					"opvader"      : none2empty( mail.opvader ),
+					"opmoeder"     : none2empty( mail.opmoeder ),
+					"type"         : none2empty( mail.type ),
+					"infoouders"   : none2empty( mail.infoouders ),
+					"infopartner"  : none2empty( mail.infopartner ),
+					"inforeis"     : none2empty( mail.inforeis ),
+					"aanmaakdatum" : none2empty( mail.aanmaakdatum )
 				}
 				
 				if mail.type == "BEV":
@@ -365,6 +367,7 @@ def put_mailbev( mailbev_req ):
 	2) if the pk is non-empty, we do an update
 	3) delete the records from the list pkdeleted
 	"""
+	print( "put_mailbev()" )
 	
 	status = "OK"
 	msg = "Nothing done"
@@ -416,27 +419,30 @@ def put_mailbev( mailbev_req ):
 			gemnr = None
 		
 		mailbev_dict = {
-			"id"          : id,
-			"idnr"        : idnr,
-			"aard"        : aard,
-			"datum"       : datum,
-			"periode"     : periode,
-			"gemnr"       : gemnr,
-			"naamgem"     : naamgem,
-			"status"      : status,
-			"opmerk"      : opmerk,
-			"opident"     : opident,
-			"oppartner"   : oppartner,
-			"opvader"     : opvader,
-			"opmoeder"    : opmoeder,
-			"type"        : mtype,
-			"infoouders"  : infoouders,
-			"infopartner" : infopartner,
-			"inforeis"    : inforeis
+			"id"           : id,
+			"idnr"         : idnr,
+			"aard"         : aard,
+			"datum"        : datum,
+			"periode"      : periode,
+			"gemnr"        : gemnr,
+			"naamgem"      : naamgem,
+			"status"       : status,
+			"opmerk"       : opmerk,
+			"opident"      : opident,
+			"oppartner"    : oppartner,
+			"opvader"      : opvader,
+			"opmoeder"     : opmoeder,
+			"type"         : mtype,
+			"infoouders"   : infoouders,
+			"infopartner"  : infopartner,
+			"inforeis"     : inforeis
 		}
 		
 		if id is None:
 			# new row (no pk)
+			now = datetime.date.today()
+			mailbev_dict[ "aanmaakdatum" ] = now.strftime( "%d-%m-%Y" )
+			
 			try:
 				status = "OK"
 				ncreated += 1
@@ -484,7 +490,7 @@ def put_mailbev( mailbev_req ):
 			print( mailbev_dict )
 
 
-	msg = "put_mailhuw() idnr = %s, updated: %d, created: %d, deleted: %d" % \
+	msg = "put_mailbev() idnr = %s, updated: %d, created: %d, deleted: %d" % \
 		( idnr, nupdated, ncreated, ndeleted )
 	print( msg )
 	
@@ -500,6 +506,7 @@ def put_mailhuw( mailhuw_req ):
 	2) if the pk is non-empty, we do an update
 	3) delete the records from the list pkdeleted
 	"""
+	print( "put_mailhuw()" )
 	
 	status = "OK"
 	msg = "Nothing done"
@@ -565,6 +572,9 @@ def put_mailhuw( mailhuw_req ):
 		
 		if id is None:
 			# new row (no pk)
+			now = datetime.date.today()
+			mailhuw_dict[ "aanmaakdatum" ] = now.strftime( "%d-%m-%Y" )
+			
 			try:
 				status = "OK"
 				ncreated += 1
