@@ -1,14 +1,14 @@
 FL-22-Mar-2017 Created
-FL-22-Mar-2017 Changed
+FL-21-Feb-2018 Changed
 
-Create a virtualenv Python-3.6.1
+Create a virtualenv Python-3.6.4
 
--1- Create a normal Python-3.6.1 from its source.
-	Get Python-3.6.1 from https://www.python.org/downloads/release/python-361/
-		$ tar -zxf Python-3.6.1.tgz
-		$ cd Python-3.6.1
-	Installation directory will be: ~/opt/Python/python-3.6.1
-		$ export PYTHON_LOCAL=~/opt/Python/python-3.6.1 
+-1- Create a normal Python-3.6.4 from its source.
+	Get Python-3.6.4 from https://www.python.org/downloads/release/python-364/
+		$ tar -zxf Python-3.6.4.tgz
+		$ cd Python-3.6.4
+	Installation directory will be: ~/opt/Python/python-3.6.4
+		$ export PYTHON_LOCAL=~/opt/Python/python-3.6.4 
 		$ ./configure --prefix=$PYTHON_LOCAL
 		...
 		If you want a release build with all optimizations active (LTO, PGO, etc),
@@ -25,8 +25,8 @@ Create a virtualenv Python-3.6.1
 		Successfully installed pip-9.0.1 setuptools-28.8.0
 
 	Use it
-		create a file ~/bin/python361 and use it
-		$ source ~/bin/python361
+		create a file ~/bin/python364 and use it
+		$ source ~/bin/python364
 
 	Notice
 		the pip and easy_install (from setuptools) are versioned: 
@@ -44,13 +44,13 @@ Create a virtualenv Python-3.6.1
 -4- Create a virtualenv python for HSNmail somewhere, say in PROJECT
 		$ cd $PROJECT
 	use the created python
-		$ source ~/bin/python361
-	create a venv python; its top-level directory will be python361
-		$ python3.6 -m venv python361
+		$ source ~/bin/python364
+	create a venv python; its top-level directory will be python364
+		$ python3.6 -m venv python364
 	use it
-		$ source python361/bin/activate
-	notice that your prompt is now prefixed with '(python361)'
+		$ source python364/bin/activate
+	notice that your prompt is now prefixed with '(python364)'
 
--3- Add more packages with pip to the new python361 for your project
+-3- Add more packages with pip to the new python364 for your project
 
 [eof]

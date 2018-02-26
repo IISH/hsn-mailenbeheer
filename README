@@ -1,5 +1,5 @@
 FL-22-Oct-2015 Created
-FL-24-Mar-2017 Changed
+FL-21-Feb-2018 Changed
 
 hsnmailenbeheer installation
 
@@ -53,6 +53,7 @@ hsnmailenbeheer installation
 		
 -4- Some required linux packages
 		cups
+		cups-dev[el]
 		openldap
 		openldap-dev[el]
 		mysql
