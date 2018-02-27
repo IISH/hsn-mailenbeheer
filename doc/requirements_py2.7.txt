@@ -1,4 +1,4 @@
-# FL-21-Feb-2018
+# FL-27-Feb-2018
 
 Update considerations:
 - could update python packages
@@ -16,7 +16,7 @@ future == 0.16.0
 Django == 1.11.2
 django_extensions == 1.8.0
 django-registration == 2.2
-mysqlclient == 1.3.10
+mysqlclient == 1.3.12
 pycups == 1.9.73				# requires cups-devel
 python-ldap == 2.4.40			# requires openldap-devel
 
