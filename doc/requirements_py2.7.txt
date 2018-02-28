@@ -1,8 +1,8 @@
-# FL-27-Feb-2018
+# FL-28-Feb-2018
 
-Update considerations:
-- could update python packages
-- could switch to mod_wsgi-express (then can use Py3?)
+# Update considerations:
+# - could update python packages
+# - could switch to mod_wsgi-express (then can use Py3?)
 
 # pip requirements file for HSNmail with a Python-2.7.13
 # setuptools, pip, and virtualenv should already be present in the (virtual) python2.7
