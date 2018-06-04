@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.6
+ * Version:     1.0.7
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -52,6 +52,7 @@
  * FL-30-Jun-2017: Do not allow duplicate volgnr's in createWindow1Missing table
  * FL-03-Jul-2017: createWindow3, kind (Aard) = "B" -> "W"    // W = Wedding
  * FL-04-Jul-2017: Mail table, new column Aanmaakdatum
+ * FL-04-Jun-2018: Clean this.input_opnum at start
  */
 
 /**
@@ -654,8 +655,9 @@ qx.Class.define( "hsnmailenbeheer.Application",
         }, 
         this
       );
-      
-    this.window0.open();  // start screen
+    
+    this.input_opnum = "";    // sometimes get spurious input at start
+    this.window0.open();      // start screen
       
     }, // createWindows
     
@@ -722,7 +724,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerOpnum.add( new qx.ui.core.Spacer( 50 ) );
       containerOpnum.add( labelOpnum );
       
-      var inputOpnum = new qx.ui.form.TextField().set({ maxLength: 15 });
+      var inputOpnum = new qx.ui.form.TextField().set({ maxLength: 15, value : "" });
       this.input_opnum = inputOpnum; // accessed by getHsnOpData
       inputOpnum.addListener( "keypress", function( ev ) {
         if( ev.getKeyIdentifier() === "Enter" )
