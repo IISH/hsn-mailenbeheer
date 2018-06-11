@@ -2,7 +2,7 @@
  * Author:      Fons Laan, KNAW IISH - International Institute of Social History
  * Project      HSN Mail
  * Name:        Application.js
- * Version:     1.0.7
+ * Version:     1.0.8
  * Goal:        Main js file
  * Notice:      Qooxdoo itself needs Python-2.6+, not Python-3
  *
@@ -52,7 +52,7 @@
  * FL-30-Jun-2017: Do not allow duplicate volgnr's in createWindow1Missing table
  * FL-03-Jul-2017: createWindow3, kind (Aard) = "B" -> "W"    // W = Wedding
  * FL-04-Jul-2017: Mail table, new column Aanmaakdatum
- * FL-04-Jun-2018: Clean this.input_opnum at start
+ * FL-11-Jun-2018: visibility issues (not false, but "hidden")
  */
 
 /**
@@ -76,7 +76,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
      * @lint ignoreDeprecated(alert)
      */
     
-    timestamp_client : "04-Jul-2017 12:53",
+    timestamp_client : "11-Jun-2018 10:33",
     
     // hsnmail.<vars> now from config.json
     wsgi_method : qx.core.Environment.get( "hsnmail.wsgi_method" ),
@@ -161,9 +161,10 @@ qx.Class.define( "hsnmailenbeheer.Application",
       this.base( arguments );		// Call super class
       
       var debug = qx.core.Environment.get( "qx.debug" );
-      //console.log( "debug: " + debug );
+      console.log( "debug: " + debug );
       if( debug ) // Enable logging in debug variant
       {
+        console.log( "enable logging" );
         qx.log.appender.Native;   // support native logging capabilities, e.g. Firebug for Firefox
         qx.log.appender.Console;  // support additional cross-browser console. Press F7 to toggle visibility
       }
@@ -656,7 +657,6 @@ qx.Class.define( "hsnmailenbeheer.Application",
         this
       );
     
-    this.input_opnum = "";    // sometimes get spurious input at start
     this.window0.open();      // start screen
       
     }, // createWindows
@@ -724,7 +724,8 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerOpnum.add( new qx.ui.core.Spacer( 50 ) );
       containerOpnum.add( labelOpnum );
       
-      var inputOpnum = new qx.ui.form.TextField().set({ maxLength: 15, value : "" });
+      var inputOpnum = new qx.ui.form.TextField().set({ maxLength: 15 });
+      
       this.input_opnum = inputOpnum; // accessed by getHsnOpData
       inputOpnum.addListener( "keypress", function( ev ) {
         if( ev.getKeyIdentifier() === "Enter" )
@@ -2395,7 +2396,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev ) 
         {
           var value = radiobuttonParents.getValue();
-          //console.debug( "Parents: " + value );
+          console.debug( "radiobuttonParents: " + value );
           if( value == true ) {
             textfield1Father.setVisibility( "visible" );
             textfield1Mother.setVisibility( "visible" );
@@ -2420,7 +2421,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev ) 
         {
           var value = radiobuttonPartner.getValue();
-          //console.debug( "Partner: " + value );
+          console.debug( "radiobuttonPartner: " + value );
           if( value == true ) { 
             combobox1Partner.setVisibility( "visible" );
             combobox1Partner.setEnabled( true );
@@ -2439,7 +2440,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
         function( ev ) 
         {
           var value = radiobuttonAlone.getValue();
-          //console.debug( "Alone: " + value );
+          console.debug( "radiobuttonAlone: " + value );
           if( value == true ) { 
             checkboxParents.setVisibility( "visible" );
             checkboxPartner.setVisibility( "visible" );
@@ -2679,13 +2680,13 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerLocation.add( new qx.ui.core.Spacer( 73 ) );
       
       // gemnr not needed in GUI (-> invisible), but needed server-side
-      var labelLocationNr = new qx.ui.basic.Label( "Gemeente Nr:" ).set({ visibility: false });
+      var labelLocationNr = new qx.ui.basic.Label( "Gemeente Nr:" ).set({ visibility: "hidden" });
       containerLocation.add( labelLocationNr );
       var textfieldLocationNr = new qx.ui.form.TextField()
       .set({
         width      : 50,
         enabled    : false,
-        visibility : false
+        visibility : "hidden"
       });
       containerLocation.add( textfieldLocationNr );
       
@@ -3693,7 +3694,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerLocation.add( new qx.ui.core.Spacer( 23 ) );
       
       // gemnr not needed in GUI (-> invisible), but needed server-side
-      var labelLocationNr = new qx.ui.basic.Label( "Gemeente Nr:" ).set({ visibility: false });
+      var labelLocationNr = new qx.ui.basic.Label( "Gemeente Nr:" ).set({ visibility: "hidden" });
       containerLocation.add( labelLocationNr );
       
       containerLocation.add( new qx.ui.core.Spacer( 25 ) );
@@ -3702,7 +3703,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       .set({
         width     : 50,
         enabled   : false,
-        visibility: false
+        visibility: "hidden"
       });
       containerLocation.add( textfieldLocationNr );
       
@@ -5777,7 +5778,7 @@ qx.Class.define( "hsnmailenbeheer.Application",
       containerButtons.add( buttonCancel );
       containerButtons.add( new qx.ui.core.Spacer( 10 ) );
       containerButtons.add( buttonLogin );
-      
+      console.debug( "createLogin() done" );
     }, // createLogin
     
     
