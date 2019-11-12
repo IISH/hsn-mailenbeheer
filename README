@@ -1,5 +1,5 @@
 FL-22-Oct-2015 Created
-FL-11-Nov-2019 Changed
+FL-12-Nov-2019 Changed
 
 hsnmailenbeheer installation
 
@@ -84,8 +84,7 @@ hsnmailenbeheer installation
 	http://manual.qooxdoo.org/current/qooxdoo.pdf
 	We used the lastest version, 5.0.3-beta, its generator needs at least Python-2.6. 
 	Download the zip or tar.gz Qooxdoo-SDK from: 
-	https://github.com/qooxdoo/qooxdoo/archive/v5.0.3-beta.zip
-	https://github.com/qooxdoo/qooxdoo/archive/v5.0.3-beta.tar.gz
+	https://github.com/qooxdoo/qooxdoo/releases/tag/v5.0.3-beta
 	and unpack it (somewhere outside the git hsnmailenbeheer tree).
 	Create an environment variable QOOXDOO_PATH that points to the unpacked sdk directory. 
 	Then: 
