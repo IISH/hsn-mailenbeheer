@@ -1,5 +1,5 @@
 FL-22-Oct-2015 Created
-FL-21-Feb-2018 Changed
+FL-11-Nov-2019 Changed
 
 hsnmailenbeheer installation
 
@@ -32,12 +32,12 @@ hsnmailenbeheer installation
 		
 -2- Documentation
 	README
-	doc/python2713
-		shell script  to activate a locally compiled pythpn-2.7.13
+	doc/python2717
+		shell script  to activate a locally compiled pythpn-2.7.17
 	/requirements.txt
 		pip requirements file to install a few additional python modules
-	doc/virtual-python-2.7.13.txt
-		description to create a virtualenv python-2.7.13
+	doc/virtual-python-2.7.17.txt
+		description to create a virtualenv python-2.7.17
 
 -3- Files not in the repository
 	Some files are installation dependent, and have to be created (from sample files). 
@@ -82,9 +82,10 @@ hsnmailenbeheer installation
 	The hsnmailenbeheer GUI is made with the JavaScript framework Qooxdoo, see: 
 	http://qooxdoo.org/
 	http://manual.qooxdoo.org/current/qooxdoo.pdf
-	We used the lastest version, 5.0.2, its generator needs at least Python-2.6. 
-	Download the Qooxdoo-SDK from: 
-	https://github.com/qooxdoo/qooxdoo/releases/download/release_5_0_2/qooxdoo-5.0.2-sdk.zip
+	We used the lastest version, 5.0.3-beta, its generator needs at least Python-2.6. 
+	Download the zip or tar.gz Qooxdoo-SDK from: 
+	https://github.com/qooxdoo/qooxdoo/archive/v5.0.3-beta.zip
+	https://github.com/qooxdoo/qooxdoo/archive/v5.0.3-beta.tar.gz
 	and unpack it (somewhere outside the git hsnmailenbeheer tree).
 	Create an environment variable QOOXDOO_PATH that points to the unpacked sdk directory. 
 	Then: 

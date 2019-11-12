@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# FL-11-Nov-2019
+
+# Python/Django
+# Before sourcing this script, create an environment variable 
+# PATH_AT_LOGIN that is the same as the PATH after login
+
+export PYTHON_LOCAL=~/opt/Python/python-2.7.17
+
+# 2.7.5 is the system python
+#alias python=/usr/bin/python
+alias python=$PYTHON_LOCAL/bin/python2.7
+
+export PYTHON_SITEPACKS=$PYTHON_LOCAL/lib/python2.7/site-packages
+
+export PYTHONPATH=$PYTHON_SITEPACKS
+
+# do not append ${PATH} to avoid mixing python versions
+export PATH=$PYTHON_LOCAL/bin:${PATH_AT_LOGIN}
+
+export LD_LIBRARY_PATH=$PYTHON_LOCAL/lib
+
+# [eof]
