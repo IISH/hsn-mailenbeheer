@@ -1,5 +1,5 @@
-# FL-28-Feb-2018
-# FL-11-Nov-2019 updates...
+# FL-28-Feb-2018 Created
+# FL-18-Nov-2019 Changed
 
 # Update considerations:
 # - could update python packages
@@ -14,11 +14,11 @@
 # $ pip install -r requirements_py2.7.txt
 
 future == 0.18.2
-Django == 1.11.2				# to-be-updated
-django_extensions == 1.8.0		# to-be-updated
-django-registration == 2.2		# to-be-updated
+Django == 1.11.26				# latest 1.11 version (for Python-2)
+django_extensions == 2.2.5		# latest version for Django-1.11
+django-registration == 2.5.2	# latest version for Django-1.11
 mysqlclient == 1.4.5			# requires linux mariadb, mariadb-libs, mariadb-devel
 pycups == 1.9.74				# requires linux cups-devel
-python-ldap == 3.2.0			# requires linux openldap-devel; also installed pyasn1-0.4.5 pyasn1-modules-0.2.5
+python-ldap == 3.2.0			# requires linux openldap-devel; also installed pyasn1-0.4.8 pyasn1-modules-0.2.7
 
 # [eof]
