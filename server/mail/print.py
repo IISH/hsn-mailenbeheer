@@ -21,7 +21,9 @@ def update_status( id ):
 17-Jun-2015	Created
 08-Mar-2016	Split-off hsn_central & hsn_reference db's
 16-Dec-2016	Letter contents changed
-22-Mar-2017 Changed
+27-Feb-2018 Missing encode( 'utf8' ) in print archive name, e.g. W\xc3\xbbnseradiel; 
+            no longer print these strings to server log
+27-Feb-2018 Changed
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -92,13 +94,24 @@ def print_mailbev():
 				
 				opsex    = none2empty( get_opsex(    mail.idnr ) )
 				mailtype = none2empty( get_mailtype( mail.idnr ) )
-				if debug: print( "opsex:", opsex, ", mailtype:", mailtype )
+				#if debug: print( "opsex:", opsex, ", mailtype:", mailtype )
 				
 				archive = none2empty( get_archive( mail.gemnr ) )
-				if debug: print( "archive:", archive )
+				#if debug: print( "archive:", archive.encode( 'utf8' ) )
 				
 				info_list = none2empty( get_op_info( mail.idnr ) )
-				if debug: print( "info_list:", info_list )
+				"""
+				if debug: 
+					print( "info_list: %d items" % len( info_list ) )
+					for info_item in info_list:
+						if isinstance( info_item, dict ): 
+							for key, value in info_item.iteritems():
+								skey   = str( key ).encode( 'utf8' )
+								svalue = str( value ).encode( 'utf8' )
+								print( "key: %s, value: %s" % ( key, svalue ) )
+						else:
+							print( "info_item:", info_item.encode( 'utf8' ) )
+				"""
 				
 				pathname_psfile = get_pathname_psfile( mail.gemnr, id )
 				
@@ -149,7 +162,7 @@ def print_mailbev():
 	except:
 		ret_status = "ERROR"
 		print( "print_mailbev()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "Mail.objects.filter failed: %s" % value
 		print( "%s\n" % msg )
 	
@@ -166,7 +179,7 @@ def get_mailtype( idnr ):
 			mail_type = hsnmanage.mail_type
 	except:
 		print( "print/get_mailtype()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "HsnBeheer.objects.get failed: %s" % value
 		print( "%s\n" % msg )
 
@@ -190,7 +203,7 @@ def get_archive( gemnr ):
 			if gemeentemet is None: gemeentemet = ""
 	except:
 		print( "print/get_archive()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "ArchiefGemeente.objects.get failed: %s" % value
 		print( "%s\n" % msg )
 	
@@ -247,7 +260,7 @@ def create_ps_letter( pathname_print_out, OP ):
 	except:
 		status = "ERROR"
 		print( "mail/views/create_ps_letter()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "Opening PostScript letter failed: %s" % value
 		print( "%s\n" % msg )
 		return status, msg
@@ -653,7 +666,7 @@ def create_ps_letter( pathname_print_out, OP ):
 	except:
 		status = "ERROR"
 		print( "mail/views/do_print_mailbev()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "Writing PostScript letter failed: %s" % value
 		print( "%s\n" % msg )
 		return status, msg
@@ -664,7 +677,7 @@ def create_ps_letter( pathname_print_out, OP ):
 	except:
 		status = "ERROR"
 		print( "mail/views/do_print_mailbev()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "Closing PostScript letter failed: %s" % value
 		print( "%s\n" % msg )
 		return status, msg
@@ -746,7 +759,7 @@ def print_ps_letter( id, pathname_print_out ):
 	except:
 		status = "ERROR"
 		print( "print_ps_letter()" )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "Printing failed: %s" % value
 		print( "%s\n" % msg )
 		return status, msg
@@ -778,7 +791,7 @@ def update_status_date( id ):
 	except:
 		ret_status = "ERROR"
 		print( "update_status(), id: ", id )
-		type, value, tb = exc_info()
+		etype, value, tb = exc_info()
 		msg = "Updating mail status failed: %s" % value
 		print( "%s\n" % msg )
 		return status, msg

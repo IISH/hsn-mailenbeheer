@@ -4,13 +4,13 @@
 Author:		Fons Laan, KNAW IISH - International Institute of Social History
 Project:	HSN Mail
 Name:		admin.py
-Version:	1.0.0
+Version:	1.0.1
 Goal:		Admin classes for the hsn_mail tables
 
 26-May-2015	Created
 09-Sep-2015	Missing HuwkndAdmin added
 12-Oct-2015	Removed superfluous tables
-17-Mar-2016	Changed
+04-Jul-2017	Mail table new column Aanmaakdatum
 """
 
 
@@ -41,7 +41,7 @@ class HsnKwytAdmin( admin.ModelAdmin ):
 class MailAdmin( admin.ModelAdmin ):
     list_display = ( 'id', 'idnr', 'briefnr', 'aard', 'datum', 'periode', 'gemnr', 'naamgem', 'status', 
 		'printdatum', 'printen', 'ontvdat', 'opmerk', 'opident', 'oppartner', 'opvader', 'opmoeder', 'type', 
-		'infoouders', 'infopartner', 'inforeis' )
+		'infoouders', 'infopartner', 'inforeis', 'aanmaakdatum' )
 
 
 class TekstFaseAAdmin( admin.ModelAdmin ):

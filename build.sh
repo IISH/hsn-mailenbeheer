@@ -103,6 +103,10 @@ else
 fi
 
 
+# Remove the settings file.
+rm "${builddir}/server/hsnmailenbeheer/settings_local.py"
+
+
 # Create the artifact
 mkdir -p target
 package=target/$instance-$version.tar.gz

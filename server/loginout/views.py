@@ -15,7 +15,8 @@ def hsn_logout( request ):
 02-Mar-2016	Created
 17-Mar-2016	@login_required added
 02-Jun-2016	@csrf_exempt only for function hsn_login
-20-Mar-2017	Changed
+26-Feb-2018	LDAP authentication optional
+26-Feb-2018	Changed
 """
 
 # future-0.16.0 imports for Python 2/3 compatibility
@@ -67,20 +68,47 @@ def hsn_login( request ):
 
 #	print( "username:", username )
 #	print( "password:", password )
+
+	do_hsn_authentication = False	# superfluous if  LDAP already fails
 	
 	if username is None or password is None:
-		print( "User: %s NOT LDAP authenticated" % username )
-		status = "LDAP fail"
-		msg    = "LDAP Authentication failure for user %s" % username
+		print( "User: %s NOT authenticated" % username )
+		status = "fail"
+		msg    = "Authentication failure for user %s" % username
 	else:
-		is_ldap_authenticated = ldap_authenticate( username, password )
+		# use ldap?
+		use_ldap = True
+		is_ldap_authenticated = False
+		
+		try:
+			use_ldap = settings.USE_LDAP
+		except:
+			pass
+		
+		if use_ldap:
+			is_ldap_authenticated = ldap_authenticate( username, password )
 		
 		status = msg = ""
-		if is_ldap_authenticated:
-			print( "User: %s LDAP authenticated OK" % username )
-			status = "ok"
-			msg    = "LDAP Authentication OK"
+		if use_ldap:
+			if is_ldap_authenticated:
+				print( "User: %s LDAP authenticated OK" % username )
+				status = "ok"
+				msg    = "LDAP Authentication OK"
+				
+				do_hsn_authentication = True
 			
+			else:
+				print( "User: %s NOT LDAP authenticated" % username )
+				status = "LDAP fail"
+				msg    = "LDAP Authentication failure for user %s" % username
+		else:
+			print( "User: %s Skip LDAP authentication OK" % username )
+			status = "ok"
+			msg    = "LDAP Authentication skipped"
+			
+			do_hsn_authentication = True
+		
+		if do_hsn_authentication:
 			# now check local app login
 			is_hsn_authenticated, is_hsn_active = hsn_authenticate( request, username, password )
 			print( "is_hsn_authenticated: %s, is_hsn_active: %s" % ( is_hsn_authenticated, is_hsn_active ) )
@@ -96,11 +124,6 @@ def hsn_login( request ):
 				status = "HSN fail"
 				msg = "HSN user <b>%s</b> authentication failure" % username
 			
-		else:
-			print( "User: %s NOT LDAP authenticated" % username )
-			status = "LDAP fail"
-			msg    = "LDAP Authentication failure for user %s" % username
-	
 	dictionary = \
 	{
 		"status"    : status,
