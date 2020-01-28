@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Python/Django
+
+# FL-09-Jul-2019
+
+export PYTHON_LOCAL=/usr/local/opt/Python/python-3.7.4
+
+# 2.7.5 is the system python
+#alias python=/usr/bin/python
+alias python=$PYTHON_LOCAL/bin/python3.7
+
+export PYTHON_SITEPACKS=$PYTHON_LOCAL/lib/python3.7/site-packages
+
+export PYTHONPATH=$PYTHON_SITEPACKS
+
+# do not append ${PATH} to avoid mixing python versions
+export PATH=$PYTHON_LOCAL/bin:${PATH_AT_LOGIN}
+
+export LD_LIBRARY_PATH=$PYTHON_LOCAL/lib
+
+# [eof]

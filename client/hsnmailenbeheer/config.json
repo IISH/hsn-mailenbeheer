@@ -41,7 +41,7 @@
   "let" :
   {
     "APPLICATION"  : "hsnmailenbeheer",
-    "QOOXDOO_PATH" : "/home/fons/opt/qooxdoo-5.0.1-sdk",
+    "QOOXDOO_PATH" : "/usr/local/opt/Qooxdoo/qooxdoo-5.0.3-beta",
     "QXTHEME"      : "hsnmailenbeheer.theme.Theme",
     "API_EXCLUDE"  : ["qx.test.*", "${APPLICATION}.theme.*", "${APPLICATION}.test.*"],
     "LOCALES"      : [ "en", "nl" ],
