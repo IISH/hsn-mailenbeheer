@@ -16,7 +16,7 @@
 future == 0.18.2
 Django == 1.11.26				# latest 1.11 version (for Python-2)
 django_extensions == 2.2.5		# latest version for Django-1.11
-django-registration == 2.5.2	# latest version for Django-1.11
+django-registration == 3.1.2	# latest version for Django-1.11
 mysqlclient == 1.4.6			# requires linux mariadb, mariadb-libs, mariadb-devel
 pycups == 1.9.74				# requires linux cups-devel
 python-ldap == 3.2.0			# requires linux openldap-devel; also installed pyasn1-0.4.8 pyasn1-modules-0.2.8
