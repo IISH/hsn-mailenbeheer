@@ -14,7 +14,7 @@
 # $ pip install -r requirements_py2.7.txt
 
 future == 0.18.2
-Django == 1.11.26				# latest 1.11 version (for Python-2)
+Django == 2.2.24				# latest 1.11 version (for Python-2)
 django_extensions == 2.2.5		# latest version for Django-1.11
 django-registration == 2.5.2	# latest version for Django-1.11
 mysqlclient == 1.4.6			# requires linux mariadb, mariadb-libs, mariadb-devel

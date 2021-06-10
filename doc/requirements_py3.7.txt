@@ -10,7 +10,7 @@
 # $ pip install -r requirements_py3.7.txt
 
 future == 0.18.2
-Django == 1.11.2				# to-be-updated for Python-3
+Django == 2.2.24				# to-be-updated for Python-3
 django_extensions == 1.8.0		# to-be-updated for Python-3
 django-registration == 2.2		# to-be-updated for Python-3
 mysqlclient == 1.4.5
