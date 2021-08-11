@@ -204,15 +204,13 @@ qx.Class.define( "hsnmailenbeheer.Application",
     {
         var prot = this.js_location.protocol;
         var host = this.js_location.host;
-        var port = this.js_location.port;
         var wsgi = this.wsgi_path;
         /*
         console.debug( "prot: " + prot );
         console.debug( "host: " + host );
-        console.debug( "port: " + port );
         console.debug( "wsgi: " + wsgi );
         */
-        var url = prot + "//" + host + port + wsgi + path;
+        var url = prot + "//" + host + wsgi + path;
         console.debug( url );
         
         return url;
