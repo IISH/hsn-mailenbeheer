@@ -15,6 +15,6 @@ django_extensions == 1.8.0		# to-be-updated for Python-3
 django-registration == 2.2		# to-be-updated for Python-3
 mysqlclient == 1.4.5
 pycups == 1.9.74				# requires cups-devel
-python-ldap == 3.2.0			# requires linux openldap-devel; also installed pyasn1-0.4.8 pyasn1-modules-0.2.7
+python-ldap == 3.4.0			# requires linux openldap-devel; also installed pyasn1-0.4.8 pyasn1-modules-0.2.7
 
 # [eof]
